@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TravelWell — Destination</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@400;500;600&family=Noto+Sans+Arabic:wght@400;500;600&family=Noto+Naskh+Arabic:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles/tokens.css">
+<link rel="stylesheet" href="styles/shell.css">
+<link rel="stylesheet" href="styles/journey.css">
+<link rel="stylesheet" href="styles/wells.css">
+<style>
+  .dd-hero { position: relative; min-height: 480px; display:flex; align-items:flex-end; overflow:hidden; }
+  .dd-hero__img { position:absolute; inset:0; }
+  .dd-hero__img img { width:100%; height:100%; object-fit:cover; }
+  .dd-hero--stub .dd-hero__img img { filter: saturate(.3) brightness(1.02); }
+  .dd-hero__scrim { position:absolute; inset:0; background: linear-gradient(180deg, rgba(13,20,18,.30) 0%, rgba(13,20,18,.50) 45%, rgba(11,17,15,.92) 100%); }
+  .dd-hero__inner { position:relative; max-width: var(--content-max); margin-inline:auto; padding: 0 var(--gutter) 44px; width:100%; color:#fff; }
+  .dd-hero__country { font-size:13px; letter-spacing:.14em; text-transform:uppercase; opacity:.88; font-weight:600; }
+  .dd-hero__title { font-family:var(--font-display); font-weight:500; font-size:clamp(42px,6vw,76px); line-height:1.02; letter-spacing:-.01em; margin-top:6px; color:#fff; text-shadow:0 2px 8px rgba(11,17,15,.55), 0 6px 36px rgba(11,17,15,.5); }
+  .dd-hero__line { font-family:var(--font-display); font-style:italic; font-size:clamp(18px,2.4vw,24px); color:rgba(255,255,255,.92); margin-top:8px; }
+  .dd-hero__badges { display:flex; gap:10px; margin-top:18px; flex-wrap:wrap; }
+
+  .dd-body { max-width: var(--content-max); margin-inline:auto; padding: 40px var(--gutter) 0; display:grid; grid-template-columns: 1fr 340px; gap: 48px; align-items:start; }
+  .dd-main { min-width:0; }
+  .dd-desc { font-size:19px; line-height:1.7; color:var(--foreground); max-width: 62ch; }
+  .dd-desc + .dd-desc { margin-top:18px; }
+
+  /* provider stacks grouped by Well */
+  .dd-stack { margin-top: 44px; }
+  .dd-stack__head { display:flex; align-items:center; gap:12px; margin-bottom:16px; }
+  .dd-stack__ic { width:42px; height:42px; border-radius:11px; background:var(--secondary); color:var(--primary); display:grid; place-items:center; flex:none; }
+  .dd-stack__name { font-family:var(--font-display); font-weight:600; font-size:21px; }
+  .dd-stack__tag { font-size:13px; color:var(--muted-foreground); }
+  .dd-stack__count { margin-inline-start:auto; font-size:13px; color:var(--muted-foreground); }
+  .dd-pvlist { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  .dd-pv { border:1px solid color-mix(in oklch, var(--primary) 16%, var(--border)); border-inline-start:4px solid var(--primary); border-radius:var(--radius); background:linear-gradient(135deg, var(--secondary), color-mix(in oklch, var(--secondary) 45%, var(--card))); box-shadow:var(--e1); padding:16px 18px; transition:transform .15s, box-shadow .15s; }
+  .dd-pv:hover { transform:translateY(-2px); box-shadow:var(--e2); }
+  .dd-pv__top { display:flex; align-items:flex-start; gap:10px; }
+  .dd-pv__name { font-weight:600; font-size:16px; flex:1; }
+  .dd-pv__tier { font-size:10px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; padding:3px 8px; border-radius:var(--radius-pill); flex:none; }
+  .dd-pv__tier--prime { background:var(--accent); color:var(--accent-foreground); }
+  .dd-pv__tier--vetted { background:var(--secondary); color:var(--secondary-foreground); }
+  .dd-pv__tier--prospective { background:var(--surface-alt); color:var(--muted-foreground); border:1px solid var(--border); }
+  .dd-pv__desc { font-size:14.5px; color:var(--foreground); margin-top:6px; line-height:1.55; }
+  .dd-pv__row { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-top:12px; }
+  .dd-pv__ftc { font-size:11px; color:var(--muted-foreground); display:flex; gap:5px; align-items:flex-start; margin-top:8px; line-height:1.4; }
+  .dd-pv__ftc svg { flex:none; margin-top:1px; }
+
+  /* sidebar */
+  .dd-side { position:sticky; top:88px; display:flex; flex-direction:column; gap:18px; }
+
+  /* Safety Card */
+  .safety-card { border:1px solid var(--border); border-radius:var(--radius-lg); overflow:hidden; box-shadow:var(--e1); background:var(--card); }
+  .safety-card__top { padding:16px 18px; display:flex; align-items:center; gap:12px; color:#fff; }
+  .safety-card__lvl { width:40px; height:40px; border-radius:50%; background:rgba(255,255,255,.22); display:grid; place-items:center; font-family:var(--font-display); font-weight:700; font-size:20px; flex:none; }
+  .safety-card__title { font-weight:700; font-size:12px; letter-spacing:.1em; text-transform:uppercase; opacity:.9; }
+  .safety-card__level-label { font-family:var(--font-display); font-size:18px; font-weight:600; }
+  .safety-card__body { padding:16px 18px; }
+  .safety-row { display:flex; gap:10px; align-items:flex-start; padding:9px 0; font-size:13.5px; }
+  .safety-row + .safety-row { border-top:1px solid var(--border); }
+  .safety-row__ic { color:var(--primary); flex:none; margin-top:1px; }
+  .safety-row__k { color:var(--muted-foreground); }
+  .safety-card__foot { padding:12px 18px; border-top:1px solid var(--border); background:var(--surface-alt); font-size:12px; color:var(--muted-foreground); display:flex; align-items:center; gap:8px; }
+  .safety-card__source { display:flex; align-items:center; gap:6px; }
+
+  .dd-quick { border:1px solid var(--border); border-radius:var(--radius); background:var(--card); box-shadow:var(--e1); padding:18px; }
+  .dd-quick h4 { font-family:var(--font-display); font-weight:600; font-size:17px; margin-bottom:12px; }
+  .dd-quick__row { display:flex; justify-content:space-between; gap:12px; padding:7px 0; font-size:13.5px; }
+  .dd-quick__row + .dd-quick__row { border-top:1px solid var(--border); }
+  .dd-quick__k { color:var(--muted-foreground); }
+  .dd-quick__v { font-weight:600; text-align:end; }
+
+  .dd-addcta { background: var(--secondary); border-radius: var(--radius); padding:18px; text-align:center; }
+  .dd-addcta p { font-size:13.5px; color:var(--secondary-foreground); margin-bottom:12px; }
+
+  /* related */
+  .dd-related { max-width: var(--content-max); margin-inline:auto; padding: 56px var(--gutter) 0; }
+  .dd-related h2 { font-size: var(--t-h2); margin-bottom: 4px; }
+  .dd-related__sub { color:var(--muted-foreground); font-size:15px; margin-bottom:22px; }
+  .dd-rel-grid { display:grid; grid-template-columns: repeat(4,1fr); gap:16px; }
+  .dd-rel { display:flex; flex-direction:column; border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; background:var(--card); box-shadow:var(--e1); text-decoration:none; color:var(--foreground); transition:transform .2s, box-shadow .2s; }
+  .dd-rel:hover { transform:translateY(-3px); box-shadow:var(--e2); text-decoration:none; }
+  .dd-rel__media { position:relative; height:168px; }
+  .dd-rel__media img { width:100%; height:100%; object-fit:cover; }
+  .dd-rel__chip { position:absolute; top:10px; inset-inline-start:10px; font-size:10.5px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; padding:4px 9px; border-radius:var(--radius-pill); }
+  .dd-rel__chip--guide { background:rgba(255,255,255,.92); color:var(--primary); }
+  .dd-rel__chip--nearby { background:var(--accent); color:var(--accent-foreground); }
+  .dd-rel__b { padding:14px 16px; flex:1; display:flex; flex-direction:column; }
+  .dd-rel__t { font-family:var(--font-display); font-weight:600; font-size:16px; line-height:1.22; }
+  .dd-rel__m { font-size:12px; color:var(--muted-foreground); margin-top:8px; display:inline-flex; align-items:center; gap:5px; }
+
+  /* stub notice */
+  .dd-stub-notice { display:flex; gap:12px; align-items:flex-start; background:color-mix(in oklch,var(--safety-3) 12%,white); border:1px solid color-mix(in oklch,var(--safety-3) 30%,white); border-radius:var(--radius); padding:16px 18px; margin-top:24px; }
+  .dd-stub-notice svg { color:oklch(.5 .14 55); flex:none; margin-top:1px; }
+  .dd-stub-notice b { color:var(--foreground); }
+
+  @media (max-width: 900px) { .dd-body { grid-template-columns:1fr; } .dd-side { position:static; } .dd-pvlist { grid-template-columns:1fr; } .dd-rel-grid { grid-template-columns: repeat(2,1fr); } }
+</style>
+</head>
+<body>
+<a href="#main" class="skip-link">Skip to content</a>
+
+<div class="jn-subhead">
+  <div class="jn-subhead__inner">
+    <nav class="jn-crumbs" aria-label="Breadcrumb">
+      <a href="Home.html">Home</a><span class="sep">/</span>
+      <a href="regions.html">Regions</a><span class="sep">/</span>
+      <a id="crumb-region" href="#">Region</a><span class="sep">/</span>
+      <span class="here" id="crumb-dest">Destination</span>
+    </nav>
+  </div>
+</div>
+
+<main id="main"><div id="dd-root"></div></main>
+
+<script src="js/data.js"></script>
+<script src="js/places.js"></script>
+<script src="js/images.js"></script>
+<script src="js/shell.js"></script>
+<script>
+TWW.mountShell({ active: "destinations" });
+const $ = (s,r=document)=>r.querySelector(s);
+const ICON = TWW.ICON;
+const qs = new URLSearchParams(location.search);
+const code = qs.get("r") || "05A";
+const R = TWW.REGIONS.find(r=>r.code===code) || TWW.REGIONS.find(r=>r.code==="05A");
+const list = TWW.DESTINATIONS[R.code] || [];
+let DEST = list.find(d=>d.id===qs.get("d")) || list[0] || { id:"x", name:qs.get("d")||"This place", country:R.name, line:"A destination in "+R.name, status:"stub", img:"mountainValley" };
+if (!DEST.country) DEST.country = R.name;
+
+const allWells = {}; [...TWW.WELLS,...TWW.LUX_WELLS].forEach(w=>allWells[w.id]=w);
+const TIER = { prime:"★ Prime", vetted:"Vetted", prospective:"Prospective" };
+
+// Safety Card data (level 1-4) — for the destination's country
+const SAFETY = {
+  "Kenya":{lvl:2,label:"Exercise increased caution",note:"Some areas near borders advise caution. Maasai Mara & main parks are routinely visited."},
+  "Tanzania":{lvl:1,label:"Exercise normal precautions",note:"Standard travel precautions apply."},
+  "default":{lvl:1,label:"Exercise normal precautions",note:"Standard travel precautions apply for this destination."},
+};
+const SAFE_COLOR = { 1:"var(--safety-1)", 2:"var(--safety-2)", 3:"var(--safety-3)", 4:"var(--safety-4)" };
+
+// related guides — pull real guides (with images), prefer same region/interest
+const relGuides = (function () {
+  const pool = TWW.GUIDES || [];
+  const pref = pool.filter(g => g.region === R.code || ["safari","romance","culinary"].includes(g.si));
+  return (pref.length >= 2 ? pref : pool).slice(0, 2);
+})();
+
+function providersByWell() {
+  // group the catalog providers under their well, take a few each
+  const groups = [];
+  ["stay","activities","eat","move"].forEach(wid=>{
+    const pool = (TWW.PROVIDERS[wid]||[]).slice(0,4);
+    if (pool.length) groups.push({ well: allWells[wid], items: pool });
+  });
+  return groups;
+}
+
+function safetyCard() {
+  const s = SAFETY[DEST.country] || SAFETY.default;
+  const color = SAFE_COLOR[s.lvl];
+  return `<div class="safety-card">
+    <div class="safety-card__top" style="background:${color}">
+      <div class="safety-card__lvl">${s.lvl}</div>
+      <div><div class="safety-card__title">Safety Card · Level ${s.lvl} of 4</div><div class="safety-card__level-label">${s.label}</div></div>
+    </div>
+    <div class="safety-card__body">
+      <div class="safety-row"><span class="safety-row__ic">${ICON("info","ic-sm")}</span><span>${s.note}</span></div>
+      <div class="safety-row"><span class="safety-row__ic">${ICON("hospital","ic-sm")}</span><span><span class="safety-row__k">Nearest hospital surfaced via</span> the Emergency Button</span></div>
+      <div class="safety-row"><span class="safety-row__ic">${ICON("phone","ic-sm")}</span><span><span class="safety-row__k">Local emergency:</span> 999 / 112</span></div>
+    </div>
+    <div class="safety-card__foot">
+      <span class="safety-card__source">${ICON("shield","ic-sm")} Source: government travel advisories</span>
+      <span style="margin-inline-start:auto">Updated Jun 2026</span>
+    </div>
+  </div>`;
+}
+
+function render() {
+  $("#crumb-region").textContent = R.name;
+  $("#crumb-region").href = "region-detail.html?r="+R.code;
+  $("#crumb-dest").textContent = DEST.name;
+  document.title = "TravelWell — " + DEST.name;
+  const stub = DEST.status==="stub";
+
+  const hero = `<section class="dd-hero ${stub?'dd-hero--stub':''}">
+    <div class="dd-hero__img"><img src="${TWW.img(DEST.img,1800)}" alt="" referrerpolicy="no-referrer"></div>
+    <div class="dd-hero__scrim"></div>
+    <div class="dd-hero__inner">
+      <div class="dd-hero__country">${DEST.country} · ${R.name}</div>
+      <h1 class="dd-hero__title">${DEST.name}</h1>
+      <p class="dd-hero__line">${DEST.line}</p>
+      <div class="dd-hero__badges">
+        ${stub?`<span class="pill pill-preview" style="background:rgba(255,255,255,.86)">Preview destination</span>`:`<span class="pill pill-live" style="background:rgba(255,255,255,.92)">Live destination</span>`}
+        <span class="pill pill-engine">In the ${R.name} journey</span>
+      </div>
+    </div>
+  </section>`;
+
+  const groups = providersByWell();
+  const stacks = stub ? "" : groups.map(g=>`
+    <div class="dd-stack">
+      <div class="dd-stack__head">
+        <div class="dd-stack__ic">${ICON(g.well.icon)}</div>
+        <div><div class="dd-stack__name">${g.well.name}</div><div class="dd-stack__tag">${g.well.tag}</div></div>
+        <span class="dd-stack__count">${g.items.length} options</span>
+      </div>
+      <div class="dd-pvlist">
+        ${g.items.map(p=>`<div class="dd-pv">
+          <div class="dd-pv__top"><div class="dd-pv__name">${p.name}</div><span class="dd-pv__tier dd-pv__tier--${p.tier}">${TIER[p.tier]}</span></div>
+          <div class="dd-pv__desc">${p.desc}</div>
+          <div class="dd-pv__row"><button class="btn btn-primary" data-book="${p.name}" data-well="${g.well.id}" style="min-height:38px;padding:0 16px;font-size:13px">Book It</button><span class="pv__mode" style="font-size:11.5px;color:var(--muted-foreground)">${p.mode==='affiliate'?'Opens partner site':'Book in TravelWell'}</span></div>
+          ${p.mode==='affiliate'?`<p class="dd-pv__ftc">${ICON("info","ic-sm")} <span>${p.commission}. We may earn a commission — at no extra cost to you.</span></p>`:``}
+        </div>`).join("")}
+      </div>
+    </div>`).join("");
+
+  const stubNotice = stub ? `<div class="dd-stub-notice">${ICON("info","ic-sm")}<span><b>This destination is a preview.</b> We have it in our taxonomy but haven't finished curating providers here yet. You can still add it to your trip as an idea, and we'll fill it in — or write it in via the Wells step.</span></div>` : "";
+
+  $("#dd-root").innerHTML = hero + `
+    <div class="dd-body">
+      <div class="dd-main">
+        <p class="dd-desc">${DEST.line}. ${stub?'':'Below, everything you need here — grouped by the Wells that matter, with vetted providers and honest pricing.'}</p>
+        ${stubNotice}
+        ${stacks}
+      </div>
+      <aside class="dd-side">
+        ${safetyCard()}
+        <div class="dd-quick">
+          <h4>At a glance</h4>
+          <div class="dd-quick__row"><span class="dd-quick__k">Country</span><span class="dd-quick__v">${D.country}</span></div>
+          <div class="dd-quick__row"><span class="dd-quick__k">Region</span><span class="dd-quick__v">${R.name}</span></div>
+          <div class="dd-quick__row"><span class="dd-quick__k">Gateways</span><span class="dd-quick__v" style="font-family:var(--font-mono);font-size:12px">${R.gateways}</span></div>
+          <div class="dd-quick__row"><span class="dd-quick__k">Status</span><span class="dd-quick__v">${stub?'Preview':'Live'}</span></div>
+        </div>
+        <div class="dd-addcta">
+          <p>Love it here? Add ${DEST.name} to your trip and keep building.</p>
+          <button class="btn btn-primary" style="width:100%" data-add-dest>Add ${DEST.name} to trip</button>
+        </div>
+      </aside>
+    </div>
+
+    <div class="dd-related">
+      <h2>Keep exploring</h2>
+      <p class="dd-related__sub">Guides to read before you go, and nearby places worth adding to your trip.</p>
+      <div class="dd-rel-grid">
+        ${relGuides.map(g=>`<a class="dd-rel" href="guide-detail.html?g=${g.id}">
+          <div class="dd-rel__media"><img src="${TWW.img(g.img,500)}" alt="" loading="lazy" referrerpolicy="no-referrer"><span class="dd-rel__chip dd-rel__chip--guide">Guide</span></div>
+          <div class="dd-rel__b"><div class="dd-rel__t">${g.title}</div><div class="dd-rel__m">${ICON("info","ic-sm")} ${g.read} read</div></div>
+        </a>`).join("")}
+        ${list.filter(d=>d.id!==DEST.id).slice(0,2).map(d=>`<a class="dd-rel" href="destination-detail.html?d=${d.id}&r=${R.code}">
+          <div class="dd-rel__media"><img src="${TWW.img(d.img,500)}" alt="" loading="lazy" referrerpolicy="no-referrer"><span class="dd-rel__chip dd-rel__chip--nearby">Nearby</span></div>
+          <div class="dd-rel__b"><div class="dd-rel__t">${d.name}</div><div class="dd-rel__m">${ICON("pin","ic-sm")} ${d.country}</div></div>
+        </a>`).join("")}
+      </div>
+    </div>
+    <div style="height:80px"></div>`;
+}
+
+document.addEventListener("click",(e)=>{
+  const book = e.target.closest("[data-book]");
+  if (book) { const w=allWells[book.dataset.well]; if(TWW.addToTrip) TWW.addToTrip({well:w.id,icon:w.icon,name:book.dataset.book,meta:`${w.name} · ${DEST.name}`,status:"idea"}); else TWW.toast("Added"); return; }
+  if (e.target.closest("[data-add-dest]")) { if(TWW.addToTrip) TWW.addToTrip({well:"activities",icon:"pin",name:DEST.name,meta:`Destination · ${R.name}`,status:"idea"}); return; }
+});
+
+render();
+</script>
+</body>
+</html>

@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TravelWell — Logo Concepts</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles/tokens.css">
+<style>
+  body { background: #ECE8DE; padding: 0 0 100px; }
+  .lc-head { max-width: 1180px; margin-inline: auto; padding: 56px 32px 36px; }
+  .lc-head .eyebrow { display:block; margin-bottom: 14px; }
+  .lc-head h1 { font-size: clamp(36px, 5vw, 60px); line-height: 1.03; letter-spacing: -.015em; max-width: 18ch; }
+  .lc-head h1 .gold { font-style: italic; color: var(--gold-deep); }
+  .lc-head p { margin-top: 18px; max-width: 64ch; color: var(--muted-foreground); font-size: 17px; line-height: 1.6; }
+  .lc-note { background: var(--card); border:1px solid var(--border); border-left:3px solid var(--accent); border-radius: var(--radius-sm); padding: 14px 18px; font-size: 14px; color: var(--muted-foreground); margin-top: 24px; max-width: 70ch; }
+  .lc-note b { color: var(--foreground); }
+
+  .lc-grid { max-width: 1180px; margin-inline: auto; padding: 0 32px; display: grid; grid-template-columns: 1fr 1fr; gap: 28px; }
+  .lc { background: var(--card); border:1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--e1); }
+  .lc__num { position:absolute; top:16px; inset-inline-start:18px; font-family: var(--font-mono); font-size:12px; letter-spacing:.14em; color: var(--muted-foreground); }
+  .lc__name { position:absolute; top:14px; inset-inline-end:18px; font-size:12px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color: var(--primary); }
+  .lc__stage { position:relative; min-height: 240px; display:grid; place-items:center; padding: 48px 32px; }
+  .lc__stage--dark { background: var(--dark-band); }
+  .lc__stage--ivory { background: var(--background); border-top:1px solid var(--border); }
+  .lc__variants { display:grid; grid-template-columns:1fr 1fr; }
+  .lc__variants .lc__stage { min-height: 150px; padding: 32px; }
+  .lc__variants .lc__stage:first-child { border-inline-end:1px solid var(--border); }
+  .lc__caption { padding: 18px 24px 22px; border-top:1px solid var(--border); }
+  .lc__caption h3 { font-family: var(--font-display); font-weight:600; font-size:20px; }
+  .lc__caption p { font-size:13.5px; color: var(--muted-foreground); margin-top:5px; line-height:1.5; }
+
+  /* shared logo pieces */
+  .logo-row { display:inline-flex; align-items:center; gap:14px; }
+  .wordmark { font-family: var(--font-display); font-weight:600; letter-spacing:-.01em; line-height:1; }
+  .wm-tww { font-family: var(--font-display); font-weight:600; letter-spacing:.02em; }
+  .tag { font-family: var(--font-sans); font-weight:600; letter-spacing:.24em; text-transform:uppercase; }
+  .ink { color: var(--foreground); } .ivory { color: #F7F4EC; } .teal { color: var(--primary); } .gold { color: var(--gold-deep); } .goldlt { color: var(--accent); }
+
+  @media (max-width: 820px){ .lc-grid { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+  <div class="lc-head">
+    <span class="eyebrow">Brand · Logo exploration</span>
+    <h1>Six marks for <span class="gold">TravelWell</span>.</h1>
+    <p>All built only from our system — pine teal, champagne gold, espresso ink on ivory — set in Playfair Display with Inter for the supporting line. Each is shown on light, ivory and dark so you can judge contrast. The motif throughout is <b>the well</b>: concentric rings, a water ripple, a compass, a horizon.</p>
+    <div class="lc-note"><b>How to choose:</b> tell me the number(s) you like. I can refine the winner (spacing, weight, a wordmark lockup, a favicon), then roll it across the nav, footer, sign-in and investor pages. Nothing is applied site-wide yet.</div>
+  </div>
+
+  <div class="lc-grid">
+
+    <!-- 1 — The Well Seal -->
+    <div class="lc">
+      <div class="lc__stage" style="background:var(--background)">
+        <span class="lc__num">01</span><span class="lc__name">The Well Seal</span>
+        <svg width="150" height="150" viewBox="0 0 150 150" role="img" aria-label="TWW well seal">
+          <circle cx="75" cy="75" r="71" fill="none" stroke="var(--primary)" stroke-width="2"/>
+          <circle cx="75" cy="75" r="63" fill="none" stroke="var(--accent)" stroke-width="1.5"/>
+          <circle cx="75" cy="75" r="46" fill="var(--primary)"/>
+          <circle cx="75" cy="75" r="34" fill="none" stroke="rgba(255,255,255,.35)" stroke-width="1"/>
+          <text x="75" y="84" text-anchor="middle" font-family="Playfair Display" font-weight="600" font-size="30" letter-spacing="1" fill="#F7F4EC">TWW</text>
+          <text x="75" y="20" text-anchor="middle" font-family="Inter" font-weight="600" font-size="7" letter-spacing="3" fill="var(--gold-deep)">EST · THE WORLD</text>
+        </svg>
+      </div>
+      <div class="lc__variants">
+        <div class="lc__stage lc__stage--ivory">
+          <div style="text-align:center">
+            <svg width="64" height="64" viewBox="0 0 150 150"><circle cx="75" cy="75" r="71" fill="none" stroke="var(--primary)" stroke-width="3"/><circle cx="75" cy="75" r="46" fill="var(--primary)"/><text x="75" y="86" text-anchor="middle" font-family="Playfair Display" font-weight="600" font-size="32" fill="#F7F4EC">TWW</text></svg>
+          </div>
+        </div>
+        <div class="lc__stage lc__stage--dark">
+          <svg width="64" height="64" viewBox="0 0 150 150"><circle cx="75" cy="75" r="71" fill="none" stroke="var(--accent)" stroke-width="3"/><circle cx="75" cy="75" r="46" fill="none" stroke="var(--accent)" stroke-width="2"/><text x="75" y="86" text-anchor="middle" font-family="Playfair Display" font-weight="600" font-size="32" fill="#F7F4EC">TWW</text></svg>
+        </div>
+      </div>
+      <div class="lc__caption"><h3>The Well Seal</h3><p>A passport-stamp seal: concentric rings (the well, ripples) around a TWW monogram. Authoritative, collectible, instantly a "mark."</p></div>
+    </div>
+
+    <!-- 2 — Ripple W -->
+    <div class="lc">
+      <div class="lc__stage" style="background:var(--background)">
+        <span class="lc__num">02</span><span class="lc__name">The Ripple</span>
+        <svg width="200" height="150" viewBox="0 0 200 150" role="img" aria-label="TravelWell ripple mark">
+          <g fill="none" stroke="var(--primary)" stroke-width="2.4" stroke-linecap="round">
+            <path d="M62 58 L75 92 L88 64 L101 92 L114 58"/>
+          </g>
+          <g fill="none" stroke="var(--accent)" stroke-width="1.6" opacity=".9">
+            <path d="M50 104 Q88 116 126 104"/>
+            <path d="M58 114 Q88 124 118 114"/>
+          </g>
+          <text x="100" y="40" text-anchor="middle" font-family="Playfair Display" font-weight="600" font-size="15" letter-spacing="3" fill="var(--foreground)">TRAVELWELL</text>
+        </svg>
+      </div>
+      <div class="lc__variants">
+        <div class="lc__stage lc__stage--ivory">
+          <div class="logo-row">
+            <svg width="40" height="40" viewBox="0 0 60 60"><path d="M10 22 L20 44 L30 26 L40 44 L50 22" fill="none" stroke="var(--primary)" stroke-width="3" stroke-linecap="round"/><path d="M12 50 Q30 56 48 50" fill="none" stroke="var(--accent)" stroke-width="2"/></svg>
+            <span class="wordmark ink" style="font-size:24px">TravelWell<span class="teal">.</span></span>
+          </div>
+        </div>
+        <div class="lc__stage lc__stage--dark">
+          <div class="logo-row">
+            <svg width="40" height="40" viewBox="0 0 60 60"><path d="M10 22 L20 44 L30 26 L40 44 L50 22" fill="none" stroke="var(--accent)" stroke-width="3" stroke-linecap="round"/><path d="M12 50 Q30 56 48 50" fill="none" stroke="rgba(247,244,236,.6)" stroke-width="2"/></svg>
+            <span class="wordmark ivory" style="font-size:24px">TravelWell<span class="goldlt">.</span></span>
+          </div>
+        </div>
+      </div>
+      <div class="lc__caption"><h3>The Ripple W</h3><p>The "W" drawn as a single brushstroke above water ripples — travel + well in one gesture. Lightest, most editorial; pairs beautifully with the wordmark.</p></div>
+    </div>
+
+    <!-- 3 — Compass Monogram -->
+    <div class="lc">
+      <div class="lc__stage" style="background:var(--background)">
+        <span class="lc__num">03</span><span class="lc__name">The Compass</span>
+        <svg width="150" height="150" viewBox="0 0 150 150" role="img" aria-label="TWW compass monogram">
+          <circle cx="75" cy="75" r="60" fill="none" stroke="var(--primary)" stroke-width="2"/>
+          <g fill="none" stroke="var(--accent)" stroke-width="1.2" opacity=".7">
+            <line x1="75" y1="15" x2="75" y2="27"/><line x1="75" y1="123" x2="75" y2="135"/>
+            <line x1="15" y1="75" x2="27" y2="75"/><line x1="123" y1="75" x2="135" y2="75"/>
+          </g>
+          <path d="M75 30 L92 92 L75 78 L58 92 Z" fill="var(--primary)"/>
+          <path d="M75 120 L58 58 L75 72 L92 58 Z" fill="var(--accent)"/>
+          <circle cx="75" cy="75" r="5" fill="var(--background)" stroke="var(--primary)" stroke-width="2"/>
+        </svg>
+      </div>
+      <div class="lc__variants">
+        <div class="lc__stage lc__stage--ivory">
+          <div class="logo-row">
+            <svg width="44" height="44" viewBox="0 0 150 150"><circle cx="75" cy="75" r="60" fill="none" stroke="var(--primary)" stroke-width="4"/><path d="M75 30 L92 92 L75 78 L58 92 Z" fill="var(--primary)"/><path d="M75 120 L58 58 L75 72 L92 58 Z" fill="var(--accent)"/></svg>
+            <div style="text-align:start"><div class="wm-tww ink" style="font-size:22px">TravelWell<span class="teal">.</span>World</div></div>
+          </div>
+        </div>
+        <div class="lc__stage lc__stage--dark">
+          <svg width="56" height="56" viewBox="0 0 150 150"><circle cx="75" cy="75" r="60" fill="none" stroke="var(--accent)" stroke-width="4"/><path d="M75 30 L92 92 L75 78 L58 92 Z" fill="#F7F4EC"/><path d="M75 120 L58 58 L75 72 L92 58 Z" fill="var(--accent)"/></svg>
+        </div>
+      </div>
+      <div class="lc__caption"><h3>The Compass</h3><p>A compass rose whose needle is teal-and-gold. Says "navigation / journey" without a literal globe. Strong as a standalone app icon.</p></div>
+    </div>
+
+    <!-- 4 — Stacked Monogram -->
+    <div class="lc">
+      <div class="lc__stage" style="background:var(--background)">
+        <span class="lc__num">04</span><span class="lc__name">The Monogram</span>
+        <svg width="160" height="150" viewBox="0 0 160 150" role="img" aria-label="TWW interlocked monogram">
+          <rect x="20" y="24" width="120" height="102" rx="10" fill="none" stroke="var(--accent)" stroke-width="1.5"/>
+          <text x="80" y="92" text-anchor="middle" font-family="Playfair Display" font-weight="700" font-size="58" letter-spacing="-2" fill="var(--primary)">W</text>
+          <text x="48" y="62" text-anchor="middle" font-family="Playfair Display" font-weight="600" font-size="26" fill="var(--gold-deep)">T</text>
+          <text x="112" y="62" text-anchor="middle" font-family="Playfair Display" font-weight="600" font-size="26" fill="var(--gold-deep)">W</text>
+          <text x="80" y="116" text-anchor="middle" font-family="Inter" font-weight="600" font-size="7" letter-spacing="3" fill="var(--muted-foreground)">TRAVELWELL · WORLD</text>
+        </svg>
+      </div>
+      <div class="lc__variants">
+        <div class="lc__stage lc__stage--ivory">
+          <svg width="56" height="56" viewBox="0 0 160 150"><rect x="20" y="24" width="120" height="102" rx="10" fill="var(--primary)"/><text x="80" y="98" text-anchor="middle" font-family="Playfair Display" font-weight="700" font-size="62" fill="#F7F4EC">W</text><text x="46" y="64" text-anchor="middle" font-family="Playfair Display" font-weight="600" font-size="24" fill="var(--accent)">T</text><text x="114" y="64" text-anchor="middle" font-family="Playfair Display" font-weight="600" font-size="24" fill="var(--accent)">W</text></svg>
+        </div>
+        <div class="lc__stage lc__stage--dark">
+          <svg width="56" height="56" viewBox="0 0 160 150"><rect x="20" y="24" width="120" height="102" rx="10" fill="none" stroke="var(--accent)" stroke-width="2"/><text x="80" y="98" text-anchor="middle" font-family="Playfair Display" font-weight="700" font-size="62" fill="#F7F4EC">W</text><text x="46" y="64" text-anchor="middle" font-family="Playfair Display" font-weight="600" font-size="24" fill="var(--accent)">T</text><text x="114" y="64" text-anchor="middle" font-family="Playfair Display" font-weight="600" font-size="24" fill="var(--accent)">W</text></svg>
+        </div>
+      </div>
+      <div class="lc__caption"><h3>The Monogram</h3><p>A serif "TWW" lockup — the two T·W flank a dominant Playfair W. Reads as a heritage maison crest. Most overtly "TWW".</p></div>
+    </div>
+
+    <!-- 5 — Horizon Well -->
+    <div class="lc">
+      <div class="lc__stage" style="background:var(--background)">
+        <span class="lc__num">05</span><span class="lc__name">The Horizon</span>
+        <svg width="150" height="150" viewBox="0 0 150 150" role="img" aria-label="TWW horizon well">
+          <circle cx="75" cy="75" r="58" fill="none" stroke="var(--primary)" stroke-width="2.5"/>
+          <path d="M30 88 Q75 64 120 88" fill="none" stroke="var(--accent)" stroke-width="2.5"/>
+          <circle cx="75" cy="60" r="11" fill="var(--gold-deep)"/>
+          <path d="M30 88 Q75 64 120 88 L120 103 Q75 80 30 103 Z" fill="var(--primary)" opacity=".14"/>
+          <text x="75" y="124" text-anchor="middle" font-family="Inter" font-weight="700" font-size="9" letter-spacing="4" fill="var(--primary)">TWW</text>
+        </svg>
+      </div>
+      <div class="lc__variants">
+        <div class="lc__stage lc__stage--ivory">
+          <div class="logo-row">
+            <svg width="42" height="42" viewBox="0 0 150 150"><circle cx="75" cy="75" r="58" fill="none" stroke="var(--primary)" stroke-width="5"/><path d="M30 90 Q75 64 120 90" fill="none" stroke="var(--accent)" stroke-width="5"/><circle cx="75" cy="60" r="13" fill="var(--gold-deep)"/></svg>
+            <span class="wordmark ink" style="font-size:23px">TravelWell<span class="teal">.</span></span>
+          </div>
+        </div>
+        <div class="lc__stage lc__stage--dark">
+          <svg width="56" height="56" viewBox="0 0 150 150"><circle cx="75" cy="75" r="58" fill="none" stroke="#F7F4EC" stroke-width="4"/><path d="M30 90 Q75 64 120 90" fill="none" stroke="var(--accent)" stroke-width="4"/><circle cx="75" cy="60" r="13" fill="var(--accent)"/></svg>
+        </div>
+      </div>
+      <div class="lc__caption"><h3>The Horizon</h3><p>A sun over a horizon, framed in a ring — calm, aspirational, "travel well." The gold sun is a warm focal point. Soft and welcoming.</p></div>
+    </div>
+
+    <!-- 6 — Wordmark lockup -->
+    <div class="lc">
+      <div class="lc__stage" style="background:var(--background); min-height:240px">
+        <span class="lc__num">06</span><span class="lc__name">The Wordmark</span>
+        <div style="text-align:center">
+          <div class="wordmark ink" style="font-size:40px; line-height:1">Travel<span class="teal">Well</span></div>
+          <div style="display:flex;align-items:center;gap:10px;justify-content:center;margin-top:10px">
+            <span style="height:1px;width:34px;background:var(--accent)"></span>
+            <span class="tag gold" style="font-size:11px">The World</span>
+            <span style="height:1px;width:34px;background:var(--accent)"></span>
+          </div>
+        </div>
+      </div>
+      <div class="lc__variants">
+        <div class="lc__stage lc__stage--ivory">
+          <span class="wordmark ink" style="font-size:26px">Travel<span class="teal">Well</span><span class="gold" style="font-style:italic;font-weight:500">.world</span></span>
+        </div>
+        <div class="lc__stage lc__stage--dark">
+          <span class="wordmark ivory" style="font-size:26px">Travel<span class="goldlt">Well</span><span class="goldlt" style="font-style:italic;font-weight:500">.world</span></span>
+        </div>
+      </div>
+      <div class="lc__caption"><h3>The Wordmark</h3><p>Type-only — "Travel" in ink, "Well" in teal, with an italic gold ".world". Pure editorial confidence; works as the masthead paired with any icon above.</p></div>
+    </div>
+
+  </div>
+</body>
+</html>

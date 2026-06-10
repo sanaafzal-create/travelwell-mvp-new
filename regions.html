@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TravelWell — Where in the world?</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@400;500;600&family=Noto+Sans+Arabic:wght@400;500;600&family=Noto+Naskh+Arabic:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles/tokens.css">
+<link rel="stylesheet" href="styles/shell.css">
+<link rel="stylesheet" href="styles/journey.css">
+<style>
+  .rg-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 16px; }
+  .rg-card { position: relative; border-radius: var(--radius-lg); overflow: hidden; background: var(--surface-alt); border: 1px solid var(--border); cursor: pointer; display: flex; flex-direction: column; padding: 0; text-align: start; font-family: var(--font-sans); transition: transform .25s cubic-bezier(.2,.7,.3,1), box-shadow .25s ease; min-height: 320px; }
+  .rg-card:hover { transform: translateY(-4px); box-shadow: var(--e2); }
+  .rg-card__media { position: relative; height: 188px; overflow: hidden; }
+  .rg-card__media img { width: 100%; height: 100%; object-fit: cover; transition: transform .5s cubic-bezier(.2,.7,.3,1); }
+  .rg-card:hover .rg-card__media img { transform: scale(1.05); }
+  .rg-card__media .scrim { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(15,22,20,.18), rgba(15,22,20,.5)); }
+  .rg-card__code { position: absolute; top: 12px; inset-inline-start: 14px; font-family: var(--font-mono); font-size: 11px; letter-spacing: .14em; color: #fff; background: rgba(20,28,26,.4); backdrop-filter: blur(4px); padding: 4px 9px; border-radius: var(--radius-pill); }
+  .rg-card__top-badge { position: absolute; top: 12px; inset-inline-end: 12px; }
+  .rg-card__name { position: absolute; bottom: 14px; inset-inline: 16px; color: #fff; font-family: var(--font-display); font-weight: 600; font-size: 23px; line-height: 1.08; text-shadow: 0 1px 12px rgba(0,0,0,.4); }
+  .rg-card__body { padding: 16px 18px 18px; display: flex; flex-direction: column; flex: 1; }
+  .rg-card__line { font-family: var(--font-display); font-style: italic; font-size: 15px; color: var(--muted-foreground); }
+  .rg-card__meta { display: flex; gap: 14px; margin-top: 14px; flex-wrap: wrap; }
+  .rg-card__stat { display: flex; flex-direction: column; }
+  .rg-card__stat .k { font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted-foreground); font-weight: 600; }
+  .rg-card__stat .v { font-size: 14px; font-weight: 600; margin-top: 2px; }
+  .rg-card__gw { font-family: var(--font-mono); font-size: 12px; color: var(--muted-foreground); }
+  .rg-card__foot { margin-top: auto; padding-top: 14px; display: flex; align-items: center; justify-content: space-between; }
+  .rg-card__match { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 600; color: var(--primary); }
+  .rg-card__match .dots { display: inline-flex; gap: 3px; }
+  .rg-card__match .dots i { width: 6px; height: 6px; border-radius: 50%; background: var(--border); }
+  .rg-card__match .dots i.on { background: var(--primary); }
+  .rg-card__cta { font-size: 13px; font-weight: 600; color: var(--foreground); display: inline-flex; align-items: center; gap: 5px; }
+  .rg-card--preview .rg-card__media img { filter: saturate(.45); }
+
+  .rg-sub-chip { font-size: 11px; font-weight: 600; background: var(--secondary); color: var(--secondary-foreground); padding: 3px 9px; border-radius: var(--radius-pill); }
+
+  /* jump nav */
+  .rg-jump { display: flex; gap: 6px; flex-wrap: wrap; }
+  .rg-jump button { border: 1px solid var(--border); background: var(--card); border-radius: var(--radius-pill); padding: 7px 13px; font-size: 13px; font-weight: 500; color: var(--foreground); cursor: pointer; font-family: var(--font-sans); transition: background-color .15s, border-color .15s; }
+  .rg-jump button[aria-pressed="true"] { background: var(--foreground); color: var(--background); border-color: var(--foreground); }
+
+  @media (max-width: 900px) { .rg-grid { grid-template-columns: repeat(2,1fr); gap: 14px; } }
+  @media (max-width: 560px) { .rg-grid { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<a href="#main" class="skip-link">Skip to content</a>
+
+<div class="jn-subhead">
+  <div class="jn-subhead__inner">
+    <nav class="jn-crumbs" aria-label="Breadcrumb">
+      <a href="Home.html">Home</a><span class="sep">/</span>
+      <a href="special-interests.html">Special Interests</a><span class="sep">/</span>
+      <span class="here">Regions</span>
+    </nav>
+    <div class="tw-steps" aria-label="Journey progress">
+      <div class="tw-step" data-state="done"><span class="tw-step__dot">1</span><span class="tw-step__label">Interest</span></div>
+      <span class="tw-step__line"></span>
+      <div class="tw-step" data-state="current"><span class="tw-step__dot">2</span><span class="tw-step__label">Region</span></div>
+      <span class="tw-step__line"></span>
+      <div class="tw-step"><span class="tw-step__dot">3</span><span class="tw-step__label">Activities</span></div>
+      <span class="tw-step__line"></span>
+      <div class="tw-step"><span class="tw-step__dot">4</span><span class="tw-step__label">Wells</span></div>
+      <span class="tw-step__line"></span>
+      <div class="tw-step"><span class="tw-step__dot">5</span><span class="tw-step__label">Book It</span></div>
+    </div>
+  </div>
+</div>
+
+<main id="main">
+  <div class="container">
+    <div class="jn-intro">
+      <span class="eyebrow">The Dream Journey · Step 2 of 5</span>
+      <h1>Now — where in the world?</h1>
+      <p class="lead">Thirteen regions, each a different promise. We've ordered them by how well they fit the way you love to travel.</p>
+      <div id="rg-context-slot"></div>
+    </div>
+
+    <div class="jn-toolbar">
+      <div class="rg-jump" role="group" aria-label="Sort regions">
+        <button data-sort="match" aria-pressed="true">Best for your interests</button>
+        <button data-sort="az" aria-pressed="false">A–Z</button>
+        <button data-sort="all" aria-pressed="false">All regions</button>
+      </div>
+      <span class="jn-sweet">
+        <svg class="ic ic-sm" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M3 12h18M12 3c2.5 2.5 2.5 15 0 18M12 3c-2.5 2.5-2.5 15 0 18" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>
+        13 regions · pick one to keep building
+      </span>
+    </div>
+
+    <div class="rg-grid" id="rg-grid"></div>
+  </div>
+</main>
+
+<div class="jn-switch low" id="jn-switch" role="group" aria-label="Preview state" style="position:fixed;inset-block-end:20px;inset-inline-end:20px;z-index:70;background:var(--foreground);color:var(--background);border-radius:var(--radius-pill);padding:7px;display:flex;gap:4px;box-shadow:var(--e3)">
+  <span style="opacity:.5;font-size:10px;letter-spacing:.1em;text-transform:uppercase;padding:0 8px;display:grid;place-items:center">Interests</span>
+  <button data-sis="safari,romance" aria-pressed="true" style="border:0;background:var(--accent);color:var(--foreground);cursor:pointer;font-family:var(--font-sans);font-weight:600;font-size:12.5px;padding:8px 13px;border-radius:var(--radius-pill)">Safari + Romance</button>
+  <button data-sis="culinary,wine" aria-pressed="false" style="border:0;background:none;color:var(--background);opacity:.65;cursor:pointer;font-family:var(--font-sans);font-weight:600;font-size:12.5px;padding:8px 13px;border-radius:var(--radius-pill)">Culinary + Wine</button>
+  <button data-sis="" aria-pressed="false" style="border:0;background:none;color:var(--background);opacity:.65;cursor:pointer;font-family:var(--font-sans);font-weight:600;font-size:12.5px;padding:8px 13px;border-radius:var(--radius-pill)">No interests</button>
+</div>
+
+<script src="js/data.js"></script>
+<script src="js/images.js"></script>
+<script src="js/shell.js"></script>
+<script>
+TWW.mountShell({ active: "regions" });
+const $ = (s,r=document)=>r.querySelector(s);
+const ICON = TWW.ICON;
+
+let chosenSIs = [];
+try {
+  const raw = JSON.parse(localStorage.getItem("tww:journeySIs"));
+  chosenSIs = Array.isArray(raw) && raw.length ? raw : ["safari","romance"];
+} catch(e){ chosenSIs = ["safari","romance"]; }
+// keep the demo coherent: if the loaded set isn't one of the switcher presets, fall back to the default
+const PRESETS = ["safari,romance","culinary,wine",""];
+if (!PRESETS.includes(chosenSIs.join(","))) chosenSIs = ["safari","romance"];
+
+function matchScore(code) {
+  if (!chosenSIs.length) return 0;
+  const aff = TWW.REGION_SI[code] || [];
+  return chosenSIs.reduce((n,si)=> n + (aff.includes(si)?1:0), 0);
+}
+function matchDots(score) {
+  const max = Math.max(1, chosenSIs.length);
+  return `<span class="dots">${Array.from({length:max},(_,i)=>`<i class="${i<score?'on':''}"></i>`).join("")}</span>`;
+}
+
+let sort = "match";
+function regionCard(r) {
+  const score = matchScore(r.code);
+  const strong = score>0 && score===chosenSIs.length;
+  return `<a class="rg-card ${r.status!=='live'?'rg-card--preview':''}" href="region-detail.html?r=${r.code}">
+    <div class="rg-card__media">
+      <img src="${TWW.regionImg(r.code,800)}" alt="" loading="lazy" referrerpolicy="no-referrer">
+      <div class="scrim"></div>
+      <span class="rg-card__code">${r.code}</span>
+      <span class="rg-card__top-badge">${r.status==='live' ? `<span class="pill pill-live" style="background:rgba(255,255,255,.92)">Live</span>` : `<span class="pill pill-preview" style="background:rgba(255,255,255,.86)">Preview</span>`}</span>
+      <span class="rg-card__name">${r.name}</span>
+    </div>
+    <div class="rg-card__body">
+      <span class="rg-card__line">${r.line}</span>
+      <div class="rg-card__meta">
+        <span class="rg-card__stat"><span class="k">Countries</span><span class="v">${r.countries}${r.sub?' · sub-regions':''}</span></span>
+        <span class="rg-card__stat"><span class="k">Gateways</span><span class="v rg-card__gw">${r.gateways}</span></span>
+      </div>
+      <div class="rg-card__foot">
+        ${chosenSIs.length ? `<span class="rg-card__match">${matchDots(score)} ${strong?'Strong match':score>0?'Good match':'Explore'}</span>` : `<span class="rg-card__match" style="color:var(--muted-foreground)">${r.sub?'<span class="rg-sub-chip">Sub-regions</span>':'Discover'}</span>`}
+        <span class="rg-card__cta">Explore ${ICON("arrow","ic-sm")}</span>
+      </div>
+    </div>
+  </a>`;
+}
+
+function renderContext() {
+  const slot = $("#rg-context-slot");
+  if (!chosenSIs.length) {
+    slot.innerHTML = `<div class="jn-context" style="background:var(--surface-alt);border:1px solid var(--border)">
+      <span class="jn-context__ic" style="background:var(--card)">${ICON("info","ic-sm")}</span>
+      <span>No interests chosen yet — showing all regions alphabetically. <a href="special-interests.html" style="font-weight:600">Pick an interest</a> to see your best-fit regions first.</span>
+    </div>`;
+    return;
+  }
+  const names = chosenSIs.map(id=>TWW.SIS.find(s=>s.id===id)?.name).filter(Boolean);
+  slot.innerHTML = `<div class="jn-context">
+    <span class="jn-context__ic">${ICON("compass","ic-sm")}</span>
+    <span><b>Ranked for your interests.</b> Regions that fit ${names.join(" + ")} rise to the top.</span>
+    <span class="lit">${names.map(n=>`<span>${n}</span>`).join("")}</span>
+  </div>`;
+}
+
+function render() {
+  let list = [...TWW.REGIONS];
+  if (sort==="az") list.sort((a,b)=>a.name.localeCompare(b.name));
+  else if (sort==="match" && chosenSIs.length) list.sort((a,b)=> matchScore(b.code)-matchScore(a.code) || a.code.localeCompare(b.code));
+  // "all" keeps canonical order
+  $("#rg-grid").innerHTML = list.map(regionCard).join("");
+}
+
+document.addEventListener("click",(e)=>{
+  const s = e.target.closest(".rg-jump button");
+  if (s) { sort = s.dataset.sort; document.querySelectorAll(".rg-jump button").forEach(b=>b.setAttribute("aria-pressed",String(b===s))); render(); return; }
+  const sw = e.target.closest("#jn-switch button");
+  if (sw) {
+    chosenSIs = sw.dataset.sis ? sw.dataset.sis.split(",") : [];
+    document.querySelectorAll("#jn-switch button").forEach(b=>{ const on=b===sw; b.setAttribute("aria-pressed",String(on)); b.style.background=on?"var(--accent)":"none"; b.style.color=on?"var(--foreground)":"var(--background)"; b.style.opacity=on?"1":".65"; });
+    renderContext(); render(); return;
+  }
+});
+
+function syncSwitch() {
+  const cur = chosenSIs.join(",");
+  document.querySelectorAll("#jn-switch button").forEach(b=>{
+    const on = b.dataset.sis===cur;
+    b.setAttribute("aria-pressed",String(on));
+    b.style.background = on?"var(--accent)":"none";
+    b.style.color = on?"var(--foreground)":"var(--background)";
+    b.style.opacity = on?"1":".65";
+  });
+}
+
+renderContext();
+render();
+syncSwitch();
+</script>
+</body>
+</html>

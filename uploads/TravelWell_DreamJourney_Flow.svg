@@ -1,0 +1,151 @@
+<svg viewBox="0 0 1280 800" xmlns="http://www.w3.org/2000/svg" font-family="&#39;Inter&#39;, system-ui, -apple-system, sans-serif">
+  <defs>
+    
+    <marker id="arrow" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto">
+      <path d="M0 0 L8 4.5 L0 9 Z" fill="#2C6E68"></path>
+    </marker>
+    <marker id="arrowg" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto">
+      <path d="M0 0 L8 4.5 L0 9 Z" fill="#A8873F"></path>
+    </marker>
+  </defs>
+
+  <rect class="ground" x="0" y="0" width="1280" height="800"></rect>
+
+  
+  <text class="eyebrow" x="40" y="44">CORE TRAVELER FLOW · FR-J1 → J7</text>
+  <text class="title" x="40" y="82" font-size="32">The Dream Journey</text>
+  <text class="stone" x="40" y="106" font-size="13">Interest → Place → Need → Plan. One clear next step at every stage; no dead ends; the traveler can always step back up the ladder.</text>
+
+  
+  <g>
+    <line x1="370" y1="149" x2="1108" y2="149" stroke="#C9C2B2" stroke-width="2"></line>
+    
+    <rect class="pillon" x="318" y="132" width="104" height="34" rx="17"></rect>
+    <text class="white" x="370" y="154" text-anchor="middle" font-size="12.5" font-weight="600">1 · Interest</text>
+    <rect class="pilloff" x="568" y="132" width="96" height="34" rx="17"></rect>
+    <text x="616" y="154" text-anchor="middle" font-size="12.5" font-weight="600" fill="#2C6E68">2 · Place</text>
+    <rect class="pilloff" x="816" y="132" width="92" height="34" rx="17"></rect>
+    <text x="862" y="154" text-anchor="middle" font-size="12.5" font-weight="600" fill="#2C6E68">3 · Need</text>
+    <rect class="pilloff" x="1062" y="132" width="92" height="34" rx="17"></rect>
+    <text x="1108" y="154" text-anchor="middle" font-size="12.5" font-weight="600" fill="#2C6E68">4 · Plan</text>
+  </g>
+
+  
+  
+  <g>
+    <rect class="teal" x="24" y="300" width="200" height="120" rx="14"></rect>
+    <text class="white" x="44" y="332" font-size="11" font-weight="700" letter-spacing="0.1em" opacity="0.85">ENTRY POINTS</text>
+    <text class="white" x="44" y="360" font-size="14" font-weight="600">Home · Discover</text>
+    <text class="white" x="44" y="384" font-size="12.5" opacity="0.9">“Get Started” or</text>
+    <text class="white" x="44" y="403" font-size="12.5" opacity="0.9">“Design Your Adventure”</text>
+  </g>
+
+  
+  <g>
+    <rect class="step" x="270" y="300" width="200" height="120" rx="14"></rect>
+    <rect class="teal" x="270" y="300" width="200" height="5" rx="2.5"></rect>
+    <text class="stepno" x="290" y="334">STEP 1 · INTEREST</text>
+    <text class="nodehd" x="290" y="358">Pick an SI</text>
+    <text class="stone" x="290" y="382">Browse all 25 Special</text>
+    <text class="stone" x="290" y="399">Interests · live vs</text>
+    <text class="stone" x="290" y="416">preview clearly distinct</text>
+  </g>
+
+  
+  <g>
+    <rect class="step" x="516" y="300" width="200" height="120" rx="14"></rect>
+    <rect class="teal" x="516" y="300" width="200" height="5" rx="2.5"></rect>
+    <text class="stepno" x="536" y="334">STEP 2 · PLACE</text>
+    <text class="nodehd" x="536" y="358">Pick Region /</text>
+    <text class="nodehd" x="536" y="376">Destination</text>
+    <text class="stone" x="536" y="400">SI × Region view ·</text>
+    <text class="stone" x="536" y="417">cap top 12, 6 at a time</text>
+  </g>
+
+  
+  <g>
+    <rect class="step" x="762" y="300" width="200" height="120" rx="14"></rect>
+    <rect class="teal" x="762" y="300" width="200" height="5" rx="2.5"></rect>
+    <text class="stepno" x="782" y="334">STEP 3 · NEED</text>
+    <text class="nodehd" x="782" y="358">Provider rail</text>
+    <text class="stone" x="782" y="382">Providers grouped by</text>
+    <text class="stone" x="782" y="399">Well · FTC disclosure</text>
+    <text class="stone" x="782" y="416">shown at the CTA</text>
+  </g>
+
+  
+  <g>
+    <rect class="step" x="1008" y="300" width="200" height="120" rx="14"></rect>
+    <rect class="teal" x="1008" y="300" width="200" height="5" rx="2.5"></rect>
+    <text class="stepno" x="1028" y="334">STEP 4 · PLAN</text>
+    <text class="nodehd" x="1028" y="358">Assemble trip</text>
+    <text class="stone" x="1028" y="382">6 time blocks · AI Sync</text>
+    <text class="stone" x="1028" y="399">(labeled AI / rules) ·</text>
+    <text class="stone" x="1028" y="416">Well-gap upsell</text>
+  </g>
+
+  
+  <line x1="224" y1="360" x2="266" y2="360" stroke="#2C6E68" stroke-width="2" marker-end="url(#arrow)"></line>
+  <line x1="470" y1="360" x2="512" y2="360" stroke="#2C6E68" stroke-width="2" marker-end="url(#arrow)"></line>
+  <line x1="716" y1="360" x2="758" y2="360" stroke="#2C6E68" stroke-width="2" marker-end="url(#arrow)"></line>
+  <line x1="962" y1="360" x2="1004" y2="360" stroke="#2C6E68" stroke-width="2" marker-end="url(#arrow)"></line>
+
+  
+  <path d="M1108 300 C1108 250, 370 250, 370 300" fill="none" stroke="#C9C2B2" stroke-width="1.6" stroke-dasharray="5 5" marker-end="url(#arrow)"></path>
+  <text class="stone" x="640" y="246" text-anchor="middle" font-size="11.5" font-style="italic">Back-navigation — step up the SI → Region → Provider ladder anytime, no lost context (FR-J6)</text>
+
+  
+  <line x1="862" y1="420" x2="862" y2="500" stroke="#A8873F" stroke-width="2" marker-end="url(#arrowg)"></line>
+  <g>
+    <rect x="742" y="500" width="240" height="92" rx="12" fill="#FFFFFF" stroke="#C2A35B" stroke-width="1.5"></rect>
+    <rect class="gold" x="742" y="500" width="5" height="92" rx="2.5"></rect>
+    <text class="stepno" x="762" y="528" fill="#A8873F">MONETIZE · FR-M3</text>
+    <text class="ink" x="762" y="550" font-weight="600">Act → /go (tracked hop)</text>
+    <text class="stone" x="762" y="570">→ Partner site · book.</text>
+    <text class="stone" x="762" y="585">Disclosure at source, not /go.</text>
+  </g>
+
+  
+  <line x1="1108" y1="420" x2="1108" y2="500" stroke="#2C6E68" stroke-width="2" marker-end="url(#arrow)"></line>
+  <g>
+    <rect class="teal" x="1008" y="500" width="200" height="92" rx="12"></rect>
+    <text class="white" x="1028" y="528" font-size="11" font-weight="700" letter-spacing="0.1em" opacity="0.85">OUTCOME</text>
+    <text class="white" x="1028" y="552" font-size="14" font-weight="600">Proceed to book</text>
+    <text class="white" x="1028" y="574" font-size="12.5" opacity="0.9">via partner link</text>
+  </g>
+
+  
+  <g>
+    <rect x="24" y="500" width="300" height="92" rx="12" fill="#FFFFFF" stroke="#2C6E68" stroke-width="1.5" stroke-dasharray="6 5"></rect>
+    <rect class="teal" x="24" y="500" width="5" height="92" rx="2.5"></rect>
+    <text class="stepno" x="44" y="528">TRAVEL ID · OPTIONAL, ANYTIME</text>
+    <text class="ink" x="44" y="550" font-weight="600">6-step wizard → Identity Card</text>
+    <text class="stone" x="44" y="570">No account · client-side · edit / reset</text>
+    <text class="stone" x="44" y="585">Feeds personalization →</text>
+  </g>
+  
+  <path d="M124 500 C124 460, 124 440, 124 424" fill="none" stroke="#2C6E68" stroke-width="1.8" stroke-dasharray="6 5" marker-end="url(#arrow)"></path>
+
+  
+  <g>
+    <rect x="350" y="500" width="368" height="92" rx="12" fill="#FBF9F3" stroke="#E7E2D6" stroke-width="1.5"></rect>
+    <text class="stepno" x="370" y="528">PERSONALIZES 4 SURFACES · FR-P1</text>
+    <text class="stone" x="370" y="550">Home “Suggested for you”  ·  SI age-cohort banner</text>
+    <text class="stone" x="370" y="569">Plan seasonal ranking  ·  Itinerary AI sync</text>
+    <text class="stone" x="370" y="585" font-style="italic">All also work gracefully with no profile.</text>
+  </g>
+  <line x1="324" y1="546" x2="346" y2="546" stroke="#2C6E68" stroke-width="1.8" marker-end="url(#arrow)"></line>
+
+  
+  <g>
+    <rect x="24" y="640" width="1184" height="120" rx="14" fill="#211D17" stroke="#211D17"></rect>
+    <text x="48" y="676" font-size="12" font-weight="700" letter-spacing="0.14em" fill="#C2A35B">PERSISTENT ON EVERY SCREEN</text>
+    <text x="48" y="706" font-size="14" font-weight="600" fill="#FFFFFF">“Your Trip” tray</text>
+    <text x="48" y="728" font-size="12.5" fill="#D8D2C6">Live trip-in-progress · continue from anywhere (FR-J5)</text>
+    <text x="450" y="706" font-size="14" font-weight="600" fill="#FFFFFF">Step Indicator</text>
+    <text x="450" y="728" font-size="12.5" fill="#D8D2C6">“Step X of 4” · forward motion always visible</text>
+    <text x="830" y="706" font-size="14" font-weight="600" fill="#FFFFFF">Emergency</text>
+    <text x="830" y="728" font-size="12.5" fill="#D8D2C6">Safety Card essentials one tap away (FR-S3)</text>
+    <text x="48" y="750" font-size="11.5" font-style="italic" fill="#A8A192">Tray + Step Indicator suppressed only on the dedicated itinerary and demo surfaces.</text>
+  </g>
+</svg>

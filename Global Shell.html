@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TravelWell — Global Shell</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@400;500;600&family=Noto+Sans+Arabic:wght@400;500;600&family=Noto+Naskh+Arabic:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles/tokens.css">
+<link rel="stylesheet" href="styles/shell.css">
+<style>
+  .demo-hero { padding: 56px 0 32px; }
+  .demo-hero .eyebrow { display:block; margin-bottom: 14px; }
+  .demo-hero h1 { font-size: clamp(36px,5vw,56px); line-height:1.04; letter-spacing:-.01em; max-width: 18ch; }
+  .demo-hero p { margin-top: 18px; max-width: 60ch; }
+  .panel { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: var(--e1); padding: 28px; margin-bottom: 24px; }
+  .panel > .eyebrow { display:block; margin-bottom: 6px; }
+  .panel > h2 { font-size: 24px; margin-bottom: 6px; }
+  .panel > .desc { color: var(--muted-foreground); font-size: 14.5px; max-width: 72ch; margin-bottom: 20px; }
+  .btn-grid { display:flex; flex-wrap:wrap; gap: 10px; }
+  .btn-grid .btn { font-size: 14px; }
+  .mini { font-size:12px;color:var(--muted-foreground);font-weight:600;letter-spacing:.08em;text-transform:uppercase;margin:18px 0 10px; }
+  .demo-steps { background: var(--surface-alt); border:1px solid var(--border); border-radius: var(--radius); padding: 22px; }
+  .swatch-note { background: var(--surface-alt); border-left:3px solid var(--accent); border-radius: var(--radius-sm); padding: 14px 18px; font-size: 14px; color: var(--muted-foreground); }
+  .swatch-note b { color: var(--foreground); }
+</style>
+</head>
+<body>
+<a href="#main" class="skip-link">Skip to content</a>
+
+<main id="main" class="container">
+  <section class="demo-hero">
+    <span class="eyebrow">Module 1 · Global Shell</span>
+    <h1>The chrome every screen wears.</h1>
+    <p class="t-lead">This is a live sample page wearing the complete shell — the same nav, mega-menu, footer, Concierge, Your-Trip tray, Emergency, Whisper and locale switcher that every screen in Modules 2–8 will inherit from <code style="font-family:var(--font-mono);font-size:13px">shell.js</code>. Use the controls below to exercise every state. Real interactions, not screenshots.</p>
+  </section>
+
+  <div class="panel">
+    <span class="eyebrow">§3.6 · Journey step indicator</span>
+    <h2>Dream Journey progress</h2>
+    <p class="desc">Communicates progress through Special Interest → Region → Activities → Wells / Book It. Shown here mid-journey.</p>
+    <div class="tw-steps">
+      <div class="tw-step" data-state="done"><span class="tw-step__dot">✓</span><span class="tw-step__label">Special Interest</span></div>
+      <span class="tw-step__line"></span>
+      <div class="tw-step" data-state="done"><span class="tw-step__dot">✓</span><span class="tw-step__label">Region</span></div>
+      <span class="tw-step__line"></span>
+      <div class="tw-step" data-state="current"><span class="tw-step__dot">3</span><span class="tw-step__label">Activities</span></div>
+      <span class="tw-step__line"></span>
+      <div class="tw-step" data-state="todo"><span class="tw-step__dot">4</span><span class="tw-step__label">The Wells</span></div>
+      <span class="tw-step__line"></span>
+      <div class="tw-step" data-state="todo"><span class="tw-step__dot">5</span><span class="tw-step__label">Book It</span></div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <span class="eyebrow">§3.2 · The Concierge — “Talk to Me”</span>
+    <h2>Every Concierge state</h2>
+    <p class="desc">A non-destructive side panel — the page stays behind it. Type or talk; read, hear, or both (persisted). Knows your SI, region, Travel ID and trip-so-far. Tap any state:</p>
+    <div class="btn-grid">
+      <button class="btn btn-primary" onclick="openC('primer')">First-use primer</button>
+      <button class="btn btn-secondary" onclick="openC('guided')">Guided First-Trip</button>
+      <button class="btn btn-secondary" onclick="openC('conversation')">Active chat</button>
+      <button class="btn btn-secondary" onclick="openC('thinking')">Thinking / streaming</button>
+      <button class="btn btn-secondary" onclick="openC('listening')">Listening (voice in)</button>
+      <button class="btn btn-secondary" onclick="openC('speaking')">Speaking (voice out)</button>
+      <button class="btn btn-secondary" onclick="openC('recommending')">Recommending (5-set)</button>
+      <button class="btn btn-secondary" onclick="openC('acting')">Acting / navigating</button>
+      <button class="btn btn-secondary" onclick="openC('stopped')">Stopped (graceful)</button>
+      <button class="btn btn-secondary" onclick="openC('degraded')">Degraded / offline</button>
+      <button class="btn btn-secondary" onclick="openC('error')">Error</button>
+    </div>
+  </div>
+
+  <div class="panel">
+    <span class="eyebrow">§3.3 · Your-Trip tray &nbsp;·&nbsp; §3.4 Emergency &nbsp;·&nbsp; §3.5 Whisper</span>
+    <h2>The always-there systems</h2>
+    <p class="desc">North-Star trip tray (empty / in-progress / just-added), the globally-reachable Emergency with GPS→itinerary fallback, and gentle dismissible Whispers on a traveler-controlled dial.</p>
+    <div class="mini">Your-Trip tray</div>
+    <div class="btn-grid">
+      <button class="btn btn-secondary" data-tw-tray>Open tray (in-progress)</button>
+      <button class="btn btn-secondary" onclick="emptyTrip()">Show empty state</button>
+      <button class="btn btn-secondary" onclick="addDemo()">Simulate “just added”</button>
+    </div>
+    <div class="mini">Emergency</div>
+    <div class="btn-grid">
+      <button class="btn btn-secondary" data-tw-emergency>Open Emergency</button>
+    </div>
+    <div class="mini">Whisper + dial</div>
+    <div class="btn-grid">
+      <button class="btn btn-secondary" onclick="TWW.showWhisper('pacing')">Comfort & Pacing</button>
+      <button class="btn btn-secondary" onclick="TWW.showWhisper('together')">Together-Time</button>
+      <button class="btn btn-secondary" onclick="TWW.showWhisper('timeblock')">Time-block idea</button>
+    </div>
+    <div class="tw-dial" style="margin-top:16px;max-width:420px">
+      <label class="mini" style="margin:0 0 8px">Whisper frequency dial</label>
+      <div class="tw-dial__track" id="dial">
+        <button class="tw-dial__opt" data-dial="often">Often</button>
+        <button class="tw-dial__opt" data-dial="rare" aria-pressed="true">Rare</button>
+        <button class="tw-dial__opt" data-dial="off">Off</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <span class="eyebrow">§3.1 · §11 · Locale & RTL</span>
+    <h2>Nine languages, full Arabic mirror</h2>
+    <p class="desc">Launch tier EN / ES / AR / ZH; the rest staged. Switching to Arabic flips the entire shell to RTL and swaps in Noto Sans / Naskh Arabic. Try it from the globe in the header, or here:</p>
+    <div class="btn-grid">
+      <button class="btn btn-secondary" onclick="TWW.setLocale('en')">English (LTR)</button>
+      <button class="btn btn-gold" onclick="TWW.setLocale('ar')">العربية — flip to RTL</button>
+      <button class="btn btn-secondary" onclick="TWW.setLocale('zh')">中文</button>
+    </div>
+    <p class="swatch-note" style="margin-top:18px"><b>Also try:</b> the “Worlds of Adventure” mega-menu in the header (full IA), the skip-to-content link (Tab from the very top), and resize the window — the nav collapses to a burger that opens the mega-menu as a sheet.</p>
+  </div>
+
+  <div class="demo-steps">
+    <span class="eyebrow">What's next</span>
+    <h2 class="t-h3" style="margin:6px 0 10px">Module 2 — Entry & Onboarding</h2>
+    <p class="t-body" style="color:var(--muted-foreground);max-width:68ch">Once you've signed off on this shell, I'll build the Home page and the full Sign-Up → Travel ID → Activation flow on top of it — every state, mobile-first, RTL-ready.</p>
+  </div>
+</main>
+
+<script src="js/data.js"></script>
+<script src="js/shell.js"></script>
+<script>
+  TWW.mountShell({ active: "" });
+  function openC(state){ TWW.closeAll(); document.querySelector('#tw-concierge').dataset.open='true'; TWW.conciergeState(state); }
+  function emptyTrip(){ TWW.trip = []; try{localStorage.setItem('tww:trip','[]')}catch(e){} TWW.renderTray(); TWW.closeAll(); document.querySelector('#tw-tray').dataset.open='true'; }
+  function addDemo(){ TWW.addToTrip({ well:'eat', icon:'utensils', name:'Dinner at a Mara bush camp', meta:'Eat-Well · added', status:'idea' }); document.querySelector('#tw-tray').dataset.open='true'; }
+  // dial
+  document.querySelectorAll('[data-dial]').forEach(b=>b.addEventListener('click',()=>{
+    document.querySelectorAll('[data-dial]').forEach(x=>x.setAttribute('aria-pressed','false'));
+    b.setAttribute('aria-pressed','true');
+    try{localStorage.setItem('tww:whisperDial',JSON.stringify(b.dataset.dial))}catch(e){}
+    TWW.toast('Whisper dial · '+b.textContent);
+  }));
+  (function(){ const d=(function(){try{return JSON.parse(localStorage.getItem('tww:whisperDial'))}catch(e){return 'rare'}})()||'rare';
+    document.querySelectorAll('[data-dial]').forEach(x=>x.setAttribute('aria-pressed', x.dataset.dial===d?'true':'false')); })();
+</script>
+</body>
+</html>

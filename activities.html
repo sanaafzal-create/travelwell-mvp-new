@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TravelWell — What excites you?</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@400;500;600&family=Noto+Sans+Arabic:wght@400;500;600&family=Noto+Naskh+Arabic:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles/tokens.css">
+<link rel="stylesheet" href="styles/shell.css">
+<link rel="stylesheet" href="styles/journey.css">
+<style>
+  .ac-layout { display: grid; grid-template-columns: 1fr 312px; gap: 36px; align-items: start; }
+  .ac-groups { min-width: 0; }
+  .ac-group { margin-bottom: 40px; }
+  .ac-group__head { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+  .ac-group__head > div { flex: 1; min-width: 0; }
+  .ac-group__accent { width: 6px; height: 26px; border-radius: 3px; flex: none; }
+  .ac-group__title { font-family: var(--font-display); font-weight: 600; font-size: 22px; }
+  .ac-group__sig { font-style: italic; color: var(--muted-foreground); font-size: 14.5px; }
+
+  .ac-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+  .ac-card { position: relative; border: 1px solid color-mix(in oklch, var(--accent) 45%, var(--border)); border-radius: var(--radius); background: linear-gradient(150deg, color-mix(in oklch, var(--accent) 7%, var(--card)), var(--card)); padding: 16px; cursor: pointer; text-align: start; font-family: var(--font-sans); transition: border-color .15s, background-color .15s, transform .15s; display: flex; flex-direction: column; gap: 8px; min-height: 128px; }
+  .ac-card:hover { border-color: var(--accent); transform: translateY(-2px); box-shadow: var(--e1); }
+  .ac-card[aria-pressed="true"], .ac-card.is-selected { border-color: var(--primary); background: var(--secondary); }
+  .ac-card__check { position: absolute; top: 12px; inset-inline-end: 12px; width: 24px; height: 24px; border-radius: 50%; border: 1.5px solid var(--border); display: grid; place-items: center; color: #fff; transition: background-color .15s, border-color .15s; }
+  .ac-card[aria-pressed="true"] .ac-card__check, .ac-card.is-selected .ac-card__check { background: var(--primary); border-color: var(--primary); }
+  .ac-card__check svg { opacity: 0; }
+  .ac-card[aria-pressed="true"] .ac-card__check svg, .ac-card.is-selected .ac-card__check svg { opacity: 1; }
+  .ac-card__name { font-weight: 600; font-size: 15px; line-height: 1.25; padding-inline-end: 28px; }
+  .ac-card__line { font-size: 13px; color: var(--foreground); line-height: 1.45; flex: 1; opacity: .8; }
+  .ac-card__well { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 600; color: var(--primary); background: var(--card); border: 1px solid color-mix(in oklch, var(--accent) 40%, var(--border)); border-radius: var(--radius-pill); padding: 3px 9px; align-self: flex-start; }
+  .ac-card[aria-pressed="true"] .ac-card__well, .ac-card.is-selected .ac-card__well { background: var(--card); }
+
+  /* sidebar — how picks map to Wells */
+  .ac-side { position: sticky; top: 88px; }
+  .ac-side__card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--e1); overflow: hidden; }
+  .ac-side__head { padding: 16px 18px; border-bottom: 1px solid var(--border); }
+  .ac-side__head h3 { font-family: var(--font-display); font-weight: 600; font-size: 17px; }
+  .ac-side__head p { font-size: 12.5px; color: var(--muted-foreground); margin-top: 2px; }
+  .ac-side__body { padding: 14px 18px; }
+  .ac-well-row { display: flex; align-items: center; gap: 12px; padding: 9px 0; }
+  .ac-well-row + .ac-well-row { border-top: 1px solid var(--border); }
+  .ac-well-row__ic { width: 34px; height: 34px; border-radius: 9px; background: var(--surface-alt); color: var(--muted-foreground); display: grid; place-items: center; flex: none; transition: background-color .2s, color .2s; }
+  .ac-well-row.lit .ac-well-row__ic { background: var(--secondary); color: var(--primary); }
+  .ac-well-row__name { font-weight: 600; font-size: 14px; flex: 1; }
+  .ac-well-row.lit .ac-well-row__name { color: var(--foreground); }
+  .ac-well-row:not(.lit) { opacity: .5; }
+  .ac-well-row__count { font-size: 12px; font-weight: 700; color: var(--primary); background: var(--secondary); border-radius: var(--radius-pill); min-width: 22px; height: 22px; padding: 0 7px; display: grid; place-items: center; }
+  .ac-side__empty { text-align: center; padding: 18px 8px; color: var(--muted-foreground); font-size: 13px; }
+  .ac-side__foot { border-top: 1px solid var(--border); padding: 14px 18px; }
+  .ac-side__foot .btn { width: 100%; }
+  .ac-summary { font-size: 12.5px; color: var(--muted-foreground); text-align: center; margin-top: 10px; }
+
+  @media (max-width: 980px) { .ac-layout { grid-template-columns: 1fr; } .ac-side { position: static; } .ac-grid { grid-template-columns: repeat(2,1fr); } }
+  @media (max-width: 560px) { .ac-grid { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<a href="#main" class="skip-link">Skip to content</a>
+
+<div class="jn-subhead">
+  <div class="jn-subhead__inner">
+    <nav class="jn-crumbs" aria-label="Breadcrumb">
+      <a href="Home.html">Home</a><span class="sep">/</span>
+      <a href="special-interests.html">Interests</a><span class="sep">/</span>
+      <a href="regions.html">Regions</a><span class="sep">/</span>
+      <span class="here">Activities</span>
+    </nav>
+    <div class="tw-steps" aria-label="Journey progress">
+      <div class="tw-step" data-state="done"><span class="tw-step__dot">1</span><span class="tw-step__label">Interest</span></div>
+      <span class="tw-step__line"></span>
+      <div class="tw-step" data-state="done"><span class="tw-step__dot">2</span><span class="tw-step__label">Region</span></div>
+      <span class="tw-step__line"></span>
+      <div class="tw-step" data-state="current"><span class="tw-step__dot">3</span><span class="tw-step__label">Activities</span></div>
+      <span class="tw-step__line"></span>
+      <div class="tw-step"><span class="tw-step__dot">4</span><span class="tw-step__label">Wells</span></div>
+      <span class="tw-step__line"></span>
+      <div class="tw-step"><span class="tw-step__dot">5</span><span class="tw-step__label">Book It</span></div>
+    </div>
+  </div>
+</div>
+
+<main id="main">
+  <div class="container">
+    <div class="jn-intro">
+      <span class="eyebrow">The Dream Journey · Step 3 of 5</span>
+      <h1>What excites you most?</h1>
+      <p class="lead">Pick the moments you're dreaming of. Each one quietly pre-fills the right Well with matched providers — so the next step is already half-done.</p>
+      <div id="ac-context-slot"></div>
+    </div>
+
+    <div class="ac-layout">
+      <div class="ac-groups" id="ac-groups"></div>
+
+      <aside class="ac-side">
+        <div class="ac-side__card">
+          <div class="ac-side__head">
+            <h3>How your picks map</h3>
+            <p>Every activity fills a Well for you.</p>
+          </div>
+          <div class="ac-side__body" id="ac-side-body"></div>
+          <div class="ac-side__foot">
+            <a class="btn btn-primary" id="ac-continue" href="#">Continue to Wells →</a>
+            <div class="ac-summary" id="ac-summary">Pick a few to begin</div>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </div>
+</main>
+
+<script src="js/data.js"></script>
+<script src="js/places.js"></script>
+<script src="js/images.js"></script>
+<script src="js/shell.js"></script>
+<script>
+TWW.mountShell({ active: "" });
+const $ = (s,r=document)=>r.querySelector(s);
+const ICON = TWW.ICON;
+const qs = new URLSearchParams(location.search);
+const code = qs.get("r") || "05A";
+const R = TWW.REGIONS.find(r=>r.code===code) || TWW.REGIONS.find(r=>r.code==="05A");
+
+let chosenSIs = [];
+try {
+  const raw = JSON.parse(localStorage.getItem("tww:journeySIs"));
+  chosenSIs = Array.isArray(raw) && raw.length ? raw : ["safari","romance"];
+} catch(e){ chosenSIs = ["safari","romance"]; }
+// only keep SIs we have activities for; fall back to safari+romance
+chosenSIs = chosenSIs.filter(id=>TWW.ACTIVITIES[id]);
+if (!chosenSIs.length) chosenSIs = ["safari","romance"];
+
+const WELL_NAME = {}; const WELL_ICON = {};
+[...TWW.WELLS, ...TWW.LUX_WELLS].forEach(w=>{ WELL_NAME[w.id]=w.name; WELL_ICON[w.id]=w.icon; });
+
+let selected = new Set();
+
+function renderContext() {
+  const names = chosenSIs.map(id=>TWW.SIS.find(s=>s.id===id)?.name).filter(Boolean);
+  $("#ac-context-slot").innerHTML = `<div class="jn-context">
+    <span class="jn-context__ic">${ICON("compass","ic-sm")}</span>
+    <span><b>${names.join(" + ")}</b> in <b>${R.name}</b>. Here's what you can do.</span>
+  </div>`;
+}
+
+function renderGroups() {
+  $("#ac-groups").innerHTML = chosenSIs.map(siId=>{
+    const si = TWW.SIS.find(s=>s.id===siId);
+    const acts = TWW.ACTIVITIES[siId] || [];
+    return `<section class="ac-group">
+      <div class="ac-group__head">
+        <span class="ac-group__accent" style="background:${si.accent}"></span>
+        <div><div class="ac-group__title">${si.name}</div><div class="ac-group__sig">${si.sig}</div></div>
+      </div>
+      <div class="ac-grid">
+        ${acts.map(act=>{
+          const key = siId+":"+act.id;
+          const on = selected.has(key);
+          return `<button class="ac-card${on?' is-selected':''}" data-act="${key}" data-well="${act.well}" aria-pressed="${on}">
+            <span class="ac-card__check">${ICON("check","ic-sm")}</span>
+            <span class="ac-card__name">${act.name}</span>
+            <span class="ac-card__line">${act.line}</span>
+            <span class="ac-card__well">${ICON(WELL_ICON[act.well]||'compass','ic-sm')} ${WELL_NAME[act.well]}</span>
+          </button>`;
+        }).join("")}
+      </div>
+    </section>`;
+  }).join("");
+}
+
+function wellCounts() {
+  const counts = {};
+  selected.forEach(key=>{
+    const [siId,actId] = key.split(":");
+    const act = (TWW.ACTIVITIES[siId]||[]).find(a=>a.id===actId);
+    if (act) counts[act.well] = (counts[act.well]||0)+1;
+  });
+  return counts;
+}
+
+function renderSide() {
+  const counts = wellCounts();
+  const body = $("#ac-side-body");
+  // show the standard 10 wells (+ lux if any lux activity chosen)
+  const luxNeeded = Object.keys(counts).some(w=>["nanny","security"].includes(w));
+  const wells = [...TWW.WELLS, ...(luxNeeded?TWW.LUX_WELLS:[])];
+  if (selected.size===0) {
+    body.innerHTML = `<div class="ac-side__empty">${ICON("compass")}<div style="margin-top:8px">Select activities and watch your Wells light up.</div></div>`;
+  } else {
+    body.innerHTML = wells.map(w=>{
+      const c = counts[w.id]||0;
+      return `<div class="ac-well-row ${c>0?'lit':''}">
+        <span class="ac-well-row__ic">${ICON(w.icon)}</span>
+        <span class="ac-well-row__name">${w.name}</span>
+        ${c>0?`<span class="ac-well-row__count">${c}</span>`:''}
+      </div>`;
+    }).join("");
+  }
+  const litWells = Object.keys(counts).length;
+  $("#ac-summary").textContent = selected.size===0 ? "Pick a few to begin" : `${selected.size} activit${selected.size===1?'y':'ies'} → ${litWells} Well${litWells===1?'':'s'} pre-filled`;
+}
+
+function render() { renderGroups(); renderSide(); }
+
+document.addEventListener("click",(e)=>{
+  const card = e.target.closest("[data-act]");
+  if (card) {
+    const key = card.dataset.act;
+    if (selected.has(key)) selected.delete(key); else selected.add(key);
+    const isOn = selected.has(key);
+    card.setAttribute("aria-pressed", String(isOn));
+    card.classList.toggle("is-selected", isOn);
+    renderSide();
+    return;
+  }
+});
+
+$("#ac-continue").addEventListener("click",(e)=>{
+  e.preventDefault();
+  if (selected.size===0) { TWW.toast("Pick at least one activity — or skip to browse all Wells"); }
+  try { localStorage.setItem("tww:journeyActs", JSON.stringify([...selected])); } catch(e){}
+  location.href = "wells-surface.html?r="+R.code;
+});
+
+renderContext();
+render();
+</script>
+</body>
+</html>

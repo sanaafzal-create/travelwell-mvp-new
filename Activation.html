@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TravelWell — Finish setting up</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@400;500;600&family=Noto+Sans+Arabic:wght@400;500;600&family=Noto+Naskh+Arabic:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles/tokens.css">
+<link rel="stylesheet" href="styles/shell.css">
+<link rel="stylesheet" href="styles/onboarding.css">
+</head>
+<body>
+<a href="#main" class="skip-link">Skip to content</a>
+
+<main id="main">
+  <div class="act">
+    <div class="act__head">
+      <span class="eyebrow">Activation · Finish setting up</span>
+      <h1 id="act-greet">You're almost there, Amara.</h1>
+      <p>Four quick switches — each one optional. Turn on what helps; skip the rest. You can change any of these later in Profile.</p>
+      <div class="act__dots" id="act-dots" aria-hidden="true"></div>
+    </div>
+    <div class="act__card" id="act-card"></div>
+  </div>
+</main>
+
+<script src="js/data.js"></script>
+<script src="js/images.js"></script>
+<script src="js/shell.js"></script>
+<script>
+TWW.mountShell({ active: "", footer: false });
+const $ = (s,r=document)=>r.querySelector(s);
+const ICON = TWW.ICON;
+
+const A = {
+  step: 0,
+  email: "amara@email.com",
+  results: { verify:null, location:null, channel:null, whisper:null }, // value or 'skipped'
+  channel: "email",
+  whisper: "rare",
+};
+const STEPS = ["verify","location","channel","whisper"];
+const STEP_LABELS = ["Email","Safety","Contact","Pace","Done"];
+const NEXT_LABELS = ["Next: Safety","Next: Contact","Next: Your pace"]; // for steps 1→3
+
+function renderDots() {
+  $("#act-dots").innerHTML = STEPS.concat(["done"]).map((_,i)=>{
+    const st = i < A.step ? "done" : i === A.step ? "current" : "todo";
+    return `<span class="act__dot-wrap"><span class="act__dot" data-state="${st}"></span><span class="act__dot-lbl" data-state="${st}">${STEP_LABELS[i]}</span></span>`;
+  }).join("");
+}
+
+/* ---------- step renderers ---------- */
+function verifyStep() {
+  const done = A.results.verify === "verified";
+  return card({
+    eyebrow:"Step 1 of 4 · Secure your account",
+    ic:"message",
+    title:"Verify your email",
+    why:`We sent a one-tap magic link to confirm it's you. Verifying secures your trip and lets you pick up where you left off on any device — <b>still no password</b>.`,
+    inner:`
+      <div class="act-mail">
+        <div class="act-mail__ic">${ICON("message")}</div>
+        <div><div class="act-mail__from">TravelWell.World</div><div class="act-mail__sub">Confirm your email to secure your trip</div></div>
+        <div class="act-mail__to">to<br>${A.email}</div>
+      </div>
+      ${done ? `<div class="act-result act-result--ok">${ICON("check","ic-sm")} Email verified — you're secured.</div>` : ``}`,
+    foot: done
+      ? `<button class="act__skip" data-act="back">← Back</button><button class="btn btn-primary" data-act="next">Continue · <span class="act__next">${NEXT_LABELS[0]}</span> →</button>`
+      : `<button class="act__skip" data-act="resend">Resend link</button>
+         <div style="display:flex;gap:10px"><button class="btn btn-secondary" data-act="changeemail">Change email</button><button class="btn btn-primary" data-act="verified">I've verified ✓</button></div>`,
+  });
+}
+
+function locationStep() {
+  const r = A.results.location;
+  return card({
+    eyebrow:"Step 2 of 4 · Safety",
+    ic:"pin",
+    title:"Turn on location for the Emergency Button",
+    why:`If anything ever goes wrong, the Emergency Button surfaces the <b>nearest hospital, your embassy and the local emergency number</b> — instantly. Prefer not to share live location? We'll use your itinerary's city instead.`,
+    inner: r ? resultBox(
+        r==="granted" ? "Location on — Emergency is ready to find help near you." :
+        r==="itinerary" ? "We'll use your itinerary's city for Emergency. You can switch to live location anytime." :
+        "Skipped — Emergency will ask for your location only if you ever need it.",
+        r!=="skipped")
+      : `<div class="act-opts">
+          <button class="act-opt" data-loc="granted"><span class="act-opt__ic">${ICON("pin")}</span><span><span class="act-opt__t">Allow live location</span><span class="act-opt__s">Most accurate help, only used for Emergency &amp; safety.</span></span><span class="act-opt__arrow">${ICON("arrow","ic-sm")}</span></button>
+          <button class="act-opt" data-loc="itinerary"><span class="act-opt__ic">${ICON("compass")}</span><span><span class="act-opt__t">Use my itinerary instead</span><span class="act-opt__s">We'll use the city you're visiting — no live tracking.</span></span><span class="act-opt__arrow">${ICON("arrow","ic-sm")}</span></button>
+          <button class="act-opt act-opt--ghost" data-loc="skipped"><span class="act-opt__ic">${ICON("close")}</span><span><span class="act-opt__t">Not now</span><span class="act-opt__s">Decide later in Profile.</span></span></button>
+        </div>`,
+    foot: r
+      ? `<button class="act__skip" data-act="back">← Back</button><button class="btn btn-primary" data-act="next">Continue · <span class="act__next">${NEXT_LABELS[1]}</span> →</button>`
+      : `<button class="act__skip" data-act="back">← Back</button><button class="act__skip" data-act="skip">Skip this step</button>`,
+  });
+}
+
+function channelStep() {
+  const opts = [
+    { v:"email", t:"Email", s:"Quietly, in your inbox", ic:"message" },
+    { v:"sms", t:"SMS", s:"Time-sensitive only", ic:"phone" },
+    { v:"both", t:"Both", s:"Belt and braces", ic:"check" },
+  ];
+  return card({
+    eyebrow:"Step 3 of 4 · Staying in touch",
+    ic:"message",
+    title:"How should we reach you?",
+    why:`Only what matters for your trip — booking confirmations, a price drop you asked about, a safety note for your destination. <b>Never marketing spam.</b>`,
+    inner:`<div class="act-channels" role="group" aria-label="Notification channel">
+        ${opts.map(o=>`<button class="act-channel" data-channel="${o.v}" aria-pressed="${A.channel===o.v}">
+          <span class="act-channel__ic">${ICON(o.ic)}</span>
+          <div class="act-channel__t">${o.t}</div><div class="act-channel__s">${o.s}</div>
+        </button>`).join("")}
+      </div>
+      <p class="fld__hint" style="margin-top:14px">${ICON("info","ic-sm")} Children in your party are never notified. A partner can set their own channel from Profile.</p>`,
+    foot:`<button class="act__skip" data-act="back">← Back</button><button class="btn btn-primary" data-act="next">Continue · <span class="act__next">${NEXT_LABELS[2]}</span> →</button>`,
+  });
+}
+
+function whisperStep() {
+  const opts = [
+    { v:"often", t:"Often", s:"A gentle idea most times I visit." },
+    { v:"rare", t:"Rare", s:"Only when it really helps. (Recommended)" },
+    { v:"off", t:"Off", s:"No Whispers — I'll ask if I want one." },
+  ];
+  return card({
+    eyebrow:"Step 4 of 4 · Your pace",
+    ic:"sun",
+    title:"Gentle nudges — how often?",
+    why:`Whispers are soft, dismissible suggestions — a free hour to slow down, a sunset you both have open. <b>You set the volume</b>, and can change it anytime.`,
+    inner:`<div class="act-dial" role="group" aria-label="Whisper frequency">
+        ${opts.map(o=>`<button class="act-dial__opt" data-whisper="${o.v}" aria-pressed="${A.whisper===o.v}">
+          <span class="act-dial__radio"></span>
+          <span><span class="act-dial__t">${o.t}</span><span class="act-dial__s">${o.s}</span></span>
+        </button>`).join("")}
+      </div>`,
+    foot:`<button class="act__skip" data-act="back">← Back</button><button class="btn btn-primary" data-act="finish">Finish setup →</button>`,
+  });
+}
+
+function doneStep() {
+  const rows = [
+    { ic:"message", name:"Email", val: A.results.verify==="verified" ? "Verified" : "Not verified", ok: A.results.verify==="verified" },
+    { ic:"pin", name:"Emergency location", val: locLabel(A.results.location), ok: A.results.location && A.results.location!=="skipped" },
+    { ic:"message", name:"Notifications", val: A.results.channel==="skipped"?"Skipped":chLabel(A.channel), ok: A.results.channel!=="skipped" },
+    { ic:"sun", name:"Whispers", val: A.results.whisper==="skipped"?"Skipped":whLabel(A.whisper), ok: A.results.whisper!=="skipped" && A.whisper!=="off" },
+  ];
+  return `<div class="act__inner act-done">
+    <div class="build__burst">${ICON("check")}</div>
+    <span class="eyebrow" style="display:block;margin-bottom:8px">All set</span>
+    <h2 class="act__title" style="font-size:30px">You're ready, Amara. Let's design your trip.</h2>
+    <p class="act__why" style="max-width:46ch;margin-inline:auto">Your account is set up and your dream trip is waiting. Everything below is editable anytime in Profile.</p>
+    <div class="act-summary">
+      ${rows.map(r=>`<div class="act-summary__row">
+        <div class="act-summary__ic">${ICON(r.ic)}</div>
+        <div style="flex:1"><div class="act-summary__name">${r.name}</div><div class="act-summary__val">${r.val}</div></div>
+        <span class="act-summary__status pill ${r.ok?'pill-live':'pill-preview'}">${r.ok?'On':'Off'}</span>
+      </div>`).join("")}
+    </div>
+    <div style="display:flex;gap:12px;justify-content:center;margin-top:30px;flex-wrap:wrap">
+      <a class="btn btn-primary" href="special-interests.html" style="height:52px;padding:0 28px;font-size:16px">Start designing your trip →</a>
+      <a class="btn btn-secondary" href="itinerary.html" style="height:52px">Open your trip</a>
+    </div>
+  </div>`;
+}
+
+/* ---------- helpers ---------- */
+function card({eyebrow, ic, title, why, inner, foot}) {
+  return `
+    <div class="act__inner">
+      <div class="act__ic">${ICON(ic)}</div>
+      <div class="act__step-eyebrow">${eyebrow}</div>
+      <h2 class="act__title">${title}</h2>
+      <p class="act__why">${why}</p>
+      ${inner||""}
+    </div>
+    <div class="act__foot">${foot||""}</div>`;
+}
+function resultBox(text, ok) {
+  return `<div class="act-result act-result--${ok?'ok':'off'}">${ICON(ok?'check':'info','ic-sm')} ${text}</div>`;
+}
+const locLabel = v => v==="granted"?"Live location":v==="itinerary"?"Itinerary city":"Skipped";
+const chLabel = v => v==="email"?"Email":v==="sms"?"SMS":"Email + SMS";
+const whLabel = v => v==="often"?"Often":v==="rare"?"Rare":"Off";
+
+const RENDER = [verifyStep, locationStep, channelStep, whisperStep];
+
+function render() {
+  renderDots();
+  const isDone = A.step >= STEPS.length;
+  $("#act-card").innerHTML = isDone ? doneStep() : RENDER[A.step]();
+  $("#act-card").style.animation = "none"; void $("#act-card").offsetWidth; $("#act-card").style.animation = "";
+  window.scrollTo({ top: 0, behavior: "instant" });
+}
+
+/* ---------- interactions (delegated) ---------- */
+document.addEventListener("click", (e) => {
+  const card = $("#act-card");
+  // location choice
+  const loc = e.target.closest("[data-loc]");
+  if (loc) { A.results.location = loc.dataset.loc; render(); TWW.toast(loc.dataset.loc==="skipped"?"Skipped — you can enable later":"Saved"); return; }
+  // channel
+  const ch = e.target.closest("[data-channel]");
+  if (ch) { A.channel = ch.dataset.channel; card.querySelectorAll("[data-channel]").forEach(x=>x.setAttribute("aria-pressed","false")); ch.setAttribute("aria-pressed","true"); return; }
+  // whisper
+  const wh = e.target.closest("[data-whisper]");
+  if (wh) { A.whisper = wh.dataset.whisper; card.querySelectorAll("[data-whisper]").forEach(x=>x.setAttribute("aria-pressed","false")); wh.setAttribute("aria-pressed","true"); try{localStorage.setItem("tww:whisperDial",JSON.stringify(A.whisper));}catch(e){} return; }
+  // generic actions
+  const act = e.target.closest("[data-act]");
+  if (!act) return;
+  switch (act.dataset.act) {
+    case "verified": A.results.verify = "verified"; render(); TWW.toast("Email verified"); break;
+    case "resend": TWW.toast("Magic link re-sent to " + A.email); break;
+    case "changeemail": TWW.toast("You can change your email in Profile"); break;
+    case "skip":
+      A.results[STEPS[A.step]] = "skipped"; A.step++; render(); break;
+    case "back": if (A.step>0) { A.step--; render(); } break;
+    case "next":
+      if (A.step===1 && !A.results.location) A.results.location = "skipped";
+      if (A.step===2) A.results.channel = A.channel;
+      A.step++; render(); break;
+    case "finish":
+      A.results.whisper = A.whisper; A.step++; render(); break;
+  }
+});
+
+render();
+</script>
+</body>
+</html>

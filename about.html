@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TravelWell — About &amp; Architecture</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@400;500;600&family=Noto+Sans+Arabic:wght@400;500;600&family=Noto+Naskh+Arabic:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles/tokens.css">
+<link rel="stylesheet" href="styles/shell.css">
+<link rel="stylesheet" href="styles/journey.css">
+<link rel="stylesheet" href="styles/investor.css">
+<style>
+  .ab-layers { display:flex; flex-direction:column; gap:12px; margin-top:8px; }
+  .ab-layer { border:1px solid var(--border); border-radius:var(--radius); background:var(--card); box-shadow:var(--e1); padding:22px 24px; display:flex; gap:20px; align-items:flex-start; flex-wrap:wrap; }
+  .ab-layer__n { width:160px; flex:none; }
+  .ab-layer__n .num { font-family:var(--font-mono); font-size:12px; color:var(--gold-deep); font-weight:700; }
+  .ab-layer__n .name { font-family:var(--font-display); font-weight:600; font-size:20px; margin-top:2px; }
+  .ab-layer__chips { display:flex; gap:7px; flex-wrap:wrap; flex:1; }
+  .ab-chip { font-size:13px; color:var(--foreground); background:var(--secondary); border-radius:var(--radius-pill); padding:5px 12px; }
+  .ab-stat-row { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-top:8px; }
+  .ab-stat { text-align:center; border:1px solid var(--border); border-radius:var(--radius); background:var(--card); padding:24px; box-shadow:var(--e1); }
+  .ab-stat__v { font-family:var(--font-display); font-weight:600; font-size:44px; color:var(--primary); line-height:1; }
+  .ab-stat__k { font-size:13px; color:var(--muted-foreground); margin-top:8px; }
+  .ab-laws { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:8px; }
+  .ab-law { display:flex; gap:12px; align-items:flex-start; border:1px solid var(--border); border-radius:var(--radius); padding:18px 20px; background:var(--card); }
+  .ab-law__n { width:30px; height:30px; border-radius:50%; background:var(--secondary); color:var(--primary); display:grid; place-items:center; font-weight:700; font-size:13px; flex:none; }
+  .ab-law__t { font-weight:600; font-size:15px; } .ab-law__s { font-size:13px; color:var(--muted-foreground); margin-top:2px; line-height:1.45; }
+  @media (max-width:760px){ .ab-stat-row{grid-template-columns:1fr 1fr;} .ab-laws{grid-template-columns:1fr;} }
+
+  /* full-bleed closing band */
+  .ab-close { position: relative; margin: 80px calc(50% - 50vw) 0; width: 100vw; background: var(--dark-band); color: #fff; overflow: hidden; }
+  .ab-close__bg { position: absolute; inset: 0; background-image: radial-gradient(circle at 1px 1px, rgba(255,255,255,.07) 1px, transparent 0); background-size: 26px 26px; mask-image: radial-gradient(120% 90% at 50% 0%, #000 40%, transparent 100%); }
+  .ab-close__bg::after { content:""; position:absolute; width:520px; height:520px; border-radius:50%; left:50%; top:-260px; transform:translateX(-50%); background: radial-gradient(circle, color-mix(in oklch, var(--accent) 26%, transparent), transparent 70%); }
+  .ab-close__inner { position: relative; max-width: 760px; margin-inline: auto; padding: 96px var(--gutter) 88px; text-align: center; }
+  .ab-close__eyebrow { color: var(--accent); display:block; margin-bottom: 18px; }
+  .ab-close__title { color: #fff; font-size: clamp(38px, 6vw, 64px); line-height: 1.04; letter-spacing: -.02em; }
+  .ab-close__em { font-style: italic; color: var(--accent); }
+  .ab-close__sub { color: var(--dark-band-muted); font-size: 18px; line-height: 1.6; margin: 20px auto 0; max-width: 52ch; }
+  .ab-close__actions { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; margin-top: 36px; }
+  .ab-close__ghost { height: 56px; padding: 0 28px; font-size: 16px; background: rgba(255,255,255,.08); color: #fff; border: 1px solid rgba(255,255,255,.25); }
+  .ab-close__ghost:hover { background: rgba(255,255,255,.16); text-decoration: none; }
+  .ab-close__stats { display: inline-flex; align-items: center; gap: 18px; flex-wrap: wrap; justify-content: center; margin-top: 48px; padding: 18px 28px; border: 1px solid rgba(255,255,255,.14); border-radius: var(--radius-pill); background: rgba(255,255,255,.04); font-size: 15px; color: var(--dark-band-muted); }
+  .ab-close__stats b { font-family: var(--font-display); font-weight: 600; font-size: 22px; color: #fff; margin-inline-end: 6px; }
+  .ab-close__dot { width: 5px; height: 5px; border-radius: 50%; background: var(--accent); }
+  .ab-close__sig { font-family: var(--font-display); font-style: italic; font-size: 19px; color: var(--dark-band-muted); margin-top: 40px; }
+  .ab-close__sig .tw { color: var(--accent); font-style: normal; }
+  @media (max-width:560px){ .ab-close__inner{padding:64px var(--gutter) 60px;} .ab-close__stats{gap:12px;font-size:13.5px;} .ab-close__stats b{font-size:18px;} }
+</style>
+</head>
+<body>
+<a href="#main" class="skip-link">Skip to content</a>
+<main id="main">
+  <div class="ab">
+    <div class="ab-hero">
+      <span class="eyebrow">About · Architecture</span>
+      <h1>A travel platform, specified like an operating system.</h1>
+      <p>TravelWell is built spec-first: every layer — the taxonomy, the Wells, the engines, the schemas — is defined and agreed before a line of UI is written. This is what makes it legible, defensible, and honest.</p>
+    </div>
+
+    <section class="ab" style="padding:0; margin-top:28px">
+      <div class="ab-stat-row">
+        <div class="ab-stat"><div class="ab-stat__v">25</div><div class="ab-stat__k">Special Interests</div></div>
+        <div class="ab-stat"><div class="ab-stat__v">13</div><div class="ab-stat__k">World Regions</div></div>
+        <div class="ab-stat"><div class="ab-stat__v">10</div><div class="ab-stat__k">Wells (+2 luxury)</div></div>
+        <div class="ab-stat"><div class="ab-stat__v">6</div><div class="ab-stat__k">Time blocks / day</div></div>
+      </div>
+    </section>
+
+    <section class="rd-section" style="max-width:none;padding:56px 0 0">
+      <div class="rd-section__head"><div><h2 class="t-h2">The OS layers</h2><p>Demand flows down; fulfillment and economics flow back up.</p></div></div>
+      <div class="ab-layers" id="ab-layers"></div>
+    </section>
+
+    <section class="rd-section" style="max-width:none;padding:56px 0 0">
+      <div class="rd-section__head"><div><h2 class="t-h2">The spec-first philosophy</h2></div></div>
+      <div class="ab-philosophy">
+        <h3>Specification before implementation.</h3>
+        <p>Most travel sites grow as a pile of pages. TravelWell starts as a written specification — entities, fields, states, and the unbreakable laws — so the product is consistent by construction. The design you've been reviewing is the spec, made visible.</p>
+      </div>
+      <div class="ab-laws" id="ab-laws" style="margin-top:20px"></div>
+    </section>
+
+    <section class="ab-close">
+      <div class="ab-close__bg" aria-hidden="true"></div>
+      <div class="ab-close__inner">
+        <span class="eyebrow ab-close__eyebrow">See it working</span>
+        <h2 class="ab-close__title">The architecture,<br>in a <span class="ab-close__em">live platform</span>.</h2>
+        <p class="ab-close__sub">Everything you've read here is built. Walk the investor demo, or step into the traveler's journey from the very first screen.</p>
+        <div class="ab-close__actions">
+          <a class="btn btn-gold" href="special-interests.html" style="height:56px;padding:0 32px;font-size:16px">Start the journey →</a>
+          <a class="btn ab-close__ghost" href="demo.html">Walk the platform demo</a>
+        </div>
+        <div class="ab-close__stats">
+          <span><b>25</b> interests</span><span class="ab-close__dot"></span>
+          <span><b>13</b> regions</span><span class="ab-close__dot"></span>
+          <span><b>10</b> Wells</span><span class="ab-close__dot"></span>
+          <span><b>1</b> itinerary</span>
+        </div>
+        <p class="ab-close__sig">However far you go — <span class="tw">Travel Well.</span></p>
+      </div>
+    </section>
+  </div>
+</main>
+
+<script src="js/data.js"></script>
+<script src="js/places.js"></script>
+<script src="js/images.js"></script>
+<script src="js/shell.js"></script>
+<script>
+TWW.mountShell({ active: "about" });
+const $ = (s,r=document)=>r.querySelector(s);
+const ICON = TWW.ICON;
+
+$("#ab-layers").innerHTML = [
+  { num:"01", name:"Demand layer", chips:["25 Special Interests","13 Regions","Activities graph","Seasonal logic"] },
+  { num:"02", name:"Fulfillment layer", chips:TWW.WELLS.map(w=>w.name).concat(["Nanny-Well","Security-Well"]) },
+  { num:"03", name:"Engine layer", chips:["Concierge (Claude)","Provider matching","Itinerary sync","Safety Cards","Book-It tracks"] },
+  { num:"04", name:"Data layer", chips:["Travel ID","Itinerary blocks","Provider catalog","Commission ledger","Consent & locale"] },
+].map(l=>`<div class="ab-layer"><div class="ab-layer__n"><div class="num">LAYER ${l.num}</div><div class="name">${l.name}</div></div><div class="ab-layer__chips">${l.chips.map(c=>`<span class="ab-chip">${c}</span>`).join("")}</div></div>`).join("");
+
+$("#ab-laws").innerHTML = [
+  { t:"Honest content", s:"Real vs. placeholder is always visually distinct." },
+  { t:"Disclosed economics", s:"FTC disclosure sits beside every monetized action." },
+  { t:"One itinerary", s:"Everything a traveler adds lands in a single saved trip." },
+  { t:"Safety first", s:"The Emergency Button and Safety Card travel everywhere." },
+  { t:"Accessible to all", s:"WCAG AA, full keyboard paths, read-or-hear, type-or-talk." },
+  { t:"The traveler chooses", s:"The Concierge suggests; the traveler always decides." },
+].map((l,i)=>`<div class="ab-law"><span class="ab-law__n">${i+1}</span><div><div class="ab-law__t">${l.t}</div><div class="ab-law__s">${l.s}</div></div></div>`).join("");
+</script>
+</body>
+</html>

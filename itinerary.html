@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TravelWell — Your Itinerary</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@400;500;600&family=Noto+Sans+Arabic:wght@400;500;600&family=Noto+Naskh+Arabic:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles/tokens.css">
+<link rel="stylesheet" href="styles/shell.css">
+<link rel="stylesheet" href="styles/itinerary.css">
+<link rel="stylesheet" href="styles/checkout.css">
+</head>
+<body>
+<a href="#main" class="skip-link">Skip to content</a>
+<main id="main"><div id="it-root"></div></main>
+
+<div class="it-switch" id="it-switch" role="group" aria-label="Preview state">
+  <span class="it-switch__label">State</span>
+  <button data-state="building" aria-pressed="true">Building</button>
+  <button data-state="empty" aria-pressed="false">Empty</button>
+  <button data-state="voyage" aria-pressed="false">Bon voyage</button>
+</div>
+
+<script src="js/data.js"></script>
+<script src="js/places.js"></script>
+<script src="js/images.js"></script>
+<script src="js/shell.js"></script>
+<script src="js/checkout.js"></script>
+<script src="js/itinerary.js"></script>
+</body>
+</html>

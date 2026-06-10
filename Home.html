@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TravelWell — Home</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@400;500;600&family=Noto+Sans+Arabic:wght@400;500;600&family=Noto+Naskh+Arabic:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles/tokens.css">
+<link rel="stylesheet" href="styles/shell.css">
+<style>
+  /* ---- Preview state switcher (design control, not product UI) ------ */
+  .state-switch { position: fixed; inset-block-start: 80px; inset-inline-end: 16px; z-index: 50; background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-pill); box-shadow: var(--e2); padding: 5px; display: flex; gap: 3px; align-items: center; }
+  .state-switch .lab { font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted-foreground); font-weight: 700; padding: 0 8px 0 10px; }
+  .state-switch button { border: 0; background: none; cursor: pointer; font-size: 12.5px; font-weight: 600; padding: 7px 12px; border-radius: var(--radius-pill); color: var(--muted-foreground); }
+  .state-switch button[aria-pressed="true"] { background: var(--secondary); color: var(--secondary-foreground); }
+
+  /* ---- Hero ---------------------------------------------------------- */
+  .hero { position: relative; overflow: hidden; }
+  .hero__inner { max-width: var(--content-max); margin-inline: auto; padding: 0 var(--gutter); display: grid; grid-template-columns: 1.05fr .95fr; gap: 56px; align-items: center; min-height: 600px; }
+  .hero__copy { padding: 72px 0; }
+  .welcome-back { display: none; align-items: center; gap: 10px; background: var(--secondary); color: var(--secondary-foreground); border-radius: var(--radius-pill); padding: 7px 14px 7px 8px; font-size: 13.5px; font-weight: 500; width: fit-content; margin-bottom: 22px; }
+  .welcome-back .av { width: 26px; height: 26px; border-radius: 50%; background: var(--primary); color: #fff; display: grid; place-items: center; font-size: 12px; font-weight: 700; }
+  body[data-state="returning"] .welcome-back { display: inline-flex; }
+  .hero h1 { font-size: clamp(40px, 5.6vw, 72px); line-height: 1.02; letter-spacing: -.015em; }
+  .hero h1 .accent { font-style: italic; color: var(--gold-deep); }
+  .hero__lead { margin-top: 22px; max-width: 46ch; font-size: clamp(17px,1.5vw,20px); }
+  .hero__cta { display: flex; gap: 14px; margin-top: 32px; flex-wrap: wrap; align-items: center; }
+  .hero__taps { margin-top: 18px; font-size: 13px; color: var(--muted-foreground); display: flex; align-items: center; gap: 8px; }
+  .hero__taps .dot { width: 4px; height: 4px; border-radius: 50%; background: var(--muted-foreground); }
+  .hero__media { position: relative; align-self: stretch; min-height: 520px; }
+  .hero__media image-slot { position: absolute; border-radius: var(--radius-lg); box-shadow: var(--e2); }
+  .hero__media .m1 { inset: 48px 0; width: auto; height: auto; }
+  .hero__media .m-tag { position: absolute; inset-block-end: 36px; inset-inline-start: 24px; inset-inline-end: 24px; z-index: 3; background: rgba(255,255,255,.95); border-radius: var(--radius); padding: 12px 16px; box-shadow: var(--e2); display: flex; align-items: center; gap: 12px; }
+  .hero__media .m-tag .ic-chip { width: 38px; height: 38px; border-radius: 9px; background: var(--secondary); color: var(--primary); display: grid; place-items: center; flex: none; }
+  .hero__media .m-tag .txt { min-width: 0; line-height: 1.3; }
+  .hero__media .m-tag .t { font-weight: 600; font-size: 13.5px; }
+  .hero__media .m-tag .s { font-size: 12px; color: var(--muted-foreground); margin-top: 1px; }
+  .hero__bg-eyebrow { position: absolute; inset-block-start: 24px; inset-inline-start: 50%; font-family: var(--font-display); font-style: italic; }
+
+  /* section scaffolding */
+  .section { padding: 72px 0; }
+  .section__head { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; margin-bottom: 32px; flex-wrap: wrap; }
+  .section__head .eyebrow { display:block; margin-bottom: 8px; }
+  .section__head h2 { font-size: var(--t-h2); max-width: 18ch; line-height: 1.1; }
+  .section__head p { color: var(--muted-foreground); margin-top: 8px; max-width: 50ch; }
+  .section__link { font-weight: 600; font-size: 14.5px; color: var(--primary); display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+
+  /* SI cards */
+  .si-rail { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+  .si-card { position: relative; border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; background: var(--card); box-shadow: var(--e1); text-decoration: none; color: inherit; transition: transform .2s ease, box-shadow .2s ease; display: flex; flex-direction: column; }
+  .si-card:hover { transform: translateY(-3px); box-shadow: var(--e2); text-decoration: none; }
+  .si-card__media { height: 180px; position: relative; }
+  .si-card__pill { position: absolute; inset-block-start: 12px; inset-inline-start: 12px; z-index: 2; }
+  .si-card__body { padding: 18px 20px 20px; flex: 1; display: flex; flex-direction: column; }
+  .si-card h3 { font-size: 21px; }
+  .si-card .sig { font-family: var(--font-display); font-style: italic; font-size: 14.5px; color: var(--muted-foreground); margin-top: 6px; }
+  .si-card .sig .tw { color: var(--primary); font-style: normal; }
+  .si-card__foot { margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; font-size: 12.5px; color: var(--muted-foreground); }
+  .si-card.is-preview .si-card__media { filter: saturate(.25) brightness(1.02); }
+  .si-card[data-sipick] { cursor: pointer; }
+  .si-card.is-picked { box-shadow: 0 0 0 2px var(--accent), var(--e2); border-color: var(--accent); }
+  .si-card__check { position: absolute; inset-block-start: 12px; inset-inline-end: 12px; z-index: 2; width: 28px; height: 28px; border-radius: 50%; border: 2px solid rgba(255,255,255,.9); background: rgba(20,28,26,.35); backdrop-filter: blur(4px); display: grid; place-items: center; color: #fff; font-weight: 700; font-size: 13px; transition: background-color .18s, border-color .18s; }
+  .si-card.is-picked .si-card__check { background: var(--accent); border-color: var(--accent); color: var(--foreground); }
+  .si-pickbar { position: fixed; inset-inline: 0; inset-block-end: 0; z-index: 70; background: var(--card); border-top: 1px solid var(--border); box-shadow: 0 -8px 28px rgba(28,27,24,.10); }
+  .si-pickbar__inner { max-width: var(--content-max); margin-inline: auto; padding: 14px var(--gutter); display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+  .si-pickbar__pills { display: flex; gap: 8px; flex-wrap: wrap; flex: 1; min-width: 0; }
+  .si-pickbar__pill { display: inline-flex; align-items: center; gap: 8px; background: var(--secondary); color: var(--secondary-foreground); border-radius: var(--radius-pill); padding: 6px 8px 6px 14px; font-weight: 600; font-size: 13.5px; }
+  .si-pickbar__pill button { width: 20px; height: 20px; border-radius: 50%; border: 0; background: rgba(0,0,0,.08); color: inherit; cursor: pointer; font-size: 11px; }
+  .si-pickbar__msg { font-size: 13.5px; color: var(--muted-foreground); font-weight: 600; }
+
+  /* what-is-travelwell value prop */
+  .what__head { max-width: 60ch; }
+  .what__head .eyebrow { display: block; margin-bottom: 12px; }
+  .what__title { font-size: var(--t-h2); line-height: 1.1; }
+  .what__lead { color: var(--muted-foreground); font-size: 17px; line-height: 1.6; margin-top: 14px; }
+  .what__steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-top: 40px; }
+  .what__step { position: relative; background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 26px 22px 24px; box-shadow: var(--e1); }
+  .what__step-n { position: absolute; top: 18px; inset-inline-end: 20px; font-family: var(--font-display); font-weight: 600; font-size: 18px; color: var(--accent); }
+  .what__step-ic { width: 52px; height: 52px; border-radius: 13px; background: var(--secondary); color: var(--primary); display: grid; place-items: center; margin-bottom: 16px; }
+  .what__step-ic .ic { width: 26px; height: 26px; }
+  .what__step h3 { font-size: 19px; line-height: 1.2; }
+  .what__step p { color: var(--muted-foreground); font-size: 14px; line-height: 1.5; margin-top: 8px; }
+  .what__cta { display: flex; align-items: center; gap: 18px; margin-top: 36px; flex-wrap: wrap; }
+  .what__cta-note { font-size: 13.5px; color: var(--muted-foreground); }
+  @media (max-width: 900px) { .what__steps { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 560px) { .what__steps { grid-template-columns: 1fr; } }
+
+  /* suggested-for-you rail (profiled only) */
+  .suggested { display: none; }
+  body[data-state="profiled"] .suggested, body[data-state="returning"] .suggested { display: block; }
+  .sugg-rail { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+  .sugg-card { border: 1px solid var(--border); border-radius: var(--radius); background: var(--card); box-shadow: var(--e1); padding: 16px; display: flex; flex-direction: column; gap: 4px; }
+  .sugg-card .why { font-size: 12px; color: var(--primary); font-weight: 600; }
+
+  /* destinations */
+  .dest-rail { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+  .dest-card { position: relative; border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--e1); text-decoration: none; color: #fff; display: block; aspect-ratio: 3/4; }
+  .dest-card image-slot { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .dest-card__scrim { position: absolute; inset: 0; background: linear-gradient(to top, rgba(20,18,14,.78) 0%, rgba(20,18,14,.15) 50%, rgba(20,18,14,.05) 100%); z-index: 2; pointer-events: none; }
+  .dest-card__top { position: absolute; inset-block-start: 14px; inset-inline: 14px; z-index: 3; display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
+  .dest-card__body { position: absolute; inset-block-end: 0; inset-inline: 0; z-index: 3; padding: 20px; }
+  .dest-card__body h3 { color: #fff; font-size: 24px; }
+  .dest-card__body .meta { font-size: 13px; color: rgba(255,255,255,.85); margin-top: 4px; display: flex; gap: 8px; align-items: center; }
+
+  /* system band (Law 1 — make the OS feel intelligent) */
+  .os-band { background: var(--dark-band); color: var(--dark-band-foreground); border-radius: var(--radius-lg); overflow: hidden; }
+  .os-band__inner { padding: 56px; display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: center; }
+  .os-band .eyebrow { color: var(--accent); }
+  .os-band h2 { color: #fff; font-size: clamp(28px,3vw,40px); margin-top: 12px; line-height: 1.1; }
+  .os-band p { color: var(--dark-band-muted); margin-top: 16px; max-width: 44ch; }
+  .os-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.12); border-radius: var(--radius); overflow: hidden; }
+  .os-stat { background: var(--dark-band); padding: 24px; }
+  .os-stat .n { font-family: var(--font-display); font-size: 44px; color: var(--accent); line-height: 1; }
+  .os-stat .l { font-size: 13px; color: var(--dark-band-muted); margin-top: 8px; }
+  .os-stat .b { font-size: 11px; color: rgba(255,255,255,.4); margin-top: 4px; font-family: var(--font-mono); text-transform: uppercase; letter-spacing: .08em; }
+
+  /* === A Travel Operating System — cinematic feature bands === */
+  .os-intro { text-align: center; max-width: 780px; margin: 0 auto 44px; }
+  .os-intro .eyebrow { display: block; margin-bottom: 14px; }
+  .os-intro h2 { font-size: clamp(32px, 4.6vw, 56px); line-height: 1.04; letter-spacing: -.015em; }
+  .os-intro h2 em { font-style: italic; color: var(--gold-deep); }
+  .os-intro p { color: var(--muted-foreground); margin-top: 18px; font-size: clamp(16px,1.5vw,19px); max-width: 58ch; margin-inline: auto; }
+
+  .os-feature { position: relative; border-radius: var(--radius-lg); overflow: hidden; min-height: 480px; display: flex; box-shadow: var(--e2); }
+  .os-feature + .os-feature { margin-top: 22px; }
+  .os-feature__bg { position: absolute; inset: 0; z-index: 0; }
+  .os-feature image-slot { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 1; }
+  .os-feature__scrim { position: absolute; inset: 0; z-index: 2; pointer-events: none; }
+  .os-feature__content { position: relative; z-index: 3; max-width: 540px; padding: 56px; align-self: center; }
+  .os-feature--right { justify-content: flex-end; }
+  .os-feature--right .os-feature__content { text-align: end; }
+  .os-feature--left .os-feature__scrim { background: linear-gradient(90deg, rgba(16,14,10,.9) 0%, rgba(16,14,10,.66) 38%, rgba(16,14,10,.2) 72%, rgba(16,14,10,0) 100%); }
+  .os-feature--right .os-feature__scrim { background: linear-gradient(270deg, rgba(16,14,10,.9) 0%, rgba(16,14,10,.66) 38%, rgba(16,14,10,.2) 72%, rgba(16,14,10,0) 100%); }
+  .os-feature__num { font-family: var(--font-display); font-weight: 600; font-size: clamp(64px,7vw,92px); line-height: .85; color: var(--accent); text-shadow: 0 2px 24px rgba(0,0,0,.45); }
+  .os-feature__content .eyebrow { color: rgba(255,255,255,.88); display: block; margin: 16px 0 6px; }
+  .os-feature__content h3 { color: #fff; font-size: clamp(28px,3.1vw,40px); line-height: 1.06; text-shadow: 0 2px 20px rgba(0,0,0,.5); }
+  .os-feature__content > p { color: rgba(255,255,255,.92); margin-top: 13px; font-size: 16.5px; max-width: 44ch; line-height: 1.55; text-shadow: 0 1px 14px rgba(0,0,0,.55); }
+  .os-feature--right .os-feature__content > p { margin-inline-start: auto; }
+  .os-feature__chips { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 20px; }
+  .os-feature--right .os-feature__chips { justify-content: flex-end; }
+  .os-feature__chip { background: rgba(255,255,255,.16); border: 1px solid rgba(255,255,255,.34); backdrop-filter: blur(8px); color: #fff; border-radius: var(--radius-pill); padding: 6px 13px; font-size: 13px; font-weight: 500; white-space: nowrap; }
+  .os-feature__chip.soon { background: rgba(255,255,255,.06); color: rgba(255,255,255,.7); }
+  .os-feature__cta { display: inline-flex; align-items: center; gap: 8px; margin-top: 24px; background: rgba(255,255,255,.96); color: var(--foreground); height: 46px; padding: 0 22px; border-radius: var(--radius-pill); font-weight: 600; font-size: 15px; text-decoration: none; transition: background-color .15s ease; }
+  .os-feature__cta:hover { background: #fff; text-decoration: none; }
+
+  /* concierge invite */
+  .concierge-invite { background: var(--secondary); border-radius: var(--radius-lg); padding: 48px; display: flex; align-items: center; gap: 32px; flex-wrap: wrap; }
+  .concierge-invite .av { width: 72px; height: 72px; border-radius: 50%; background: linear-gradient(150deg, var(--primary), var(--primary-hover)); color: #fff; display: grid; place-items: center; flex: none; box-shadow: var(--e2); }
+  .concierge-invite h2 { font-size: 28px; }
+  .concierge-invite p { color: var(--secondary-foreground); margin-top: 8px; max-width: 52ch; opacity: .85; }
+
+  /* ===== "Talk to Me" feature showcase ===== */
+  .talk { position: relative; border-radius: var(--radius-lg); overflow: hidden; border: 1px solid color-mix(in oklch, var(--primary) 18%, var(--border)); background: radial-gradient(120% 130% at 0% 0%, color-mix(in oklch, var(--secondary) 85%, var(--card)) 0%, var(--card) 60%); }
+  .talk__inner { display: grid; grid-template-columns: 1.04fr .96fr; gap: 52px; padding: 56px; align-items: center; }
+  .talk__eyebrow { display: inline-flex; align-items: center; gap: 8px; color: var(--primary); }
+  .talk__eyebrow .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--primary); box-shadow: 0 0 0 4px var(--secondary); }
+  .talk h2 { font-size: clamp(30px, 3.6vw, 46px); line-height: 1.04; letter-spacing: -.01em; margin-top: 14px; }
+  .talk h2 em { font-style: italic; color: var(--primary); }
+  .talk__lead { color: var(--muted-foreground); margin-top: 16px; font-size: 17px; max-width: 46ch; }
+  .talk__feats { display: grid; grid-template-columns: 1fr 1fr; gap: 16px 18px; margin-top: 30px; }
+  .talk__feat { display: flex; gap: 12px; align-items: flex-start; }
+  .talk__feat .fic { width: 38px; height: 38px; border-radius: 10px; background: var(--secondary); color: var(--primary); display: grid; place-items: center; flex: none; }
+  .talk__feat b { display: block; font-size: 14.5px; font-weight: 600; }
+  .talk__feat span { font-size: 13px; color: var(--muted-foreground); line-height: 1.4; }
+  .talk__cta-row { display: flex; align-items: center; gap: 16px; margin-top: 32px; flex-wrap: wrap; }
+  .talk__cta-row .note { font-size: 13px; color: var(--muted-foreground); }
+
+  /* demo panel — a live, looping mock of the real Concierge */
+  .talk__demo { position: relative; background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--e3); overflow: hidden; }
+  .talk__demo-head { display: flex; align-items: center; gap: 11px; padding: 14px 16px; border-bottom: 1px solid var(--border); }
+  .talk__demo-av { width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(150deg, var(--primary), var(--primary-hover)); color: #fff; display: grid; place-items: center; flex: none; }
+  .talk__demo-title { font-family: var(--font-display); font-weight: 600; font-size: 15.5px; line-height: 1.1; }
+  .talk__demo-sub { font-size: 11.5px; color: var(--muted-foreground); display: flex; align-items: center; gap: 5px; }
+  .talk__demo-sub .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--safety-1); }
+  .talk__demo-tag { margin-inline-start: auto; font-size: 10px; letter-spacing: .1em; font-weight: 700; text-transform: uppercase; color: var(--primary); background: var(--secondary); border-radius: var(--radius-pill); padding: 4px 9px; }
+  .talk__demo-body { padding: 18px; display: flex; flex-direction: column; gap: 11px; min-height: 360px; }
+  .talk__demo-foot { border-top: 1px solid var(--border); padding: 12px 14px; display: flex; align-items: center; gap: 8px; }
+  .talk__demo-input { flex: 1; background: var(--surface-alt); border: 1px solid var(--border); border-radius: var(--radius-pill); padding: 9px 15px; font-size: 13.5px; color: var(--muted-foreground); display: flex; align-items: center; }
+  .talk__demo-input .caret { width: 1px; height: 15px; background: var(--primary); margin-inline-start: 1px; animation: talkCaret 1.1s steps(1) infinite; }
+  @keyframes talkCaret { 50% { opacity: 0; } }
+  .talk__demo-mic, .talk__demo-send { width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; flex: none; }
+  .talk__demo-mic { background: transparent; color: var(--muted-foreground); }
+  .talk__demo-send { background: var(--primary); color: #fff; }
+
+  .talk-msg { max-width: 90%; padding: 11px 14px; border-radius: 15px; font-size: 14px; line-height: 1.46; opacity: 0; transform: translateY(10px); animation: talkIn .45s cubic-bezier(.2,.7,.3,1) forwards; }
+  .talk-msg--bot { background: var(--surface-alt); border: 1px solid var(--border); align-self: flex-start; border-bottom-left-radius: 4px; }
+  .talk-msg--user { background: var(--primary); color: #fff; align-self: flex-end; border-bottom-right-radius: 4px; }
+  .talk-rec { opacity: 0; transform: translateY(10px); animation: talkIn .45s cubic-bezier(.2,.7,.3,1) forwards; border: 1px solid var(--border); border-radius: var(--radius); padding: 11px 13px; background: var(--card); display: flex; gap: 11px; align-items: flex-start; box-shadow: var(--e1); }
+  .talk-rec__num { width: 23px; height: 23px; border-radius: 50%; background: var(--secondary); color: var(--secondary-foreground); font-weight: 700; font-size: 12px; display: grid; place-items: center; flex: none; }
+  .talk-rec__name { font-weight: 600; font-size: 14px; }
+  .talk-rec__why { font-size: 12px; color: var(--muted-foreground); margin-top: 2px; }
+  .talk-rec__why b { color: var(--primary); font-weight: 600; }
+  @keyframes talkIn { to { opacity: 1; transform: none; } }
+  .talk-typing { display: inline-flex; gap: 4px; align-items: center; padding: 3px 2px; }
+  .talk-typing span { width: 7px; height: 7px; border-radius: 50%; background: var(--muted-foreground); animation: tw-bounce 1.2s infinite ease-in-out; }
+  .talk-typing span:nth-child(2) { animation-delay: .15s; }
+  .talk-typing span:nth-child(3) { animation-delay: .3s; }
+  @media (prefers-reduced-motion: reduce) {
+    .talk-msg, .talk-rec { animation: none; opacity: 1; transform: none; }
+    .talk__demo-input .caret { animation: none; }
+  }
+
+  @media (max-width: 900px) {
+    .hero__inner { grid-template-columns: 1fr; gap: 0; min-height: 0; }
+    .hero__media { min-height: 360px; margin-bottom: 40px; }
+    .hero__copy { padding: 48px 0 8px; }
+    .si-rail, .dest-rail { grid-template-columns: 1fr 1fr; }
+    .sugg-rail { grid-template-columns: 1fr 1fr; }
+    .os-band__inner { grid-template-columns: 1fr; padding: 36px; }
+    .os-feature { min-height: 430px; }
+    .os-feature__content { padding: 32px; align-self: flex-end; max-width: 100%; text-align: start !important; }
+    .os-feature--left .os-feature__scrim, .os-feature--right .os-feature__scrim { background: linear-gradient(0deg, rgba(16,14,10,.93) 0%, rgba(16,14,10,.6) 42%, rgba(16,14,10,.12) 80%, rgba(16,14,10,0) 100%); }
+    .os-feature--right .os-feature__content > p { margin-inline-start: 0; }
+    .os-feature--right .os-feature__chips { justify-content: flex-start; }
+    .state-switch { inset-block-start: auto; inset-block-end: 16px; inset-inline-end: 16px; }
+    .talk__inner { grid-template-columns: 1fr; gap: 36px; padding: 36px; }
+    .talk__demo-body { min-height: 320px; }
+  }
+  @media (max-width: 560px) { .si-rail, .dest-rail, .sugg-rail { grid-template-columns: 1fr; } .talk__feats { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body data-state="anonymous">
+<a href="#main" class="skip-link">Skip to content</a>
+
+<div class="state-switch" role="group" aria-label="Preview Home states">
+  <span class="lab">State</span>
+  <button data-st="anonymous" aria-pressed="true">Anonymous</button>
+  <button data-st="profiled" aria-pressed="false">Profiled</button>
+  <button data-st="returning" aria-pressed="false">Returning</button>
+</div>
+
+<main id="main">
+  <!-- HERO -->
+  <section class="hero band-ivory">
+    <div class="hero__inner">
+      <div class="hero__copy">
+        <div class="welcome-back"><span class="av">A</span> Welcome back, Amara — your East Africa trip is saved.</div>
+        <span class="eyebrow">A Travel Operating System</span>
+        <h1 style="margin-top:14px">Your next journey, <span class="accent">designed around you.</span></h1>
+        <p class="hero__lead t-lead" style="color:var(--foreground)">Tell us what moves you. We route you from a single spark — an interest, a place, a feeling — all the way to a booked, beautifully organized trip. One clear step at a time.</p>
+        <div class="hero__cta">
+          <a class="btn btn-primary" href="special-interests.html" style="height:52px;padding:0 28px;font-size:16px">Design Your Dream Journey</a>
+          <button class="btn btn-secondary" data-tw-concierge style="height:52px">Not sure? Speak with Claude</button>
+        </div>
+        <p class="hero__taps"><span>4–5 taps from here to a booked trip</span><span class="dot"></span><span>No account needed to start</span></p>
+      </div>
+      <div class="hero__media">
+        <image-slot id="home-hero" class="m1" shape="rounded" radius="16" src="https://images.unsplash.com/photo-1516426122078-c23e76319801?auto=format&fit=crop&w=1100&q=78" placeholder="Drop a hero travel image (e.g. a Mara sunrise)"></image-slot>
+        <div class="m-tag">
+          <div class="ic-chip"><svg class="ic" viewBox="0 0 24 24"><path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5z" stroke="currentColor" fill="none" stroke-width="1.75" stroke-linejoin="round"/></svg></div>
+          <div class="txt"><div class="t">Safari &amp; Wildlife · East Africa</div><div class="s">A live journey, ready to design</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHAT IS TRAVELWELL — value prop + how it works -->
+  <section class="section band-linen what">
+    <div class="container">
+      <div class="what__head">
+        <span class="eyebrow">What is TravelWell</span>
+        <h2 class="what__title">A travel operating system that designs the whole trip — <span class="accent">around you.</span></h2>
+        <p class="what__lead">Most sites sell you one booking and leave the rest to you. TravelWell starts with what moves you, then assembles every piece — flights, stays, dining, transport, activities and more — into one beautifully organized journey you actually control.</p>
+      </div>
+
+      <div class="what__steps">
+        <div class="what__step">
+          <div class="what__step-n">1</div>
+          <div class="what__step-ic"><svg class="ic" viewBox="0 0 24 24"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg></div>
+          <h3>Tell us what moves you</h3>
+          <p>Pick the ways you love to travel — safari, romance, culinary, and more. Or just speak with Claude.</p>
+        </div>
+        <div class="what__step">
+          <div class="what__step-n">2</div>
+          <div class="what__step-ic"><svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M3 12h18M12 3c2.5 2.5 2.5 15 0 18M12 3c-2.5 2.5-2.5 15 0 18" fill="none" stroke="currentColor" stroke-width="1.5"/></svg></div>
+          <h3>Choose where in the world</h3>
+          <p>Thirteen regions, each with researched destinations and an honest Safety Card you can trust.</p>
+        </div>
+        <div class="what__step">
+          <div class="what__step-n">3</div>
+          <div class="what__step-ic"><svg class="ic" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h10" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></div>
+          <h3>Move through the Wells</h3>
+          <p>Flights, stays, dining, transport, activities — each Well surfaces the best 6 providers, matched to you.</p>
+        </div>
+        <div class="what__step">
+          <div class="what__step-n">4</div>
+          <div class="what__step-ic"><svg class="ic" viewBox="0 0 24 24"><rect x="4" y="7" width="16" height="13" rx="2" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M9 7V5a3 3 0 0 1 6 0v2M9 13l2 2 4-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <h3>Book it — all in one trip</h3>
+          <p>Everything lands in a single itinerary, always saved. You always choose, and you always book.</p>
+        </div>
+      </div>
+
+      <div class="what__cta">
+        <a class="btn btn-primary" href="special-interests.html" style="height:52px;padding:0 28px;font-size:16px">Start designing — it's free</a>
+        <span class="what__cta-note">4–5 taps to a booked trip · no account needed to start</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- SUGGESTED FOR YOU (profiled / returning only) -->
+  <section class="section band-linen suggested">
+    <div class="container">
+      <div class="section__head">
+        <div>
+          <span class="eyebrow">From your Travel ID</span>
+          <h2>Suggested for you, Amara</h2>
+          <p>Drawn from your saved interests, party of 2, and your “easy on the feet” pace.</p>
+        </div>
+        <a class="section__link" href="plan.html">See your full plan <svg class="ic ic-sm" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" fill="none" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+      </div>
+      <div class="sugg-rail" id="sugg-rail"></div>
+    </div>
+  </section>
+
+  <!-- FEATURED SPECIAL INTERESTS -->
+  <section class="section band-ivory">
+    <div class="container">
+      <div class="section__head">
+        <div>
+          <span class="eyebrow">Start with what moves you</span>
+          <h2>Pick up to 3. Two is the sweet spot.</h2>
+          <p>Tap the ways you love to travel — they light up as you go. Most journeys shine with 1–2, but some need 3 (Family + Tropical + Romance, say). You can fine-tune anytime.</p>
+        </div>
+        <a class="section__link" href="special-interests.html">All 25 interests <svg class="ic ic-sm" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" fill="none" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+      </div>
+      <div class="si-rail" id="si-rail"></div>
+    </div>
+  </section>
+
+  <!-- A TRAVEL OPERATING SYSTEM — cinematic subsections -->
+  <section class="section band-ivory" style="padding-top:0">
+    <div class="container">
+      <div class="os-intro">
+        <span class="eyebrow">How it all fits together</span>
+        <h2>A Travel Operating <em>System</em>.</h2>
+        <p>Behind the calm surface, an organized engine routes every traveler from a spark of interest, to a place, to what excites them, to every need met — ending in a vetted, booked plan. Four moving parts, one effortless journey.</p>
+      </div>
+
+      <!-- 25 Special Interests -->
+      <article class="os-feature os-feature--left">
+        <div class="os-feature__bg" style="background:radial-gradient(120% 90% at 25% 15%, #d8b35e 0%, transparent 55%), linear-gradient(120deg, #8a5a2a 0%, #4a3019 55%, #28190d 100%)"></div>
+        <image-slot id="os-si" src="https://images.unsplash.com/photo-1509316785289-025f5b846b35?auto=format&fit=crop&w=1500&q=78" placeholder="Drop a cinematic safari / golden-hour image"></image-slot>
+        <div class="os-feature__scrim"></div>
+        <div class="os-feature__content">
+          <div class="os-feature__num">25</div>
+          <span class="eyebrow">Ways to travel</span>
+          <h3>Special Interests</h3>
+          <p>Twenty-five reasons to go — from Safari &amp; Wildlife to Culinary Journeys to Wellness. Pick one or two, and the system shapes everything else around them.</p>
+          <div class="os-feature__chips">
+            <span class="os-feature__chip">Safari &amp; Wildlife</span>
+            <span class="os-feature__chip">Culinary Journeys</span>
+            <span class="os-feature__chip">Wellness &amp; Spa</span>
+            <span class="os-feature__chip">+22 more</span>
+          </div>
+          <a class="os-feature__cta" href="special-interests.html">Explore all 25 <svg class="ic ic-sm" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" fill="none" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+        </div>
+      </article>
+
+      <!-- 10 Wells -->
+      <article class="os-feature os-feature--right">
+        <div class="os-feature__bg" style="background:radial-gradient(120% 90% at 75% 20%, #56a89c 0%, transparent 55%), linear-gradient(240deg, #2c6e68 0%, #1c4541 55%, #102825 100%)"></div>
+        <image-slot id="os-wells" src="https://images.unsplash.com/photo-1505228395891-9a51e7e86bf6?auto=format&fit=crop&w=1500&q=78" placeholder="Drop a cinematic image (open water / serene resort)"></image-slot>
+        <div class="os-feature__scrim"></div>
+        <div class="os-feature__content">
+          <div class="os-feature__num">10</div>
+          <span class="eyebrow">Every travel need, met</span>
+          <h3>The Wells</h3>
+          <p>Each Well maps to a need the way an organ maps to the body — Fly, Stay, Eat, Move, and more. Fill them as you go; the journey is whole when they are.</p>
+          <div class="os-feature__chips">
+            <span class="os-feature__chip">Fly-Well</span>
+            <span class="os-feature__chip">Stay-Well</span>
+            <span class="os-feature__chip">Eat-Well</span>
+            <span class="os-feature__chip soon">Insure-Well · soon</span>
+          </div>
+          <a class="os-feature__cta" href="wells.html">Discover the Wells <svg class="ic ic-sm" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" fill="none" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+        </div>
+      </article>
+
+      <!-- 13 World Regions -->
+      <article class="os-feature os-feature--left">
+        <div class="os-feature__bg" style="background:radial-gradient(120% 90% at 25% 15%, #7b91c4 0%, transparent 55%), linear-gradient(120deg, #3a4f7a 0%, #25304f 55%, #141a2e 100%)"></div>
+        <image-slot id="os-regions" src="https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&w=1500&q=78" placeholder="Drop a cinematic image (sweeping world landscape / map at dusk)"></image-slot>
+        <div class="os-feature__scrim"></div>
+        <div class="os-feature__content">
+          <div class="os-feature__num">13</div>
+          <span class="eyebrow">From 01F to 13A</span>
+          <h3>World Regions</h3>
+          <p>The whole map, organized — Western Europe to the Caribbean, each region scored for safety and stitched into your route, never a detour off it.</p>
+          <div class="os-feature__chips">
+            <span class="os-feature__chip">01F · Western Europe</span>
+            <span class="os-feature__chip">05A · East Africa</span>
+            <span class="os-feature__chip">11C · Caribbean</span>
+            <span class="os-feature__chip">+10 more</span>
+          </div>
+          <a class="os-feature__cta" href="regions.html">Browse all 13 regions <svg class="ic ic-sm" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" fill="none" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+        </div>
+      </article>
+
+      <!-- 200+ Vetted Providers -->
+      <article class="os-feature os-feature--right">
+        <div class="os-feature__bg" style="background:radial-gradient(120% 90% at 75% 20%, #cf9468 0%, transparent 55%), linear-gradient(240deg, #9c5b3b 0%, #5e3520 55%, #2e1a10 100%)"></div>
+        <image-slot id="os-providers" src="https://images.unsplash.com/photo-1571896349842-33c89424de2d?auto=format&fit=crop&w=1500&q=78" placeholder="Drop a cinematic image (luxury hotel / curated detail)"></image-slot>
+        <div class="os-feature__scrim"></div>
+        <div class="os-feature__content">
+          <div class="os-feature__num">6 <span style="font-size:.42em;font-weight:600;vertical-align:middle;opacity:.85">at a time</span></div>
+          <span class="eyebrow">Hand-vetted, honestly disclosed</span>
+          <h3>Providers, in your flow</h3>
+          <p>No overwhelming directory. Inside each Well we surface the <b>best 6 first</b> — matched to you and your trip — with “See more” for the rest. Every monetized link is disclosed right beside it. You always choose, and you always book.</p>
+          <div class="os-feature__chips">
+            <span class="os-feature__chip">Best-ranked first</span>
+            <span class="os-feature__chip">FTC-disclosed</span>
+            <span class="os-feature__chip">You always book</span>
+          </div>
+          <a class="os-feature__cta" href="wells-surface.html">See it in the Wells <svg class="ic ic-sm" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" fill="none" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+        </div>
+      </article>
+
+      <div style="text-align:center;margin-top:40px">
+        <a class="btn btn-gold" href="about.html" style="height:50px;padding:0 28px;font-size:15px">See the full architecture</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- TALK TO ME — feature showcase -->
+  <section class="section band-ivory" style="padding-top:0">
+    <div class="container">
+      <div class="talk">
+        <div class="talk__inner">
+          <div class="talk__copy">
+            <span class="eyebrow talk__eyebrow"><span class="dot"></span> Meet your Concierge</span>
+            <h2>Don't know where to start? <em>Just talk to me.</em></h2>
+            <p class="talk__lead">Your Concierge is a travel expert that lives on every page. Tell it your dream in plain words — by typing or speaking — and watch a real, bookable trip take shape in seconds. No forms, no jargon.</p>
+
+            <div class="talk__feats">
+              <div class="talk__feat">
+                <div class="fic"><svg class="ic" viewBox="0 0 24 24"><path d="M4 5h16v11H8l-4 4z" stroke="currentColor" fill="none" stroke-width="1.75" stroke-linejoin="round"/></svg></div>
+                <div><b>Type or talk</b><span>Chat by keyboard or just speak — whatever feels easy.</span></div>
+              </div>
+              <div class="talk__feat">
+                <div class="fic"><svg class="ic" viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9zM16 9a3 3 0 0 1 0 6" stroke="currentColor" fill="none" stroke-width="1.75" stroke-linejoin="round"/></svg></div>
+                <div><b>Read or hear it</b><span>It answers in text, or reads replies aloud to you.</span></div>
+              </div>
+              <div class="talk__feat">
+                <div class="fic"><svg class="ic" viewBox="0 0 24 24"><path d="M12 3l1.6 4.4L18 9l-4.4 1.6L12 15l-1.6-4.4L6 9z" stroke="currentColor" fill="none" stroke-width="1.6" stroke-linejoin="round"/></svg></div>
+                <div><b>It knows your trip</b><span>Sees your interests, region &amp; plan — so advice fits you.</span></div>
+              </div>
+              <div class="talk__feat">
+                <div class="fic"><svg class="ic" viewBox="0 0 24 24"><path d="M5 12l5 5L20 6" stroke="currentColor" fill="none" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+                <div><b>You're in control</b><span>It suggests; you always choose and book. Say “stop” anytime.</span></div>
+              </div>
+            </div>
+
+            <div class="talk__cta-row">
+              <button class="btn btn-primary" data-tw-concierge style="height:52px;padding:0 26px;font-size:16px"><svg class="ic ic-sm" viewBox="0 0 24 24" style="margin-inline-end:2px"><path d="M12 3l1.6 4.4L18 9l-4.4 1.6L12 15l-1.6-4.4L6 9z" stroke="currentColor" fill="none" stroke-width="1.6" stroke-linejoin="round"/></svg> Try the Concierge</button>
+              <span class="note">Free to try · no account needed · powered by Claude</span>
+            </div>
+          </div>
+
+          <!-- live looping demo -->
+          <div class="talk__demo" aria-hidden="true">
+            <div class="talk__demo-head">
+              <div class="talk__demo-av"><svg class="ic ic-sm" viewBox="0 0 24 24"><path d="M12 3l1.6 4.4L18 9l-4.4 1.6L12 15l-1.6-4.4L6 9z" stroke="currentColor" fill="none" stroke-width="1.6" stroke-linejoin="round"/></svg></div>
+              <div>
+                <div class="talk__demo-title">Speak with Claude</div>
+                <div class="talk__demo-sub"><span class="dot"></span> Your Concierge · online</div>
+              </div>
+              <span class="talk__demo-tag">Live demo</span>
+            </div>
+            <div class="talk__demo-body" id="talk-demo-body"></div>
+            <div class="talk__demo-foot">
+              <div class="talk__demo-input" id="talk-demo-input"><span id="talk-demo-typed"></span><span class="caret"></span></div>
+              <div class="talk__demo-mic"><svg class="ic ic-sm" viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3" stroke="currentColor" fill="none" stroke-width="1.75"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3" stroke="currentColor" fill="none" stroke-width="1.75" stroke-linecap="round"/></svg></div>
+              <div class="talk__demo-send"><svg class="ic ic-sm" viewBox="0 0 24 24"><path d="M4 12l16-7-7 16-2-7z" stroke="currentColor" fill="none" stroke-width="1.75" stroke-linejoin="round"/></svg></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script src="image-slot.js"></script>
+<script src="js/data.js"></script>
+<script src="js/images.js"></script>
+<script src="js/shell.js"></script>
+<script>
+  TWW.mountShell({ active: "" });
+
+  // Featured SIs — David's 6, paired by row: Romance/Tropical · Safari/Expedition · Ultra/River
+  const featOrder = ["romance","tropical","safari","expedition","ultra","river"];
+  const featured = featOrder.map(id => TWW.SIS.find(s => s.id === id)).filter(Boolean);
+  let siPicks = [];
+  const SI_MAX = 3;
+
+  function renderSiRail() {
+    document.getElementById('si-rail').innerHTML = featured.map(s => {
+      const live = s.status === 'live';
+      const on = siPicks.includes(s.id);
+      const order = siPicks.indexOf(s.id) + 1;
+      return `
+      <div class="si-card ${s.status==='preview'?'is-preview':''} ${on?'is-picked':''}" ${live?`role="button" tabindex="0" data-sipick="${s.id}"`:`data-sigo="${s.id}"`}>
+        <div class="si-card__media" style="background-image:linear-gradient(150deg, color-mix(in oklch, ${s.accent} 30%, transparent), rgba(20,18,14,.55)), url('${TWW.siImg(s.id, 800)}'); background-size:cover; background-position:center">
+          <span class="si-card__pill pill ${live?'pill-live':'pill-preview'}" style="background:rgba(255,255,255,.92)">${live?'Live':'Preview'}</span>
+          ${live?`<span class="si-card__check" aria-hidden="true">${on?order:''}</span>`:''}
+        </div>
+        <div class="si-card__body">
+          <h3>${s.name}</h3>
+          <p class="sig">If it's ${s.sig}… <span class="tw">Travel Well.</span></p>
+          <div class="si-card__foot">
+            <span>${s.lux?'Luxury & Ultra':'All travelers'}</span>
+            <span style="color:var(--primary);font-weight:600">${live?(on?'Selected ✓':'Tap to choose'):'Notify me →'}</span>
+          </div>
+        </div>
+      </div>`;
+    }).join('');
+    renderSiBar();
+  }
+
+  function renderSiBar() {
+    let bar = document.getElementById('si-pickbar');
+    if (!siPicks.length) { if (bar) bar.remove(); return; }
+    const names = siPicks.map(id => featured.find(s=>s.id===id)?.name).filter(Boolean);
+    const msg = siPicks.length===2 ? 'Two — the sweet spot ✨' : siPicks.length===3 ? 'Three — the most we recommend' : 'Add one more, or continue';
+    const html = `<div class="si-pickbar__inner">
+        <div class="si-pickbar__pills">${names.map((n,i)=>`<span class="si-pickbar__pill">${n}<button data-siremove="${siPicks[i]}" aria-label="Remove ${n}">✕</button></span>`).join('')}</div>
+        <span class="si-pickbar__msg">${msg}</span>
+        <a class="btn btn-primary" href="regions.html" id="si-continue">Continue · choose a region →</a>
+      </div>`;
+    if (!bar) { bar = document.createElement('div'); bar.id = 'si-pickbar'; bar.className = 'si-pickbar'; document.body.appendChild(bar); }
+    bar.innerHTML = html;
+  }
+
+  function toggleSi(id) {
+    const s = featured.find(x=>x.id===id); if (!s || s.status!=='live') return;
+    const i = siPicks.indexOf(id);
+    if (i>=0) siPicks.splice(i,1);
+    else { if (siPicks.length>=SI_MAX) { TWW.toast('Up to 3 — remove one to add another'); return; } siPicks.push(id); }
+    renderSiRail();
+  }
+
+  document.addEventListener('click', (e) => {
+    const pick = e.target.closest('[data-sipick]'); if (pick) { toggleSi(pick.dataset.sipick); return; }
+    const rm = e.target.closest('[data-siremove]'); if (rm) { toggleSi(rm.dataset.siremove); return; }
+    const go = e.target.closest('[data-sigo]'); if (go) { location.href = 'si-detail.html?si=' + go.dataset.sigo; return; }
+    const cont = e.target.closest('#si-continue'); if (cont) { try { localStorage.setItem('tww:journeySIs', JSON.stringify(siPicks)); } catch(e){} }
+  });
+  document.addEventListener('keydown', (e) => {
+    if ((e.key==='Enter'||e.key===' ') && e.target.closest('[data-sipick]')) { e.preventDefault(); toggleSi(e.target.closest('[data-sipick]').dataset.sipick); }
+  });
+
+  renderSiRail();
+
+  // Suggested-for-you (profiled)
+  const sugg = [
+    { name:'Angama Mara', why:'Matches Safari + Romance', meta:'Stay-Well · East Africa' },
+    { name:'Great Migration drive', why:'Your July dates', meta:'Activities-Well' },
+    { name:'Nairobi → Mara flight', why:'Easy on the feet', meta:'Fly-Well' },
+    { name:'Bush-camp dinner', why:'For 2', meta:'Eat-Well' },
+  ];
+  document.getElementById('sugg-rail').innerHTML = sugg.map(c => `
+    <div class="sugg-card">
+      <span class="pill pill-live" style="width:fit-content;margin-bottom:8px">Live</span>
+      <div class="why">${c.why}</div>
+      <div style="font-weight:600;font-size:15px">${c.name}</div>
+      <div style="font-size:12.5px;color:var(--muted-foreground)">${c.meta}</div>
+    </div>`).join('');
+
+  // state switcher
+  document.querySelectorAll('[data-st]').forEach(b => b.addEventListener('click', () => {
+    document.querySelectorAll('[data-st]').forEach(x => x.setAttribute('aria-pressed','false'));
+    b.setAttribute('aria-pressed','true');
+    document.body.dataset.state = b.dataset.st;
+    if (b.dataset.st !== 'anonymous') TWW.toast('Personalized view · Travel ID active');
+  }));
+
+  /* ===== "Talk to Me" looping demo ===== */
+  (function () {
+    const body = document.getElementById('talk-demo-body');
+    const typed = document.getElementById('talk-demo-typed');
+    if (!body) return;
+    const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const userText = 'A safari for our anniversary in July';
+    const recos = [
+      ['Angama Mara', 'Clifftop suites over the Mara — <b>romance + safari</b>'],
+      ['Governors\u2019 Camp', 'Front-row Great Migration — <b>fits your July dates</b>'],
+      ['Mahali Mzuri', 'Branson\u2019s tented camp — <b>made for two</b>'],
+    ];
+    const wait = (ms) => new Promise(r => setTimeout(r, ms));
+    let token = 0;
+
+    function botBubble(html) {
+      const d = document.createElement('div');
+      d.className = 'talk-msg talk-msg--bot';
+      d.innerHTML = html;
+      body.appendChild(d);
+      return d;
+    }
+    function userBubble(html) {
+      const d = document.createElement('div');
+      d.className = 'talk-msg talk-msg--user';
+      d.innerHTML = html;
+      body.appendChild(d);
+    }
+
+    async function typeInto(str, mine) {
+      for (let i = 0; i <= str.length; i++) {
+        if (mine !== token) return;
+        typed.textContent = str.slice(0, i);
+        await wait(34);
+      }
+    }
+
+    async function run() {
+      const mine = ++token;
+      body.innerHTML = '';
+      typed.textContent = '';
+
+      if (reduce) {
+        botBubble('Hi! Tell me your dream in a sentence — I\u2019ll start building it.');
+        userBubble(userText + ' \uD83E\uDD81');
+        botBubble('The Great Migration peaks then. Here are <b>3 that fit you</b>:');
+        recos.forEach((r, i) => addReco(r, i));
+        botBubble('Want me to add these to your trip?');
+        return;
+      }
+
+      await wait(500); if (mine !== token) return;
+      botBubble('Hi! Tell me your dream in a sentence — I\u2019ll start building it.');
+      await wait(900); if (mine !== token) return;
+
+      // user "types" in the input, then sends
+      await typeInto(userText, mine); if (mine !== token) return;
+      await wait(450); if (mine !== token) return;
+      typed.textContent = '';
+      userBubble(userText + ' \uD83E\uDD81');
+      await wait(650); if (mine !== token) return;
+
+      // thinking
+      const think = botBubble('<span class="talk-typing"><span></span><span></span><span></span></span>');
+      await wait(1300); if (mine !== token) return;
+      think.innerHTML = 'The Great Migration peaks then. Here are <b>3 that fit you</b>:';
+
+      for (let i = 0; i < recos.length; i++) {
+        await wait(520); if (mine !== token) return;
+        addReco(recos[i], i);
+      }
+      await wait(650); if (mine !== token) return;
+      botBubble('Want me to add these to your trip? \u2728');
+
+      await wait(3600); if (mine !== token) return;
+      run(); // loop
+    }
+
+    function addReco([name, why], i) {
+      const d = document.createElement('div');
+      d.className = 'talk-rec';
+      d.innerHTML = `<div class="talk-rec__num">${i + 1}</div><div><div class="talk-rec__name">${name}</div><div class="talk-rec__why">${why}</div></div>`;
+      body.appendChild(d);
+    }
+
+    // start when scrolled into view; fall back to starting right away
+    let started = false;
+    function begin() { if (started) return; started = true; run(); }
+    try {
+      const obs = new IntersectionObserver((entries) => {
+        if (entries.some(e => e.isIntersecting)) begin();
+      }, { threshold: 0.3 });
+      obs.observe(document.querySelector('.talk__demo'));
+    } catch (e) { /* ignore */ }
+    // safety net: if the observer never fires in this environment, start anyway
+    setTimeout(begin, 1200);
+  })();
+</script>
+</body>
+</html>

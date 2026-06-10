@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TravelWell — Create your Travel ID</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@400;500;600&family=Noto+Sans+Arabic:wght@400;500;600&family=Noto+Naskh+Arabic:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles/tokens.css">
+<link rel="stylesheet" href="styles/shell.css">
+<link rel="stylesheet" href="styles/onboarding.css">
+</head>
+<body>
+<a href="#main" class="skip-link">Skip to content</a>
+
+<main id="main">
+  <div class="ob">
+    <!-- LEFT RAIL -->
+    <aside class="ob__rail">
+      <span class="eyebrow">Sign up · Build your Travel ID</span>
+      <h1 id="rail-title">Let's design the trip of a lifetime.</h1>
+      <p class="ob__rail-lead" id="rail-lead">A few easy questions — no jargon, no commitment. By the end you'll have a Travel ID and a dream trip already started.</p>
+
+      <div class="ob__tis">
+        <div class="ob__tis-head"><span class="ob__tis-ic"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.6 4.4L18 9l-4.4 1.6L12 15l-1.6-4.4L6 9z"/></svg></span> Travel Intelligence</div>
+        <p class="ob__tis-lead">As you answer, our Travel Intelligence System quietly builds your <b>Travel Personality</b> — so every suggestion fits you.</p>
+        <ul class="ob__tis-list">
+          <li><span class="ob__tis-dot"></span> Your <b>pace</b> — slow or packed</li>
+          <li><span class="ob__tis-dot"></span> What <b>excites</b> you</li>
+          <li><span class="ob__tis-dot"></span> Your <b>budget ranges</b></li>
+          <li><span class="ob__tis-dot"></span> Who's <b>traveling</b> along</li>
+        </ul>
+      </div>
+
+      <nav class="ob-steps" id="ob-steps" aria-label="Sign-up progress"></nav>
+    </aside>
+
+    <!-- PANEL -->
+    <section class="ob__panel">
+      <div class="ob__bar">
+        <div class="ob__progress"><i id="ob-prog" style="width:16%"></i></div>
+        <span class="ob__count" id="ob-count">Step 1 of 6</span>
+        <button class="ob__walk-link" data-walk>
+          <svg class="ic ic-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 3l1.6 4.4L18 9l-4.4 1.6L12 15l-1.6-4.4L6 9z" stroke-linejoin="round"/></svg>
+          Walk me through it instead
+        </button>
+      </div>
+
+      <div class="ob__scroll">
+        <div class="ob__stepwrap" id="ob-step" aria-live="polite"></div>
+      </div>
+    </section>
+  </div>
+</main>
+
+<script src="js/data.js"></script>
+<script src="js/images.js"></script>
+<script src="js/shell.js"></script>
+<script>
+TWW.mountShell({ active: "", footer: false });
+
+/* ============================ Wizard state ============================ */
+const S = {
+  step: 0,
+  name: "", email: "", emailErr: false, nameErr: false,
+  age: "",
+  party: [],              // companions (besides you)
+  notif: {},              // memberId -> 'email'|'sms'|'both'|'none'
+  dream: "",
+  themes: [],             // up to 2
+  length: "",
+  budget: {},             // wellId -> array of selected range values (multi-select)
+  partyDraft: null,       // {name, age, rel} while adding
+};
+
+const STEPS = [
+  { key:"you",     label:"You",          sub:"Name & email" },
+  { key:"age",     label:"Age range",    sub:"Safe & exciting" },
+  { key:"party",   label:"Your party",   sub:"Who's traveling" },
+  { key:"notif",   label:"Notifications",sub:"Who hears from us" },
+  { key:"dream",   label:"Your dream",   sub:"Theme & length" },
+  { key:"budget",  label:"Budget blend", sub:"Per-Well tiers" },
+];
+
+const AGES = [
+  { v:"18-24", t:"18–24" }, { v:"25-34", t:"25–34" }, { v:"35-49", t:"35–49" },
+  { v:"50-64", t:"50–64" }, { v:"65+", t:"65 and over" }, { v:"na", t:"Prefer not to say" },
+];
+const THEMES = [
+  { v:"wild",    t:"Wild & remote",       s:"Big nature, few crowds" },
+  { v:"sun",     t:"Sun & sea",            s:"Beaches, islands, slow days" },
+  { v:"culture", t:"Culture & cities",     s:"History, food, design" },
+  { v:"restore", t:"Slow & restorative",   s:"Wellness, space to breathe" },
+  { v:"celebrate",t:"A big celebration",   s:"Honeymoon, milestone, group" },
+  { v:"offbeat", t:"Off the beaten path",  s:"Surprise me" },
+];
+const LENGTHS = [
+  { v:"weekend", t:"A weekend" }, { v:"week", t:"About a week" },
+  { v:"twoweek", t:"Two weeks" }, { v:"month", t:"A month or more" }, { v:"unsure", t:"Not sure yet" },
+];
+const BUDGET_WELLS = [
+  { id:"fly", name:"Fly-Well", icon:"plane", tag:"Getting there" },
+  { id:"stay", name:"Stay-Well", icon:"bed", tag:"Where you rest" },
+  { id:"eat", name:"Eat-Well", icon:"utensils", tag:"What you savor" },
+  { id:"move", name:"Move-Well", icon:"car", tag:"Getting around" },
+  { id:"gear", name:"Gear-Well", icon:"bag", tag:"What you carry" },
+  { id:"beauty", name:"Beauty-Well", icon:"sparkle", tag:"Looking & feeling well" },
+  { id:"activities", name:"Activities-Well", icon:"compass", tag:"What excites you" },
+  { id:"shop", name:"Shop-Well", icon:"gift", tag:"Taking it home" },
+  { id:"insure", name:"Insure-Well", icon:"shield", tag:"Peace of mind" },
+  { id:"ship", name:"Ship-Well", icon:"box", tag:"Sending it ahead" },
+];
+// Choose as many ranges as you like, in any Well — except Fly-Well (cabin class).
+const BUDGET_RANGES = [
+  { v:"luxury",   t:"Luxury",           s:"The very best" },
+  { v:"highend",  t:"High-End",         s:"Premium, polished" },
+  { v:"midrange", t:"Mid-Range",        s:"Comfortable value" },
+  { v:"family",   t:"Family Friendly",  s:"Easy for all ages" },
+  { v:"budget",   t:"Budget Conscious", s:"Smart & lean" },
+];
+const FLY_RANGES = [
+  { v:"first",    t:"First Class",    s:"The pointy end" },
+  { v:"business", t:"Business Class", s:"Lie-flat comfort" },
+  { v:"coach",    t:"Coach",          s:"Get me there" },
+];
+const rangesFor = (id) => id==="fly" ? FLY_RANGES : BUDGET_RANGES;
+const rangeLabel = (id,v) => (rangesFor(id).find(r=>r.v===v)||{}).t || v;
+
+const $ = (s, r=document) => r.querySelector(s);
+const ICON = TWW.ICON;
+const initials = (n) => (n||"?").trim().split(/\s+/).map(w=>w[0]).slice(0,2).join("").toUpperCase() || "?";
+
+/* ============================ Rendering ============================== */
+function renderRail() {
+  $("#ob-steps").innerHTML = STEPS.map((st, i) => {
+    const state = i < S.step ? "done" : i === S.step ? "current" : "todo";
+    return `<div class="ob-step" data-state="${state}">
+      <div class="ob-step__dot">${i < S.step ? ICON("check","ic-sm") : i+1}</div>
+      <div><div class="ob-step__label">${st.label}</div><div class="ob-step__sub">${st.sub}</div></div>
+    </div>`;
+  }).join("");
+}
+
+function renderBar() {
+  const isBuild = S.step >= STEPS.length;
+  $("#ob-prog").style.width = isBuild ? "100%" : `${((S.step+1)/STEPS.length)*100}%`;
+  $("#ob-count").textContent = isBuild ? "All set" : `Step ${S.step+1} of ${STEPS.length}`;
+}
+
+function step_you() {
+  return `
+    <span class="eyebrow ob__eyebrow">First, the basics</span>
+    <h2 class="ob__title">Who's dreaming?</h2>
+    <div class="ob__why">${ICON("globe","ic-sm")}<span>Your name personalizes everything; your email is just for your magic link and trip updates. <b>No password, ever.</b></span></div>
+    <div class="ob__fields">
+      <div class="fld">
+        <label for="f-name">Your name</label>
+        <input type="text" id="f-name" value="${S.name}" placeholder="e.g. Amara Okonkwo" aria-invalid="${S.nameErr}">
+        <div class="fld__err" data-show="${S.nameErr}">${ICON("close","ic-sm")} Please tell us what to call you.</div>
+      </div>
+      <div class="fld">
+        <label for="f-email">Email</label>
+        <input type="email" id="f-email" value="${S.email}" placeholder="you@email.com" aria-invalid="${S.emailErr}">
+        <div class="fld__err" data-show="${S.emailErr}">${ICON("close","ic-sm")} That doesn't look like an email yet.</div>
+        <div class="fld__hint">We'll send a one-tap magic link here — nothing to remember.</div>
+      </div>
+    </div>`;
+}
+
+function step_age() {
+  return `
+    <span class="eyebrow ob__eyebrow">A gentle question</span>
+    <h2 class="ob__title">Which age range fits you?</h2>
+    <div class="ob__why">${ICON("shield","ic-sm")}<span>We use a <b>range, never your birthday</b> — only to keep suggestions both safe and exciting (think: nightlife vs. nap-friendly pacing). It's yours to change anytime.</span></div>
+    <div class="ob__fields">
+      <div class="choices choices--2" role="group" aria-label="Age range">
+        ${AGES.map(a => `<button class="choice" data-age="${a.v}" aria-pressed="${S.age===a.v}">
+          <span class="choice__check">${ICON("check","ic-sm")}</span>
+          <span class="choice__t">${a.t}</span>
+        </button>`).join("")}
+      </div>
+    </div>`;
+}
+
+function step_party() {
+  const you = { name: S.name || "You", role:"You · books & pays", tag:"Lead", av: initials(S.name||"You") };
+  const draft = S.partyDraft;
+  return `
+    <span class="eyebrow ob__eyebrow">Your party</span>
+    <h2 class="ob__title">Who's coming with you?</h2>
+    <div class="ob__why">${ICON("heart","ic-sm")}<span>A couple or family travels on <b>one itinerary and one budget</b>. Travelers who pay separately get their own party — you can link them later. Add anyone you'll book &amp; pay for.</span></div>
+    <div class="ob__fields">
+      <div class="party-list" id="party-list">
+        <div class="party-member">
+          <div class="party-member__av">${you.av}</div>
+          <div><div class="party-member__name">${you.name}</div><div class="party-member__meta">${you.role}</div></div>
+          <span class="party-member__tag">${you.tag}</span>
+        </div>
+        ${S.party.map((m, i) => `
+          <div class="party-member">
+            <div class="party-member__av">${initials(m.name)}</div>
+            <div><div class="party-member__name">${m.name}</div><div class="party-member__meta">${relLabel(m.rel)} · ${ageLabel(m.age)}</div></div>
+            <button class="party-member__remove" data-remove="${i}" aria-label="Remove ${m.name}">${ICON("close","ic-sm")}</button>
+          </div>`).join("")}
+      </div>
+      ${draft ? `
+        <div class="party-form" id="party-form">
+          <div class="fld"><label for="pf-name">Their name</label><input type="text" id="pf-name" value="${draft.name}" placeholder="e.g. Maya"></div>
+          <div class="fld"><label for="pf-age">Age range</label>
+            <select id="pf-age">${[{v:"0-12",t:"Child (0–12)"},{v:"13-17",t:"Teen (13–17)"}].concat(AGES.filter(a=>a.v!=="na")).map(a=>`<option value="${a.v}" ${draft.age===a.v?"selected":""}>${a.t}</option>`).join("")}</select>
+          </div>
+          <div class="fld" style="grid-column:1/-1"><label for="pf-rel">Relationship</label>
+            <select id="pf-rel">${[["partner","Partner / spouse"],["child","Child"],["family","Family member"],["companion","Travel companion"]].map(([v,t])=>`<option value="${v}" ${draft.rel===v?"selected":""}>${t}</option>`).join("")}</select>
+          </div>
+          <div class="party-form__row">
+            <button class="btn btn-secondary" data-canceladd>Cancel</button>
+            <button class="btn btn-primary" data-saveadd>Add to party</button>
+          </div>
+        </div>` : `<button class="party-add" data-add>${ICON("check","ic-sm")} Add a traveler</button>`}
+      <p class="fld__hint">Traveling solo? That's perfect too — just continue.</p>
+    </div>`;
+}
+
+function step_notif() {
+  const members = [{ id:"you", name: S.name||"You", role:"You (always notified)", locked:true }]
+    .concat(S.party.map((m,i)=>({ id:"m"+i, name:m.name, role: relLabel(m.rel), child: m.age==="0-12"||m.age==="13-17" })));
+  return `
+    <span class="eyebrow ob__eyebrow">Notifications</span>
+    <h2 class="ob__title">Who hears from us, and how?</h2>
+    <div class="ob__why">${ICON("message","ic-sm")}<span>You're always in the loop. A partner can opt into their own channel; <b>children get none</b>. Quiet by default — only what matters for the trip.</span></div>
+    <div class="ob__fields">
+      ${members.map(m => {
+        const val = S.notif[m.id] || (m.locked ? "email" : m.child ? "none" : "email");
+        const childNote = m.child ? `<span class="party-member__meta">No notifications for children</span>` : "";
+        return `<div class="notif-row">
+          <div class="party-member__av">${initials(m.name)}</div>
+          <div><div class="party-member__name">${m.name}</div><div class="party-member__meta">${m.role}</div>${childNote}</div>
+          <div class="seg" role="group" aria-label="Notify ${m.name}">
+            ${["email","sms","both","none"].map(o=>`<button data-notif="${m.id}" data-val="${o}" aria-pressed="${val===o}" ${m.child?"disabled":""}>${o==="email"?"Email":o==="sms"?"SMS":o==="both"?"Both":"None"}</button>`).join("")}
+          </div>
+        </div>`;
+      }).join("")}
+    </div>`;
+}
+
+function step_dream() {
+  return `
+    <span class="eyebrow ob__eyebrow">Your dream</span>
+    <h2 class="ob__title">Paint the trip in your own words.</h2>
+    <div class="ob__why">${ICON("sparkles","ic-sm")}<span>One sentence is plenty — the Concierge reads this to seed your dream trip. You can be vague ("somewhere warm") or specific.</span></div>
+    <div class="ob__fields">
+      <div class="fld">
+        <label for="f-dream">Your dream, in a line or two</label>
+        <textarea id="f-dream" placeholder="e.g. A safari for our 10th anniversary in July — romantic, a little wild, easy on the feet.">${S.dream}</textarea>
+      </div>
+      <div class="fld">
+        <label>Pick a theme or two <span class="opt">— not the full catalog, just a feeling</span></label>
+        <div class="choices choices--3" role="group" aria-label="Theme">
+          ${THEMES.map(t=>`<button class="choice" data-theme="${t.v}" aria-pressed="${S.themes.includes(t.v)}" style="flex-direction:column;align-items:flex-start;gap:4px">
+            <span class="choice__t">${t.t}</span><span class="choice__s">${t.s}</span>
+          </button>`).join("")}
+        </div>
+        <div class="fld__hint" id="theme-hint">1–2 is the sweet spot.</div>
+      </div>
+      <div class="fld">
+        <label>How long, roughly?</label>
+        <div class="choices choices--3" role="group" aria-label="Trip length">
+          ${LENGTHS.map(l=>`<button class="choice" data-length="${l.v}" aria-pressed="${S.length===l.v}" style="justify-content:center"><span class="choice__t">${l.t}</span></button>`).join("")}
+        </div>
+      </div>
+    </div>`;
+}
+
+function step_budget() {
+  return `
+    <span class="eyebrow ob__eyebrow">Budget ranges</span>
+    <h2 class="ob__title">Set your comfort, Well by Well.</h2>
+    <div class="ob__why">${ICON("compass","ic-sm")}<span>Pick <b>as many ranges as you like</b> in each Well — most travelers mix (splurge on the stay, keep flights sensible). Fly-Well is by cabin class. This shapes which providers we surface.</span></div>
+
+    <button class="bdg-speak" type="button" data-tw-concierge>
+      <span class="bdg-speak__ic">${ICON("sparkles","ic-sm")}</span>
+      <span class="bdg-speak__t">Rather just say it? <b>Speak with Claude</b> — “luxury stays, business class, mid-range food” — and we'll fill these in.</span>
+      <span class="bdg-speak__mic">${ICON("mic","ic-sm")}</span>
+    </button>
+
+    <div class="ob__fields bdg-list" id="bdg-list">
+      ${BUDGET_WELLS.map(budgetRow).join("")}
+    </div>`;
+}
+
+function budgetRow(w) {
+  const sel = S.budget[w.id] || [];
+  const opts = rangesFor(w.id);
+  const trigger = sel.length
+    ? `<span class="bdg-drop__chips">${sel.map(v=>`<span class="bdg-chip">${rangeLabel(w.id,v)}</span>`).join("")}</span>`
+    : `<span class="bdg-drop__ph">${w.id==="fly"?"Choose cabin class…":"Choose ranges…"}</span>`;
+  return `<div class="bdg-row" data-well="${w.id}">
+    <div class="bdg-row__head">
+      <div class="budget-well__ic">${ICON(w.icon)}</div>
+      <div><div class="party-member__name">${w.name}</div><div class="party-member__meta">${w.tag}</div></div>
+      ${sel.length?`<span class="bdg-row__count">${sel.length}</span>`:``}
+    </div>
+    <div class="bdg-drop" data-dd="${w.id}">
+      <button class="bdg-drop__trigger" type="button" aria-expanded="false" aria-haspopup="listbox" data-ddtrigger="${w.id}">
+        ${trigger}
+        <span class="bdg-drop__chev">${ICON("chev","ic-sm")}</span>
+      </button>
+      <div class="bdg-drop__menu" role="listbox" aria-multiselectable="true" aria-label="${w.name} ranges">
+        ${opts.map(r=>{
+          const on = sel.includes(r.v);
+          return `<button class="bdg-opt" type="button" role="option" aria-selected="${on}" data-bopt="${w.id}:${r.v}">
+            <span class="bdg-opt__box">${ICON("check","ic-sm")}</span>
+            <span class="bdg-opt__t">${r.t}</span><span class="bdg-opt__s">${r.s}</span>
+          </button>`;
+        }).join("")}
+      </div>
+    </div>
+  </div>`;
+}
+
+function step_build() {
+  const members = [{ name: S.name||"You", role:"Lead traveler · books & pays", lead:true, age:S.age }]
+    .concat(S.party.map(m=>({ name:m.name, role: relLabel(m.rel), age:m.age })));
+  const themeNames = S.themes.map(v=>THEMES.find(t=>t.v===v)?.t).filter(Boolean);
+  const lengthName = LENGTHS.find(l=>l.v===S.length)?.t || "Flexible";
+  return `
+    <div class="build">
+      <div class="build__burst">${ICON("check")}</div>
+      <span class="eyebrow ob__eyebrow" style="text-align:center">Your party is ready</span>
+      <h2 class="ob__title">${members.length>1?`${members.length} Travel IDs built`:`Your Travel ID is built`} — and your dream trip has started.</h2>
+      <p class="t-lead" style="margin-top:14px">Everything's saved to this device. Next we'll switch a few things on (email, safety location, alerts) — or you can dive straight into designing.</p>
+
+      <div class="id-cards">
+        ${members.map(m => `
+          <div class="id-card">
+            <div class="id-card__top">
+              <div class="id-card__av">${initials(m.name)}</div>
+              <div style="flex:1;min-width:0"><div class="id-card__name">${m.name}</div><div class="id-card__role">${m.role}</div></div>
+            </div>
+            <div class="id-card__body">
+              <div class="id-attr"><div class="id-attr__k">Age range</div><div class="id-attr__v">${ageLabel(m.age)||"—"}</div></div>
+              <div class="id-attr"><div class="id-attr__k">Trip length</div><div class="id-attr__v">${lengthName}</div></div>
+              <div class="id-attr" style="grid-column:1/-1"><div class="id-attr__k">Themes</div>
+                <div class="id-card__chips">${(themeNames.length?themeNames:["Open to ideas"]).map(t=>`<span class="pill pill-live" style="background:var(--secondary)">${t}</span>`).join("")}</div>
+              </div>
+              ${m.lead ? `<div class="id-attr" style="grid-column:1/-1"><div class="id-attr__k">Budget blend</div>
+                <div class="id-card__chips">${BUDGET_WELLS.map(w=>`<span class="pill pill-preview">${w.name.split("-")[0]}: ${(S.budget[w.id]||"elevated")}</span>`).join("")}</div></div>` : ""}
+              ${m.lead && S.dream ? `<div class="id-attr" style="grid-column:1/-1"><div class="id-attr__k">The dream</div><div class="id-attr__v" style="font-family:var(--font-display);font-style:italic;font-weight:400">"${S.dream}"</div></div>`:""}
+            </div>
+          </div>`).join("")}
+      </div>
+
+      <div class="card" style="margin-top:24px;padding:20px;display:flex;gap:14px;align-items:center;text-align:start">
+        <div class="icon-chip" style="background:var(--secondary)">${ICON("sparkles")}</div>
+        <div style="flex:1">
+          <div style="font-weight:600">Your dream trip is started</div>
+          <div class="t-body-s" style="color:var(--muted-foreground)">We seeded an Activities-Well block from your dream. It's waiting in Your Trip.</div>
+        </div>
+        <span class="pill pill-gold">Started</span>
+      </div>
+
+      <div style="display:flex;gap:12px;justify-content:center;margin-top:28px;flex-wrap:wrap">
+        <a class="btn btn-primary" href="activate.html" style="height:52px;padding:0 28px;font-size:16px">Finish setting up →</a>
+        <a class="btn btn-secondary" href="special-interests.html" style="height:52px">Skip — start designing</a>
+      </div>
+      <p class="ftc" style="justify-content:center;margin-top:18px">${ICON("globe","ic-sm")} You can edit or delete your Travel ID anytime from Profile. We never sold or shared it — it lives on your device.</p>
+    </div>`;
+}
+
+function relLabel(r){ return ({partner:"Partner",child:"Child",family:"Family",companion:"Companion"})[r]||"Companion"; }
+function ageLabel(v){ if(v==="0-12")return "Child (0–12)"; if(v==="13-17")return "Teen (13–17)"; if(v==="na")return "Undisclosed"; const a=AGES.find(x=>x.v===v); return a?a.t:v; }
+
+const RENDER = { you:step_you, age:step_age, party:step_party, notif:step_notif, dream:step_dream, budget:step_budget };
+
+function render() {
+  renderRail(); renderBar();
+  const isBuild = S.step >= STEPS.length;
+  let html = isBuild ? step_build() : RENDER[STEPS[S.step].key]();
+  if (!isBuild) {
+    const lastStep = S.step === STEPS.length - 1;
+    html += `
+      <div class="ob__inline-actions">
+        ${S.step > 0 ? '<button class="btn btn-secondary" id="ob-back">← Back</button>' : '<span></span>'}
+        <button class="btn btn-primary" id="ob-next">${lastStep ? 'Build my Travel ID →' : 'Continue →'}</button>
+      </div>
+      <p class="ob__footnote">${ICON('shield','ic-sm')} No password needed — we'll send a magic link. We never ask your birthday, only an age range. You can edit or delete everything later.</p>`;
+  }
+  $("#ob-step").innerHTML = html;
+  $("#ob-step").style.animation = "none"; void $("#ob-step").offsetWidth; $("#ob-step").style.animation = "";
+  wireStep();
+  document.querySelector('.ob__scroll')?.scrollTo?.(0,0);
+}
+
+/* ============================ Step wiring ============================ */
+function wireStep() {
+  const key = S.step < STEPS.length ? STEPS[S.step].key : "build";
+  if (key === "you") {
+    $("#f-name").addEventListener("input", e => { S.name = e.target.value; if(S.nameErr&&e.target.value.trim()){S.nameErr=false;e.target.setAttribute("aria-invalid","false");e.target.parentElement.querySelector(".fld__err").dataset.show="false";} });
+    $("#f-email").addEventListener("input", e => { S.email = e.target.value; if(S.emailErr&&validEmail(e.target.value)){S.emailErr=false;e.target.setAttribute("aria-invalid","false");e.target.parentElement.querySelector(".fld__err").dataset.show="false";} });
+  }
+  if (key === "age") $("#ob-step").querySelectorAll("[data-age]").forEach(b=>b.addEventListener("click",()=>{S.age=b.dataset.age;syncPressed("data-age",b);}));
+  if (key === "party") {
+    $("#ob-step").querySelector("[data-add]")?.addEventListener("click",()=>{S.partyDraft={name:"",age:"35-49",rel:"partner"};render();setTimeout(()=>$("#pf-name")?.focus(),50);});
+    $("#ob-step").querySelector("[data-canceladd]")?.addEventListener("click",()=>{S.partyDraft=null;render();});
+    $("#ob-step").querySelector("[data-saveadd]")?.addEventListener("click",()=>{
+      const name=$("#pf-name").value.trim(); if(!name){$("#pf-name").focus();return;}
+      S.party.push({name,age:$("#pf-age").value,rel:$("#pf-rel").value}); S.partyDraft=null; render(); TWW.toast("Added to your party");
+    });
+    $("#ob-step").querySelectorAll("[data-remove]").forEach(b=>b.addEventListener("click",()=>{S.party.splice(+b.dataset.remove,1);render();}));
+  }
+  if (key === "notif") $("#ob-step").querySelectorAll("[data-notif]").forEach(b=>b.addEventListener("click",()=>{
+    if(b.disabled)return; S.notif[b.dataset.notif]=b.dataset.val;
+    b.parentElement.querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed","false")); b.setAttribute("aria-pressed","true");
+  }));
+  if (key === "dream") {
+    $("#f-dream").addEventListener("input",e=>S.dream=e.target.value);
+    $("#ob-step").querySelectorAll("[data-theme]").forEach(b=>b.addEventListener("click",()=>{
+      const v=b.dataset.theme; const i=S.themes.indexOf(v);
+      if(i>=0)S.themes.splice(i,1); else { if(S.themes.length>=2){TWW.toast("1–2 themes is the sweet spot");return;} S.themes.push(v); }
+      b.setAttribute("aria-pressed",S.themes.includes(v));
+    }));
+    $("#ob-step").querySelectorAll("[data-length]").forEach(b=>b.addEventListener("click",()=>{S.length=b.dataset.length;syncPressed("data-length",b);}));
+  }
+  if (key === "budget") {
+    const stepEl = $("#ob-step");
+    // toggle a dropdown open/closed
+    stepEl.querySelectorAll("[data-ddtrigger]").forEach(t=>t.addEventListener("click",(ev)=>{
+      ev.stopPropagation();
+      const dd = t.closest(".bdg-drop");
+      const open = dd.classList.contains("open");
+      stepEl.querySelectorAll(".bdg-drop.open").forEach(d=>{ d.classList.remove("open"); d.querySelector("[data-ddtrigger]")?.setAttribute("aria-expanded","false"); });
+      if(!open){ dd.classList.add("open"); t.setAttribute("aria-expanded","true"); }
+    }));
+    // multi-select a range option
+    stepEl.querySelectorAll("[data-bopt]").forEach(o=>o.addEventListener("click",(ev)=>{
+      ev.stopPropagation();
+      const [wid,v] = o.dataset.bopt.split(":");
+      const arr = S.budget[wid] = S.budget[wid] || [];
+      const i = arr.indexOf(v);
+      if(i>=0) arr.splice(i,1); else arr.push(v);
+      if(!arr.length) delete S.budget[wid];
+      // re-render just this row in place, keeping its menu open
+      const row = o.closest(".bdg-row");
+      const fresh = document.createElement("div"); fresh.innerHTML = budgetRow(BUDGET_WELLS.find(w=>w.id===wid));
+      const newRow = fresh.firstElementChild; newRow.querySelector(".bdg-drop").classList.add("open");
+      newRow.querySelector("[data-ddtrigger]").setAttribute("aria-expanded","true");
+      row.replaceWith(newRow);
+      bindBudgetRow(newRow);
+    }));
+  }
+}
+// re-bind handlers for a single freshly-rendered budget row
+function bindBudgetRow(row) {
+  const stepEl = $("#ob-step");
+  row.querySelector("[data-ddtrigger]")?.addEventListener("click",(ev)=>{
+    ev.stopPropagation();
+    const dd = row.querySelector(".bdg-drop"); const open = dd.classList.contains("open");
+    stepEl.querySelectorAll(".bdg-drop.open").forEach(d=>{ d.classList.remove("open"); d.querySelector("[data-ddtrigger]")?.setAttribute("aria-expanded","false"); });
+    if(!open){ dd.classList.add("open"); ev.currentTarget.setAttribute("aria-expanded","true"); }
+  });
+  row.querySelectorAll("[data-bopt]").forEach(o=>o.addEventListener("click",(ev)=>{
+    ev.stopPropagation();
+    const [wid,v] = o.dataset.bopt.split(":");
+    const arr = S.budget[wid] = S.budget[wid] || [];
+    const i = arr.indexOf(v); if(i>=0) arr.splice(i,1); else arr.push(v);
+    if(!arr.length) delete S.budget[wid];
+    const fresh = document.createElement("div"); fresh.innerHTML = budgetRow(BUDGET_WELLS.find(w=>w.id===wid));
+    const newRow = fresh.firstElementChild; newRow.querySelector(".bdg-drop").classList.add("open");
+    newRow.querySelector("[data-ddtrigger]").setAttribute("aria-expanded","true");
+    row.replaceWith(newRow); bindBudgetRow(newRow);
+  }));
+}
+// close any open budget dropdown when clicking elsewhere
+document.addEventListener("click",(e)=>{
+  if(e.target.closest(".bdg-drop")) return;
+  document.querySelectorAll(".bdg-drop.open").forEach(d=>{ d.classList.remove("open"); d.querySelector("[data-ddtrigger]")?.setAttribute("aria-expanded","false"); });
+});
+function syncPressed(attr,el){ el.parentElement.querySelectorAll(`[${attr}]`).forEach(x=>x.setAttribute("aria-pressed","false")); el.setAttribute("aria-pressed","true"); }
+function validEmail(v){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim()); }
+
+/* ============================ Nav / validation ====================== */
+function validate() {
+  const key = STEPS[S.step].key;
+  if (key === "you") {
+    let ok = true;
+    if (!S.name.trim()) { S.nameErr = true; ok = false; }
+    if (!validEmail(S.email)) { S.emailErr = true; ok = false; }
+    if (!ok) { render(); return false; }
+  }
+  if (key === "age" && !S.age) { TWW.toast("Pick an age range to continue"); return false; }
+  return true;
+}
+
+document.addEventListener("click", (e) => {
+  if (e.target.closest("#ob-next")) {
+    if (S.step < STEPS.length) { if (!validate()) return; }
+    if (S.step === STEPS.length-1) {
+      // build moment: seed a trip block from the dream
+      TWW.trip = (TWW.trip||[]).concat([{ well:"activities", icon:"compass", name:"Your dream trip", meta:"Seeded from sign-up", status:"idea" }]);
+      try{ localStorage.setItem("tww:trip", JSON.stringify(TWW.trip)); localStorage.setItem("tww:travelID", JSON.stringify({name:S.name,age:S.age,themes:S.themes,party:S.party.length+1})); }catch(e){}
+      TWW.renderTray?.();
+    }
+    S.step++;
+    render();
+  } else if (e.target.closest("#ob-back")) {
+    if(S.step>0){S.step--;render();}
+  }
+});
+
+/* "Walk me through it" hands to the Concierge guided flow */
+document.querySelector("[data-walk]").addEventListener("click", () => {
+  TWW.closeAll(); const c=$("#tw-concierge"); if(c){c.dataset.open="true"; TWW.conciergeState("guided");}
+});
+
+render();
+</script>
+</body>
+</html>

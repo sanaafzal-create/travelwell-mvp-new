@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TravelWell — Guide</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@400;500;600&family=Noto+Sans+Arabic:wght@400;500;600&family=Noto+Naskh+Arabic:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles/tokens.css">
+<link rel="stylesheet" href="styles/shell.css">
+<link rel="stylesheet" href="styles/journey.css">
+<style>
+  .gd-hero { position:relative; min-height:460px; display:flex; align-items:flex-end; overflow:hidden; }
+  .gd-hero img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+  .gd-hero__scrim { position:absolute; inset:0; background:linear-gradient(180deg,rgba(15,22,20,.15),rgba(13,20,18,.85)); }
+  .gd-hero__inner { position:relative; max-width:var(--reading-max); margin-inline:auto; padding:0 var(--gutter) 44px; width:100%; color:#fff; }
+  .gd-hero__type { display:inline-flex; align-items:center; gap:7px; background:rgba(255,255,255,.16); backdrop-filter:blur(6px); border:1px solid rgba(255,255,255,.25); border-radius:var(--radius-pill); padding:5px 13px; font-size:12px; font-weight:600; }
+  .gd-hero h1 { color:#fff; font-size:clamp(34px,5.5vw,58px); line-height:1.03; letter-spacing:-.015em; margin-top:14px; text-shadow:0 2px 24px rgba(0,0,0,.4); }
+  .gd-hero__meta { display:flex; gap:16px; margin-top:16px; font-size:14px; color:rgba(255,255,255,.85); flex-wrap:wrap; }
+  .gd-hero__meta span { display:inline-flex; align-items:center; gap:6px; }
+
+  .gd-body { max-width:var(--reading-max); margin-inline:auto; padding:44px var(--gutter) 0; }
+  .gd-lede { font-size:22px; line-height:1.5; color:var(--foreground); font-family:var(--font-display); font-weight:400; }
+  .gd-prose p { font-size:18px; line-height:1.75; color:var(--foreground); margin-top:20px; }
+  .gd-prose h2 { font-size:28px; margin-top:40px; }
+  .gd-prose a { color:var(--primary); font-weight:600; text-decoration:underline; text-underline-offset:2px; }
+  .gd-inline-link { display:flex; gap:14px; align-items:center; border:1px solid var(--border); border-radius:var(--radius); background:var(--surface-alt); padding:14px 16px; margin:24px 0; text-decoration:none; color:var(--foreground); transition:border-color .15s; }
+  .gd-inline-link:hover { border-color:var(--primary); text-decoration:none; }
+  .gd-inline-link__ic { width:42px; height:42px; border-radius:10px; background:var(--secondary); color:var(--primary); display:grid; place-items:center; flex:none; }
+  .gd-inline-link__k { font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:var(--muted-foreground); font-weight:700; }
+  .gd-inline-link__t { font-family:var(--font-display); font-weight:600; font-size:17px; }
+  .gd-inline-link__arrow { margin-inline-start:auto; color:var(--primary); }
+
+  /* ranked top list */
+  .gd-rank { margin-top:24px; display:flex; flex-direction:column; gap:14px; }
+  .gd-rank__item { display:flex; gap:18px; align-items:flex-start; border:1px solid var(--border); border-radius:var(--radius); background:var(--card); box-shadow:var(--e1); padding:18px 20px; }
+  .gd-rank__num { width:44px; height:44px; border-radius:50%; background:var(--secondary); color:var(--primary); display:grid; place-items:center; font-family:var(--font-display); font-weight:700; font-size:20px; flex:none; }
+  .gd-rank__name { font-family:var(--font-display); font-weight:600; font-size:20px; }
+  .gd-rank__note { font-size:14.5px; color:var(--muted-foreground); margin-top:3px; line-height:1.5; }
+
+  .gd-share { display:flex; align-items:center; gap:12px; margin-top:40px; padding-top:24px; border-top:1px solid var(--border); }
+  .gd-share span { font-size:13.5px; color:var(--muted-foreground); }
+
+  /* related */
+  .gd-related { max-width:var(--content-max); margin-inline:auto; padding:56px var(--gutter) 0; }
+  .gd-related h2 { font-size:var(--t-h2); margin-bottom:20px; }
+  .gd-rel-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:18px; }
+  .gd-rel { border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; background:var(--card); box-shadow:var(--e1); text-decoration:none; color:var(--foreground); }
+  .gd-rel img { width:100%; height:130px; object-fit:cover; }
+  .gd-rel__b { padding:14px 16px; } .gd-rel__t { font-family:var(--font-display); font-weight:600; font-size:16px; line-height:1.2; }
+  .gd-rel__m { font-size:12px; color:var(--muted-foreground); margin-top:6px; }
+  @media (max-width:760px){ .gd-rel-grid{grid-template-columns:1fr;} }
+</style>
+</head>
+<body>
+<a href="#main" class="skip-link">Skip to content</a>
+<div class="jn-subhead"><div class="jn-subhead__inner">
+  <nav class="jn-crumbs" aria-label="Breadcrumb"><a href="Home.html">Home</a><span class="sep">/</span><a href="guides.html">Guides</a><span class="sep">/</span><span class="here" id="crumb">Guide</span></nav>
+</div></div>
+<main id="main"><div id="gd-root"></div></main>
+
+<script src="js/data.js"></script>
+<script src="js/places.js"></script>
+<script src="js/images.js"></script>
+<script src="js/shell.js"></script>
+<script>
+TWW.mountShell({ active: "guides" });
+const $ = (s,r=document)=>r.querySelector(s);
+const ICON = TWW.ICON;
+const qs = new URLSearchParams(location.search);
+const G = TWW.GUIDES.find(x=>x.id===qs.get("g")) || TWW.GUIDES.find(x=>x.id==="morocco-top8");
+$("#crumb").textContent = G.title;
+document.title = "TravelWell — " + G.title;
+
+const isTop = G.type==="Top List" && G.id==="morocco-top8";
+const region = TWW.REGIONS.find(r=>r.code===G.region);
+const si = TWW.SIS.find(s=>s.id===G.si);
+
+// generic prose for non-Morocco guides
+const PROSE = {
+  "migration-timing": `<p>The Great Migration isn't an event so much as a year-long circuit — nearly two million wildebeest, zebra and gazelle following the rains in a vast clockwise loop through the Serengeti and the Maasai Mara.</p><h2>Month by month</h2><p>From <b>July to October</b>, the herds mass in the northern Serengeti and the Mara, and the famous river crossings happen — heart-stopping, crocodile-lined, and impossible to schedule precisely. <b>January to March</b> brings calving season in the southern Serengeti: gentler, greener, and extraordinary for predators.</p><p>The honest truth: nature doesn't read calendars. Give yourself a window of several days in the right region, and let your guide chase the movement.</p>`,
+  "safari-packing": `<p>The single biggest packing mistake on safari is bringing too much. Soft duffel, neutral layers, and a good pair of binoculars will carry you further than a suitcase of options.</p><h2>The non-negotiables</h2><p>Layers for cold dawns and hot middays. A wide-brim hat. Real sunscreen. And the three things first-timers always forget: a headtorch, a dust-proof bag for your camera, and twice as many memory cards as you think you need.</p>`,
+  "default": `<p>${G.lede}</p><p>This guide is part of the TravelWell desk's growing library — practical, honest, and written by people who've made the trip themselves. We update it whenever the on-the-ground reality changes.</p><h2>Why it matters</h2><p>Great trips are built on small, well-timed decisions. The right month, the right base, the right order of days. That's what these guides are for.</p>`,
+};
+const prose = isTop ? "" : (PROSE[G.id] || PROSE.default);
+
+function render() {
+  const hero = `<section class="gd-hero">
+    <img src="${TWW.img(G.img,1800)}" alt="" referrerpolicy="no-referrer"><span class="gd-hero__scrim"></span>
+    <div class="gd-hero__inner">
+      <span class="gd-hero__type">${ICON("compass","ic-sm")} ${G.type}</span>
+      <h1>${G.title}</h1>
+      <div class="gd-hero__meta"><span>${ICON("info","ic-sm")} ${G.read} read</span><span>Updated ${G.updated}</span>${region?`<span>${ICON("pin","ic-sm")} ${region.name}</span>`:''}</div>
+    </div>
+  </section>`;
+
+  const inlineLinks = `
+    ${region?`<a class="gd-inline-link" href="region-detail.html?r=${region.code}"><span class="gd-inline-link__ic">${ICON("globe")}</span><span><span class="gd-inline-link__k">Region</span><span class="gd-inline-link__t">${region.name}</span></span><span class="gd-inline-link__arrow">${ICON("arrow","ic-sm")}</span></a>`:''}
+    ${si?`<a class="gd-inline-link" href="si-detail.html?si=${si.id}"><span class="gd-inline-link__ic">${ICON("compass")}</span><span><span class="gd-inline-link__k">Special interest</span><span class="gd-inline-link__t">${si.name}</span></span><span class="gd-inline-link__arrow">${ICON("arrow","ic-sm")}</span></a>`:''}`;
+
+  const topList = isTop ? `<div class="gd-rank">
+    ${TWW.MOROCCO_TOP8.map(s=>`<div class="gd-rank__item"><span class="gd-rank__num">${s.rank}</span><div><div class="gd-rank__name">${s.name}</div><div class="gd-rank__note">${s.note}</div></div></div>`).join("")}
+  </div>` : "";
+
+  const body = `<div class="gd-body">
+    <p class="gd-lede">${G.lede}</p>
+    ${isTop ? `<div class="gd-prose"><p>Morocco rewards a loop, not a single base. Here's the route we'd send a first-timer on — ranked, with why each stop earns its place. Tap any region or interest to start building it into your own trip.</p></div>${inlineLinks}${topList}` : `<div class="gd-prose">${prose}</div>${inlineLinks}`}
+    <div class="gd-share">${ICON("sparkle","ic-sm")} <span>Written by the TravelWell desk · Want this as a trip? <a href="special-interests.html" style="color:var(--primary);font-weight:600">Start designing →</a></span></div>
+  </div>`;
+
+  const related = TWW.GUIDES.filter(x=>x.id!==G.id).slice(0,3);
+  const rel = `<div class="gd-related"><h2>More from the desk</h2><div class="gd-rel-grid">
+    ${related.map(r=>`<a class="gd-rel" href="guide-detail.html?g=${r.id}"><img src="${TWW.img(r.img,500)}" alt="" loading="lazy" referrerpolicy="no-referrer"><div class="gd-rel__b"><div class="gd-rel__t">${r.title}</div><div class="gd-rel__m">${r.type} · ${r.read}</div></div></a>`).join("")}
+  </div></div>`;
+
+  $("#gd-root").innerHTML = hero + body + rel + `<div style="height:80px"></div>`;
+}
+render();
+</script>
+</body>
+</html>

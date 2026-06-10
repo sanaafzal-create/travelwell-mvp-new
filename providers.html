@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TravelWell — Providers for your trip</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@400;500;600&family=Noto+Sans+Arabic:wght@400;500;600&family=Noto+Naskh+Arabic:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles/tokens.css">
+<link rel="stylesheet" href="styles/shell.css">
+<link rel="stylesheet" href="styles/journey.css">
+<link rel="stylesheet" href="styles/wells.css">
+<style>
+  /* trip-context header */
+  .pr-ctx { background: var(--secondary); border-bottom: 1px solid var(--border); }
+  .pr-ctx__inner { max-width: var(--content-max); margin-inline: auto; padding: 22px var(--gutter); display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+  .pr-ctx__ic { width: 46px; height: 46px; border-radius: 12px; background: var(--card); color: var(--primary); display: grid; place-items: center; flex: none; }
+  .pr-ctx__t { font-family: var(--font-display); font-weight: 600; font-size: 20px; line-height: 1.1; }
+  .pr-ctx__m { font-size: 13.5px; color: var(--secondary-foreground); opacity: .85; margin-top: 3px; display: flex; gap: 10px; flex-wrap: wrap; }
+  .pr-ctx__m span { display: inline-flex; align-items: center; gap: 5px; }
+  .pr-ctx__edit { margin-inline-start: auto; }
+
+  .pr-intro { padding: 36px 0 8px; }
+  .pr-intro .eyebrow { display:block; margin-bottom:10px; }
+  .pr-intro h1 { font-size: clamp(30px,4.4vw,44px); line-height:1.05; letter-spacing:-.015em; }
+  .pr-intro .lead { color:var(--muted-foreground); margin-top:12px; font-size:17px; max-width:60ch; }
+
+  /* Well focus chips (scopes to one Well at a time) */
+  .pr-wells { display:flex; gap:8px; overflow-x:auto; scrollbar-width:none; padding: 22px 0 6px; }
+  .pr-wells::-webkit-scrollbar { display:none; }
+  .pr-wellchip { display:inline-flex; align-items:center; gap:8px; border:1.5px solid var(--border); background:var(--card); border-radius:var(--radius-pill); padding:9px 15px 9px 12px; cursor:pointer; font-family:var(--font-sans); font-weight:600; font-size:13.5px; color:var(--foreground); white-space:nowrap; flex:none; transition:border-color .15s, background-color .15s; }
+  .pr-wellchip .ic { color:var(--primary); }
+  .pr-wellchip[aria-pressed="true"] { border-color:var(--primary); background:var(--secondary); color:var(--secondary-foreground); }
+  .pr-wellchip__n { font-size:11px; font-weight:700; color:var(--muted-foreground); }
+  .pr-wellchip[aria-pressed="true"] .pr-wellchip__n { color:var(--primary); }
+
+  .pr-sechead { display:flex; align-items:baseline; gap:12px; margin:26px 0 16px; flex-wrap:wrap; }
+  .pr-sechead h2 { font-family:var(--font-display); font-weight:600; font-size:23px; }
+  .pr-sechead .sub { font-size:14px; color:var(--muted-foreground); }
+  .pr-sechead .count { margin-inline-start:auto; font-size:12.5px; color:var(--muted-foreground); }
+
+  .pr-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:16px; }
+
+  /* contextual "why it fits" line on each card */
+  .pv__why { display:flex; gap:8px; align-items:flex-start; background:var(--secondary); border-radius:var(--radius-sm); padding:9px 12px; margin-top:12px; font-size:12.5px; line-height:1.45; color:var(--secondary-foreground); }
+  .pv__why .ic { color:var(--primary); flex:none; margin-top:1px; }
+  .pv__why b { color:var(--primary); font-weight:600; }
+
+  .pr-more { display:flex; justify-content:center; margin-top:24px; }
+  .pr-foot-note { text-align:center; margin-top:18px; font-size:13px; color:var(--muted-foreground); display:flex; align-items:center; justify-content:center; gap:7px; }
+
+  @media (max-width: 700px){ .pr-grid { grid-template-columns:1fr; } }
+</style>
+</head>
+<body>
+<a href="#main" class="skip-link">Skip to content</a>
+
+<div class="jn-subhead">
+  <div class="jn-subhead__inner">
+    <nav class="jn-crumbs" aria-label="Breadcrumb">
+      <a href="Home.html">Home</a><span class="sep">/</span>
+      <a href="wells.html">The Wells</a><span class="sep">/</span>
+      <span class="here">Providers</span>
+    </nav>
+    <a class="btn btn-ghost" href="itinerary.html">Open your trip →</a>
+  </div>
+</div>
+
+<!-- trip context -->
+<div class="pr-ctx">
+  <div class="pr-ctx__inner">
+    <span class="pr-ctx__ic" id="pr-ctx-ic"></span>
+    <div>
+      <div class="pr-ctx__t" id="pr-ctx-title">Kenya: Anniversary Safari</div>
+      <div class="pr-ctx__m" id="pr-ctx-meta"></div>
+    </div>
+    <a class="btn btn-secondary pr-ctx__edit" href="Profile.html">Edit trip</a>
+  </div>
+</div>
+
+<main id="main">
+  <div class="container">
+    <div class="pr-intro">
+      <span class="eyebrow">Matched to your trip</span>
+      <h1 id="pr-h1">Providers chosen for the two of you.</h1>
+      <p class="lead">No endless catalog — just the vetted partners that fit your Wells, your region and your budget. Pick a Well to see its best matches.</p>
+    </div>
+
+    <div class="pr-wells" id="pr-wells" role="tablist" aria-label="Filter by Well"></div>
+
+    <div class="pr-sechead">
+      <h2 id="pr-sectitle">Stay-Well</h2>
+      <span class="sub" id="pr-secsub"></span>
+      <span class="count" id="pr-count"></span>
+    </div>
+
+    <div class="pr-grid" id="pr-grid"></div>
+
+    <div class="pr-more" id="pr-more"></div>
+    <p class="pr-foot-note" id="pr-foot"></p>
+  </div>
+  <div style="height:80px"></div>
+</main>
+
+<script src="js/data.js"></script>
+<script src="js/places.js"></script>
+<script src="js/images.js"></script>
+<script src="js/shell.js"></script>
+<script>
+TWW.mountShell({ active: "providers" });
+const $ = (s,r=document)=>r.querySelector(s);
+const ICON = TWW.ICON;
+const allWells = {}; [...TWW.WELLS,...TWW.LUX_WELLS].forEach(w=>allWells[w.id]=w);
+const TIER = { prime:"★ Prime", vetted:"Vetted", prospective:"Prospective" };
+const PRICE_LABEL = { value:"Value", comfort:"Comfort", premium:"Premium", ultra:"Ultra" };
+const PRICE_DOT = { value:"#3F7E55", comfort:"#2C6E68", premium:"#C2A35B", ultra:"#A8873F" };
+const PAGE = 6;
+
+/* ---- the traveler's trip context (mock, mirrors the itinerary) ---- */
+const TRIP = {
+  title: "Kenya: Anniversary Safari",
+  region: "East Africa",
+  party: "2 travelers",
+  dates: "Jul 12–22, 2026",
+  budget: "comfort",
+  interests: ["safari","romance"],
+  // Wells active in this trip, in priority order
+  wells: ["stay","activities","eat","fly","move","beauty"],
+};
+$("#pr-ctx-ic").innerHTML = ICON("suitcase");
+$("#pr-ctx-meta").innerHTML =
+  `<span>${ICON("pin","ic-sm")} ${TRIP.region}</span><span>${ICON("calendar","ic-sm")} ${TRIP.dates}</span><span>${ICON("heart","ic-sm")} ${TRIP.party}</span><span>${ICON("gift","ic-sm")} ${PRICE_LABEL[TRIP.budget]} budget</span>`;
+
+let activeWell = TRIP.wells[0];
+let shown = PAGE;
+
+/* contextual reason a provider fits this trip */
+function whyFits(p) {
+  const reasons = [];
+  if (p.price === TRIP.budget) reasons.push(`fits your <b>${PRICE_LABEL[p.price]}</b> budget`);
+  else if ((p.price==="premium"||p.price==="ultra") && TRIP.budget==="comfort") reasons.push(`a worthwhile <b>splurge</b> for an anniversary`);
+  if (p.tier === "prime") reasons.push(`<b>Prime</b> — most deeply vetted`);
+  reasons.push(`in <b>${TRIP.region}</b>`);
+  return reasons.slice(0,2).join(" · ");
+}
+
+function card(p) {
+  const w = allWells[activeWell];
+  const affiliate = p.mode==="affiliate";
+  const prospective = p.tier==="prospective";
+  return `<article class="pv" data-pv="${p.name}">
+    <div class="pv__body">
+      <div class="pv__top"><h3 class="pv__name">${p.name}</h3><span class="pv__tier pv__tier--${p.tier}">${TIER[p.tier]}</span></div>
+      <p class="pv__desc">${p.desc}</p>
+      <div class="pv__attrs">
+        <span class="pv__attr">${ICON(w.icon,'ic-sm')} ${w.name}</span>
+        <span class="pv__attr"><span class="dot" style="background:${PRICE_DOT[p.price]}"></span>${PRICE_LABEL[p.price]}</span>
+        ${prospective?`<span class="pv__attr" style="color:var(--muted-foreground)">${ICON("info","ic-sm")} Prospective — not yet signed</span>`:``}
+      </div>
+      <div class="pv__why">${ICON("sparkle","ic-sm")} <span>${whyFits(p)}</span></div>
+    </div>
+    <div class="pv__foot">
+      <div class="pv__cta-row">
+        ${affiliate
+          ? `<a class="btn btn-primary" href="go.html?to=${encodeURIComponent(p.name)}">Visit partner</a><span class="pv__mode">${ICON("arrow","ic-sm")} via /go</span>`
+          : `<button class="btn btn-primary" data-book="${p.name}" data-well="${activeWell}">Book It</button><span class="pv__mode">${ICON("check","ic-sm")} In TravelWell</span>`}
+      </div>
+      ${affiliate?`<p class="pv__ftc">${ICON("info","ic-sm")} <span>${p.commission}. We may earn a commission if you book through this link — at no extra cost to you.</span></p>`:``}
+    </div>
+  </article>`;
+}
+
+function poolFor(wid) {
+  const tierRank = { prime:0, vetted:1, prospective:2 };
+  return (TWW.PROVIDERS[wid]||[]).slice().sort((a,b)=>
+    (a.price===TRIP.budget?-1:0)-(b.price===TRIP.budget?-1:0) ||
+    tierRank[a.tier]-tierRank[b.tier] || a.name.localeCompare(b.name));
+}
+
+function renderWells() {
+  $("#pr-wells").innerHTML = TRIP.wells.map(wid=>{
+    const w = allWells[wid]; const n = (TWW.PROVIDERS[wid]||[]).length;
+    return `<button class="pr-wellchip" role="tab" data-well="${wid}" aria-pressed="${wid===activeWell}">${ICON(w.icon,'ic-sm')} ${w.name.replace('-Well','')} <span class="pr-wellchip__n">${n}</span></button>`;
+  }).join("");
+}
+
+function render() {
+  const w = allWells[activeWell];
+  const pool = poolFor(activeWell);
+  const visible = pool.slice(0, shown);
+  $("#pr-sectitle").textContent = w.name;
+  $("#pr-secsub").textContent = "· " + w.tag;
+  $("#pr-count").textContent = `showing ${visible.length} of ${pool.length}`;
+  $("#pr-grid").innerHTML = visible.length
+    ? visible.map(card).join("")
+    : `<div style="grid-column:1/-1;text-align:center;padding:48px 20px;color:var(--muted-foreground)">${ICON("info")}<div style="margin-top:10px">No vetted partners here yet for ${TRIP.region} — we're curating them now.</div></div>`;
+  $("#pr-more").innerHTML = pool.length > shown
+    ? `<button class="btn btn-secondary" id="pr-showmore">Show ${Math.min(PAGE, pool.length-shown)} more in ${w.name.replace('-Well','')}</button>`
+    : "";
+  $("#pr-foot").innerHTML = `${ICON("shield","ic-sm")} <span>Every match is scoped to your trip. Looking for something specific? <a href="#" data-tw-concierge style="font-weight:600">Ask the Concierge</a>.</span>`;
+}
+
+document.addEventListener("click",(e)=>{
+  const chip = e.target.closest(".pr-wellchip");
+  if (chip) { activeWell = chip.dataset.well; shown = PAGE; renderWells(); render(); return; }
+  if (e.target.closest("#pr-showmore")) { shown += PAGE; render(); return; }
+  const book = e.target.closest("[data-book]");
+  if (book) { const w=allWells[book.dataset.well]; if(TWW.addToTrip) TWW.addToTrip({well:w.id,icon:w.icon,name:book.dataset.book,meta:`${w.name} · ${TRIP.region}`,status:"idea"}); else TWW.toast("Added"); return; }
+});
+
+renderWells();
+render();
+</script>
+</body>
+</html>

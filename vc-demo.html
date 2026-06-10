@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TravelWell — VC Demo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@400;500;600&family=Noto+Sans+Arabic:wght@400;500;600&family=Noto+Naskh+Arabic:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles/tokens.css">
+<link rel="stylesheet" href="styles/shell.css">
+<link rel="stylesheet" href="styles/investor.css">
+</head>
+<body>
+<a href="#main" class="skip-link">Skip to content</a>
+<div class="inv">
+  <main id="main"><div id="vc-root"></div></main>
+</div>
+
+<script src="js/data.js"></script>
+<script src="js/places.js"></script>
+<script src="js/images.js"></script>
+<script src="js/shell.js"></script>
+<script>
+TWW.mountShell({ active: "", footer: false });
+const $ = (s,r=document)=>r.querySelector(s);
+const ICON = TWW.ICON;
+const qs = new URLSearchParams(location.search);
+const ultra = qs.get("tier")==="ultra";
+const CODE = "TWW2026";
+let unlocked = false;
+const ph = (s)=>`<span class="ph">${s}</span>`;
+const allWells = {}; [...TWW.WELLS,...TWW.LUX_WELLS].forEach(w=>allWells[w.id]=w);
+
+function gate() {
+  return `<div class="inv-gate"><div class="inv-gate__card">
+    <div class="inv-gate__ic">${ICON("lock")}</div>
+    <h1>Investor access</h1>
+    <p>This demo includes a worked itinerary with commission detail and a scaling model. Enter your access code to continue.</p>
+    <div class="inv-gate__field"><input type="text" id="vc-code" placeholder="ACCESS CODE" aria-label="Access code" autocomplete="off"></div>
+    <div class="inv-gate__err" id="vc-err">${ICON("info","ic-sm")} That code isn't right. Try again or request access.</div>
+    <div class="inv-gate__hint">Demo code: <b style="color:#fff">${CODE}</b> · or <a href="#" id="vc-request" style="color:var(--accent)">request access</a></div>
+    <button class="btn btn-gold" id="vc-unlock" style="width:100%;margin-top:20px;height:50px">Unlock demo</button>
+    <div style="margin-top:16px"><a href="demo.html" style="color:var(--dark-band-muted);font-size:13px">← Back to public demo</a></div>
+  </div></div>`;
+}
+
+function dashboard() {
+  return `
+  <div class="inv-disclaimer"><div class="inv-disclaimer__inner">
+    ${ICON("info","ic-sm")}<span><b>Illustrative figures.</b> Commission rates and totals below are design placeholders pending audited data. Structure is real; numbers are not.</span>
+  </div></div>
+  <section class="inv-hero"><div class="inv-wrap inv-hero__inner">
+    <span class="eyebrow">${ultra?'VC Ultra Demo · Unlocked':'VC Demo · Unlocked'}</span>
+    <h1>${ultra?'The economics of one ultra trip.':'The economics of one real trip.'}</h1>
+    <p>A ${ultra?'$':''}worked ${ultra?'ultra-luxury':''} itinerary — every Well, every provider, every commission line — then how it scales.</p>
+    <div class="inv-hero__tabs">
+      <a class="inv-hero__tab" href="vc-demo.html" aria-current="${!ultra}">Standard trip</a>
+      <a class="inv-hero__tab" href="vc-demo.html?tier=ultra" aria-current="${ultra}">Ultra trip</a>
+    </div>
+  </div></section>
+
+  <section class="inv-section"><div class="inv-wrap">
+    <div class="inv-section__head"><span class="eyebrow">Worked itinerary</span><h2>${ultra?'Private Island Buyout · 7 nights':'Kenya Anniversary Safari · 10 nights'}</h2><p>${ultra?'Two travelers · ultra-luxury tier':'Two travelers · East Africa · comfort–premium tier'}</p></div>
+    <div class="inv-table" id="vc-table"></div>
+  </div></section>
+
+  <section class="inv-section"><div class="inv-wrap">
+    <div class="inv-section__head"><span class="eyebrow">Scaling model</span><h2>What it looks like at volume</h2><p>Drag to model monthly trips and average take. Outputs are illustrative.</p></div>
+    <div class="inv-calc">
+      <div class="inv-calc__row"><span class="inv-calc__label">Trips / month</span><span class="inv-calc__slider"><input type="range" id="calc-trips" min="100" max="20000" step="100" value="2500"></span><span class="inv-calc__val" id="calc-trips-v">2,500</span></div>
+      <div class="inv-calc__row"><span class="inv-calc__label">Avg. trip value</span><span class="inv-calc__slider"><input type="range" id="calc-val" min="1500" max="80000" step="500" value="${ultra?'45000':'8500'}"></span><span class="inv-calc__val" id="calc-val-v">$8,500</span></div>
+      <div class="inv-calc__row"><span class="inv-calc__label">Blended take rate</span><span class="inv-calc__slider"><input type="range" id="calc-take" min="5" max="25" step="1" value="12"></span><span class="inv-calc__val" id="calc-take-v">12%</span></div>
+      <div class="inv-calc__out"><span class="l">Modeled annual net revenue <span style="color:var(--accent)">· illustrative</span></span><span class="v" id="calc-out">$—</span></div>
+    </div>
+  </div></section>
+
+  <section class="inv-section" style="padding-bottom:80px"><div class="inv-wrap">
+    <div class="inv-section__head"><span class="eyebrow">Roadmap</span><h2>The next four quarters</h2></div>
+    <div class="inv-roadmap" id="vc-roadmap"></div>
+  </div></section>`;
+}
+
+const STD_TRIP = [
+  { well:"fly", item:"Kenya Airways + bush flights", gross:3800, rate:"2%" },
+  { well:"stay", item:"Angama Mara · 4 nights", gross:12400, rate:"14%" },
+  { well:"activities", item:"Balloon + game drives + culture", gross:4200, rate:"20%" },
+  { well:"eat", item:"Bush dinners + Nairobi tables", gross:1600, rate:"10%" },
+  { well:"move", item:"Private transfers", gross:900, rate:"15%" },
+  { well:"beauty", item:"Couples spa", gross:600, rate:"15%" },
+];
+const ULTRA_TRIP = [
+  { well:"stay", item:"Private island buyout · 7 nights", gross:210000, rate:"12%" },
+  { well:"fly", item:"Private jet · round trip", gross:140000, rate:"3%" },
+  { well:"eat", item:"In-villa Michelin chef", gross:38000, rate:"15%" },
+  { well:"activities", item:"Curated private experiences", gross:46000, rate:"22%" },
+  { well:"security", item:"Close protection · 7 days", gross:32000, rate:"18%" },
+  { well:"nanny", item:"Private nanny · 7 days", gross:9000, rate:"15%" },
+];
+
+function renderTable() {
+  const trip = ultra?ULTRA_TRIP:STD_TRIP;
+  let totalGross=0, totalComm=0;
+  const rows = trip.map(r=>{
+    const w=allWells[r.well]; const comm = Math.round(r.gross*parseFloat(r.rate)/100);
+    totalGross+=r.gross; totalComm+=comm;
+    return `<div class="inv-table__row"><div class="well">${ICON(w.icon,'ic-sm')} ${r.item}</div><div class="num hide-sm">$${r.gross.toLocaleString()}</div><div class="num hide-sm">${r.rate}</div><div class="num gold">$${comm.toLocaleString()}</div></div>`;
+  }).join("");
+  $("#vc-table").innerHTML =
+    `<div class="inv-table__row head"><div>Well · provider</div><div class="num hide-sm">Gross</div><div class="num hide-sm">Rate</div><div class="num">Commission</div></div>`
+    + rows
+    + `<div class="inv-table__row total"><div class="well">Trip total</div><div class="num hide-sm">$${totalGross.toLocaleString()}</div><div class="num hide-sm"></div><div class="num gold">$${totalComm.toLocaleString()}</div></div>`;
+}
+
+function renderRoadmap() {
+  const RM = [
+    { q:"Q3 2026", items:["Public launch","Insure-Well live","Stripe checkout"] },
+    { q:"Q4 2026", items:["Ship-Well live","3 launch locales","Registry"] },
+    { q:"Q1 2027", items:["Cross-device accounts","Linked-group travel","API partners x10"] },
+    { q:"Q2 2027", items:["Live status (flight/lift)","eSIM nudges","B2B concierge"] },
+  ];
+  $("#vc-roadmap").innerHTML = RM.map(r=>`<div class="inv-rm"><div class="inv-rm__q">${r.q}</div><ul class="inv-rm__items">${r.items.map(i=>`<li>${ICON("check","ic-sm")} ${i}</li>`).join("")}</ul></div>`).join("");
+}
+
+function bindCalc() {
+  const trips=$("#calc-trips"), val=$("#calc-val"), take=$("#calc-take");
+  function upd() {
+    $("#calc-trips-v").textContent = (+trips.value).toLocaleString();
+    $("#calc-val-v").textContent = "$"+(+val.value).toLocaleString();
+    $("#calc-take-v").textContent = take.value+"%";
+    const annual = (+trips.value) * (+val.value) * (+take.value/100) * 12;
+    const m = (annual/1e6);
+    $("#calc-out").innerHTML = "$" + (m>=1000 ? (m/1000).toFixed(1)+"B" : m.toFixed(1)+"M") + ` ${ph('· est.')}`;
+  }
+  [trips,val,take].forEach(s=>s.addEventListener("input",upd)); upd();
+}
+
+function render() {
+  if (!unlocked) { $("#vc-root").innerHTML = gate(); return; }
+  $("#vc-root").innerHTML = dashboard();
+  renderTable(); renderRoadmap(); bindCalc();
+}
+
+document.addEventListener("click",(e)=>{
+  if (e.target.closest("#vc-unlock")) {
+    const v = $("#vc-code").value.trim().toUpperCase();
+    if (v===CODE) { unlocked=true; render(); window.scrollTo(0,0); TWW.toast("Access granted"); }
+    else { $("#vc-err").dataset.show="true"; $("#vc-code").focus(); }
+    return;
+  }
+  if (e.target.closest("#vc-request")) { e.preventDefault(); TWW.toast("Access request noted — we'll be in touch"); return; }
+});
+document.addEventListener("keydown",(e)=>{ if (e.key==="Enter" && $("#vc-code")) $("#vc-unlock")?.click(); });
+render();
+</script>
+</body>
+</html>

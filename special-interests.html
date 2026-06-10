@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TravelWell — How do you love to travel?</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@400;500;600&family=Noto+Sans+Arabic:wght@400;500;600&family=Noto+Naskh+Arabic:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles/tokens.css">
+<link rel="stylesheet" href="styles/shell.css">
+<link rel="stylesheet" href="styles/journey.css">
+<style>
+  .jn-switch { position: fixed; inset-block-end: 84px; inset-inline-end: 20px; z-index: 70; background: var(--foreground); color: var(--background); border-radius: var(--radius-pill); padding: 7px; display: flex; gap: 4px; box-shadow: var(--e3); }
+  .jn-switch.low { inset-block-end: 20px; }
+  .jn-switch button { border: 0; background: none; color: var(--background); opacity: .65; cursor: pointer; font-family: var(--font-sans); font-weight: 600; font-size: 12.5px; padding: 8px 13px; border-radius: var(--radius-pill); white-space: nowrap; }
+  .jn-switch button[aria-pressed="true"] { background: var(--accent); color: var(--foreground); opacity: 1; }
+  .jn-switch__label { opacity: .5; font-size: 10px; letter-spacing: .1em; text-transform: uppercase; padding: 0 8px; display: grid; place-items: center; }
+  .si-tile__order { top: 14px; inset-inline-start: 14px; z-index: 4; width: 26px; height: 26px; border-radius: 50%; background: var(--primary); color: #fff; font-weight: 700; font-size: 13px; display: none; place-items: center; }
+  .si-tile[aria-pressed="true"] .si-tile__order { display: grid; }
+</style>
+</head>
+<body>
+<a href="#main" class="skip-link">Skip to content</a>
+
+<div class="jn-subhead">
+  <div class="jn-subhead__inner">
+    <nav class="jn-crumbs" aria-label="Breadcrumb">
+      <a href="Home.html">Home</a><span class="sep">/</span>
+      <span class="here">Special Interests</span>
+    </nav>
+    <div class="tw-steps" aria-label="Journey progress">
+      <div class="tw-step" data-state="current"><span class="tw-step__dot">1</span><span class="tw-step__label">Interest</span></div>
+      <span class="tw-step__line"></span>
+      <div class="tw-step"><span class="tw-step__dot">2</span><span class="tw-step__label">Region</span></div>
+      <span class="tw-step__line"></span>
+      <div class="tw-step"><span class="tw-step__dot">3</span><span class="tw-step__label">Activities</span></div>
+      <span class="tw-step__line"></span>
+      <div class="tw-step"><span class="tw-step__dot">4</span><span class="tw-step__label">Wells</span></div>
+      <span class="tw-step__line"></span>
+      <div class="tw-step"><span class="tw-step__dot">5</span><span class="tw-step__label">Book It</span></div>
+    </div>
+  </div>
+</div>
+
+<main id="main">
+  <div class="container">
+    <div class="jn-intro">
+      <span class="eyebrow">The Dream Journey · Step 1 of 5</span>
+      <h1>How do you love to travel?</h1>
+      <p class="lead">Start with the feeling, not the place. Pick the ways of traveling that pull at you — we'll shape everything else around them.</p>
+      <div id="jn-context-slot"></div>
+    </div>
+
+    <div class="jn-toolbar">
+      <span class="jn-sweet">
+        <svg class="ic ic-sm" viewBox="0 0 24 24"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
+        Choose up to 3 — but <b style="color:var(--foreground);font-weight:600;margin:0 3px">1–2 is the sweet spot</b> for a focused trip.
+      </span>
+      <div class="jn-filter" role="group" aria-label="Filter interests">
+        <button data-filter="all" aria-pressed="true">All 25</button>
+        <button data-filter="live" aria-pressed="false">Ready now</button>
+        <button data-filter="soon" aria-pressed="false">Coming soon</button>
+      </div>
+    </div>
+
+    <div id="si-grid"></div>
+  </div>
+</main>
+
+<!-- sticky selection bar -->
+<div class="jn-selbar" id="jn-selbar" aria-live="polite">
+  <div class="jn-selbar__inner">
+    <div class="jn-selbar__pills" id="jn-selbar-pills"></div>
+    <div class="jn-selbar__msg" id="jn-selbar-msg"></div>
+    <div class="jn-selbar__actions">
+      <button class="btn btn-secondary" id="jn-clear">Clear</button>
+      <a class="btn btn-primary" id="jn-continue" href="regions.html">Choose a region →</a>
+    </div>
+  </div>
+</div>
+
+<div class="jn-switch low" id="jn-switch" role="group" aria-label="Preview state">
+  <span class="jn-switch__label">State</span>
+  <button data-state="anon" aria-pressed="true">Anonymous</button>
+  <button data-state="profiled" aria-pressed="false">Profiled</button>
+</div>
+
+<script src="js/data.js"></script>
+<script src="js/images.js"></script>
+<script src="js/shell.js"></script>
+<script>
+TWW.mountShell({ active: "special-interests" });
+const $ = (s,r=document)=>r.querySelector(s);
+const ICON = TWW.ICON;
+const MAX = 3;
+
+let profiled = false;
+const PRELIT = ["safari","romance"]; // from Travel ID theme
+let selected = [];
+
+function tile(si) {
+  const soon = si.status !== "live";
+  const lit = profiled && PRELIT.includes(si.id) && !soon;
+  const idx = selected.indexOf(si.id);
+  const pressed = idx > -1;
+  return `<button class="si-tile ${soon?'si-tile--soon':''}" data-si="${si.id}" ${soon?'aria-disabled="true"':`aria-pressed="${pressed}"`}>
+    <span class="si-tile__img"><img src="${TWW.siImg(si.id, 700)}" alt="" loading="lazy" referrerpolicy="no-referrer"></span>
+    <span class="si-tile__scrim"></span>
+    <span class="si-tile__top">
+      ${soon
+        ? `<span></span><span class="si-soon-badge">Coming soon</span>`
+        : `<span class="si-tile__order">${pressed?idx+1:''}</span>
+           ${lit?`<span class="si-lit">From your dream</span>`:`<span></span>`}
+           <span class="si-check" aria-hidden="true">${ICON("check","ic-sm")}</span>`}
+    </span>
+    <span class="si-tile__accent" style="background:${si.accent}"></span>
+    <span class="si-tile__body">
+      <span class="si-tile__name">${si.name}</span>
+      <span class="si-tile__sig">${cap(si.sig)}</span>
+    </span>
+    ${soon ? `<span class="si-tile__view">Preview ${ICON("arrow","ic-sm")}</span>` : `<span class="si-tile__view">View ${ICON("arrow","ic-sm")}</span>`}
+  </button>`;
+}
+const cap = s => s.charAt(0).toUpperCase()+s.slice(1);
+
+let filter = "all";
+function render() {
+  const root = $("#si-grid");
+  const matches = (si) => filter==="all" ? true : filter==="live" ? si.status==="live" : si.status!=="live";
+  const groups = TWW.SI_GROUPS.map(g => ({ ...g, items: TWW.SIS.filter(si => si.group===g.id && matches(si)) })).filter(g => g.items.length);
+  root.innerHTML = groups.map(g => `
+    <section class="si-group">
+      <div class="si-group__head">
+        <h2 class="si-group__title">${g.name}</h2>
+        <span class="si-group__blurb">${g.blurb}</span>
+        <span class="si-group__count">${g.items.filter(s=>s.status==='live').length} live · ${g.items.length} total</span>
+      </div>
+      <div class="si-grid">${g.items.map(tile).join("")}</div>
+    </section>`).join("");
+  renderSelbar();
+}
+
+function renderContext() {
+  const slot = $("#jn-context-slot");
+  if (!profiled) { slot.innerHTML = ""; return; }
+  const names = PRELIT.map(id=>TWW.SIS.find(s=>s.id===id).name);
+  slot.innerHTML = `<div class="jn-context">
+    <span class="jn-context__ic">${ICON("sparkle","ic-sm")}</span>
+    <span><b>Pre-lit from your Travel ID.</b> Your dream pointed to these — we've highlighted them, but you're free to change course.</span>
+    <span class="lit">${names.map(n=>`<span>${n}</span>`).join("")}</span>
+  </div>`;
+}
+
+function renderSelbar() {
+  const bar = $("#jn-selbar");
+  bar.setAttribute("data-show", String(selected.length>0));
+  $("#jn-switch").classList.toggle("low", selected.length===0);
+  $("#jn-selbar-pills").innerHTML = selected.map(id=>{
+    const si = TWW.SIS.find(s=>s.id===id);
+    return `<span class="jn-sel-pill"><span class="dot" style="width:8px;height:8px;border-radius:50%;background:${si.accent}"></span>${si.name}<button data-remove="${id}" aria-label="Remove ${si.name}">${ICON("close","ic-sm")}</button></span>`;
+  }).join("");
+  const msg = $("#jn-selbar-msg");
+  if (selected.length===3) msg.innerHTML = `<span class="warn"><b>3 of 3</b> — that's the max. Fewer means a more focused trip.</span>`;
+  else if (selected.length===2) msg.innerHTML = `<b>2 selected</b> — the sweet spot. ✨`;
+  else msg.innerHTML = `<b>1 selected</b> — add one more, or continue.`;
+}
+
+function toggle(id) {
+  const si = TWW.SIS.find(s=>s.id===id);
+  if (!si || si.status!=="live") return;
+  const i = selected.indexOf(id);
+  if (i>-1) selected.splice(i,1);
+  else {
+    if (selected.length>=MAX) { TWW.toast("Up to 3 — remove one to add another"); return; }
+    selected.push(id);
+  }
+  render();
+}
+
+document.addEventListener("click",(e)=>{
+  const sw = e.target.closest("#jn-switch button");
+  if (sw) { profiled = sw.dataset.state==="profiled";
+    document.querySelectorAll("#jn-switch button").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.state===sw.dataset.state)));
+    selected = profiled ? [...PRELIT] : [];
+    renderContext(); render(); return; }
+  const rm = e.target.closest("[data-remove]");
+  if (rm) { selected = selected.filter(x=>x!==rm.dataset.remove); render(); return; }
+  const tileEl = e.target.closest("[data-si]");
+  if (tileEl) {
+    const id = tileEl.dataset.si;
+    const si = TWW.SIS.find(s=>s.id===id);
+    if (si.status!=="live") { location.href = "si-detail.html?si="+id; return; } // preview → detail
+    toggle(id);
+    return;
+  }
+  const fl = e.target.closest(".jn-filter button");
+  if (fl) { filter = fl.dataset.filter; document.querySelectorAll(".jn-filter button").forEach(b=>b.setAttribute("aria-pressed",String(b===fl))); render(); return; }
+  if (e.target.closest("#jn-clear")) { selected = []; render(); return; }
+});
+
+$("#jn-continue").addEventListener("click",(e)=>{
+  if (selected.length===0) { e.preventDefault(); TWW.toast("Pick at least one way to travel"); return; }
+  try { localStorage.setItem("tww:journeySIs", JSON.stringify(selected)); } catch(e){}
+});
+
+renderContext();
+render();
+</script>
+</body>
+</html>

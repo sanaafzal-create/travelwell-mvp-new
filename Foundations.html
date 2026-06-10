@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TravelWell — Foundations &amp; Tokens</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@400;500;600&family=Noto+Sans+Arabic:wght@400;500;600&family=Noto+Naskh+Arabic:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles/tokens.css">
+<style>
+  /* Page-local scaffolding for the spec sheet only (not part of the system) */
+  .doc { max-width: 1120px; margin-inline: auto; padding: 0 var(--gutter) 120px; }
+  .doc-head { padding: 64px 0 40px; border-bottom: 1px solid var(--border); margin-bottom: 56px; }
+  .doc-head .kicker { margin-bottom: 16px; }
+  .doc-head h1 { font-size: clamp(40px, 6vw, 64px); line-height: 1.04; letter-spacing: -0.01em; max-width: 14ch; }
+  .doc-head .gold { color: var(--gold-deep); font-style: italic; }
+  .doc-head p { margin-top: 20px; max-width: 64ch; }
+  section.block { margin-top: 72px; scroll-margin-top: 24px; }
+  .block > .eyebrow { display: block; margin-bottom: 8px; }
+  .block > h2 { font-size: var(--t-h2); margin-bottom: 6px; }
+  .block > .desc { color: var(--muted-foreground); max-width: 70ch; margin-bottom: 28px; font-size: 15px; }
+  .ref { color: var(--muted-foreground); font-size: 12px; font-weight: 500; }
+
+  /* Color */
+  .swatch-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; }
+  .swatch { border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; background: var(--card); box-shadow: var(--e1); }
+  .swatch .chip { height: 84px; }
+  .swatch .meta { padding: 12px 14px 14px; }
+  .swatch .name { font-weight: 600; font-size: 14px; }
+  .swatch .role { color: var(--muted-foreground); font-size: 12px; margin-top: 1px; }
+  .swatch .vals { display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
+  .swatch .vals code { font-family: var(--font-mono); font-size: 11px; color: var(--muted-foreground); background: var(--surface-alt); padding: 2px 6px; border-radius: 5px; }
+
+  /* Type specimens */
+  .type-row { display: grid; grid-template-columns: 140px 1fr; gap: 24px; padding: 20px 0; border-bottom: 1px solid var(--border); align-items: baseline; }
+  .type-row .tk { font-size: 12px; color: var(--muted-foreground); font-weight: 500; }
+  .type-row .tk b { display: block; color: var(--foreground); font-size: 13px; margin-bottom: 2px; }
+  .specimen { color: var(--foreground); }
+
+  /* Spacing */
+  .space-row { display: flex; align-items: center; gap: 16px; padding: 7px 0; }
+  .space-row .bar { background: var(--primary); height: 16px; border-radius: 3px; }
+  .space-row .lbl { font-family: var(--font-mono); font-size: 12px; color: var(--muted-foreground); width: 110px; }
+
+  /* Material */
+  .mat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px,1fr)); gap: 20px; }
+  .mat-card { background: var(--card); border: 1px solid var(--border); padding: 22px; }
+  .mat-card .t { font-size: 13px; font-weight: 600; }
+  .mat-card .s { font-size: 12px; color: var(--muted-foreground); margin-top: 4px; font-family: var(--font-mono); }
+  .radius-demo { display: flex; gap: 16px; align-items: flex-end; flex-wrap: wrap; }
+  .radius-demo .r { background: var(--secondary); border: 1px solid var(--border); width: 84px; height: 84px; display: grid; place-items: end center; padding-bottom: 8px; font-size: 11px; color: var(--secondary-foreground); font-family: var(--font-mono); }
+
+  /* Component preview shells */
+  .preview-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 28px; box-shadow: var(--e1); }
+  .row { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+  .stack { display: flex; flex-direction: column; gap: 14px; }
+  .label-min { font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted-foreground); font-weight: 600; margin-bottom: 10px; }
+  .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px,1fr)); gap: 20px; }
+
+  /* mini SI card demo */
+  .si-card { border:1px solid var(--border); border-radius: var(--radius); overflow:hidden; background:var(--card); box-shadow:var(--e1); }
+  .si-card .media { height: 130px; background: linear-gradient(135deg, oklch(0.55 0.06 200), oklch(0.45 0.05 178)); position: relative; }
+  .si-card .media .acc { position:absolute; inset: 0 0 auto 0; height: 4px; background: var(--accent); }
+  .si-card .bd { padding: 16px 16px 18px; }
+  .si-card h3 { font-size: 19px; margin-bottom: 4px; }
+  .si-card .sig-slot { margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--border); }
+
+  .toc { position: sticky; top: 0; background: color-mix(in oklch, var(--background) 88%, transparent); backdrop-filter: blur(8px); border-bottom: 1px solid var(--border); z-index: 20; }
+  .toc .inner { max-width: 1120px; margin-inline:auto; padding: 12px var(--gutter); display:flex; gap: 6px; flex-wrap: wrap; align-items:center; }
+  .toc a { font-size: 13px; color: var(--muted-foreground); padding: 6px 12px; border-radius: var(--radius-pill); font-weight: 500; }
+  .toc a:hover { background: var(--secondary); color: var(--secondary-foreground); text-decoration: none; }
+  .toc .brand { font-family: var(--font-display); font-weight: 600; font-size: 15px; color: var(--foreground); margin-right: 8px; }
+  .toc .brand .dot { color: var(--primary); }
+
+  .note { background: var(--surface-alt); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: var(--radius-sm); padding: 14px 18px; font-size: 14px; color: var(--muted-foreground); margin-top: 20px; }
+  .note b { color: var(--foreground); font-weight: 600; }
+</style>
+</head>
+<body>
+<a href="#main" class="skip-link">Skip to content</a>
+
+<nav class="toc" aria-label="Section navigation">
+  <div class="inner">
+    <span class="brand">TravelWell<span class="dot">.</span></span>
+    <a href="#color">Color</a>
+    <a href="#type">Type</a>
+    <a href="#spacing">Spacing</a>
+    <a href="#material">Material</a>
+    <a href="#status">Status &amp; honesty</a>
+    <a href="#buttons">Buttons</a>
+    <a href="#signature">Signature</a>
+  </div>
+</nav>
+
+<main id="main" class="doc">
+  <header class="doc-head">
+    <span class="eyebrow kicker">Step 1 · Foundations</span>
+    <h1>Design tokens, <span class="gold">confirmed</span> against the brief.</h1>
+    <p class="t-lead">Everything below is read straight from §3–§6 of the Design Direction and wired into one stylesheet (<code style="font-family:var(--font-mono);font-size:13px">styles/tokens.css</code>) that every screen will inherit. Review the values — once you approve, I'll build the global shell next. Nothing here is invented; each card cites its source section.</p>
+    <div class="note" style="margin-top:28px"><b>How to read this:</b> these are live tokens, not a screenshot — the fonts, colors, radii, shadows and component primitives you see are the exact CSS the product will use. Theme is light-only; the one dark panel below is the reserved “band” treatment for footer / investor strips.</div>
+  </header>
+
+  <!-- COLOR -->
+  <section class="block" id="color">
+    <span class="eyebrow">§3 · Color system</span>
+    <h2>Warm ivory ground, one action color, one accent</h2>
+    <p class="desc">A dominant pine-teal for every action, champagne-gold as editorial seasoning (decorative — never body text on light), warm-charcoal reserved for bands. Hex shown for reference; oklch is the shipped token.</p>
+
+    <div class="label-min">Core palette</div>
+    <div class="swatch-grid" id="core-swatches"></div>
+
+    <div class="label-min" style="margin-top:36px">Safety Card ramp (1–4) — color is always paired with a number + label</div>
+    <div class="swatch-grid" id="safety-swatches"></div>
+
+    <div class="note"><b>Contrast (§3 note):</b> Ink on Ivory/White clears AA (AAA for large). Pine-teal text on ivory passes AA. White on pine-teal passes AA for buttons. Gold is decorative only — for gold <i>text</i>, Antique Gold (<code style="font-family:var(--font-mono)">--gold-deep</code>) or gold on the dark band.</p></div>
+  </section>
+
+  <!-- TYPE -->
+  <section class="block" id="type">
+    <span class="eyebrow">§4 · Typography</span>
+    <h2>Playfair Display over Inter</h2>
+    <p class="desc">High-contrast serif for display, neutral sans for everything else. The character comes from the contrast between the two and from generous sizing — not exotic faces. Body never drops below 14px.</p>
+
+    <div id="type-specimens"></div>
+
+    <div class="grid-2" style="margin-top:32px">
+      <div class="preview-card">
+        <div class="label-min">Eyebrow + signature treatment</div>
+        <span class="eyebrow">Why TravelWell</span>
+        <p class="signature" style="margin-top:14px">If it's a once-in-a-lifetime dive… <span class="tw">Travel Well.</span></p>
+      </div>
+      <div class="preview-card" dir="rtl" lang="ar">
+        <div class="label-min" dir="ltr">Arabic companions (§12) — Noto Sans + Noto Naskh Arabic</div>
+        <h3 style="font-size:28px">عوالم المغامرة</h3>
+        <p class="t-body" style="margin-top:8px;color:var(--muted-foreground)">رحلتك تبدأ من هنا — خطوة واحدة واضحة في كل شاشة.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SPACING -->
+  <section class="block" id="spacing">
+    <span class="eyebrow">§5 · Spacing &amp; grid</span>
+    <h2>4px base, editorial rhythm</h2>
+    <p class="desc">Sections breathe with 96–128px vertical rhythm; cards use 24–32px internal padding. 12-column grid, 1200px max content, 720px reading column.</p>
+    <div id="space-scale"></div>
+    <div class="row" style="margin-top:24px;gap:24px">
+      <div class="mat-card" style="border-radius:var(--radius)"><div class="t">Content max</div><div class="s">1200px · gutters 24px</div></div>
+      <div class="mat-card" style="border-radius:var(--radius)"><div class="t">Reading column</div><div class="s">720px · long-form guides</div></div>
+      <div class="mat-card" style="border-radius:var(--radius)"><div class="t">Card grids</div><div class="s">3-up features · 5-up SI/Wells</div></div>
+    </div>
+  </section>
+
+  <!-- MATERIAL -->
+  <section class="block" id="material">
+    <span class="eyebrow">§6 · Material</span>
+    <h2>Radius, elevation, borders</h2>
+    <p class="desc">12px radius for cards/buttons, pills for chips and CTAs. Soft warm shadows in three steps; 1px Sand-Line hairlines.</p>
+
+    <div class="label-min">Radius</div>
+    <div class="radius-demo">
+      <div class="r" style="border-radius:var(--radius-sm)">8px</div>
+      <div class="r" style="border-radius:var(--radius)">12px</div>
+      <div class="r" style="border-radius:var(--radius-lg)">16px</div>
+      <div class="r" style="border-radius:var(--radius-pill);width:120px">pill</div>
+    </div>
+
+    <div class="label-min" style="margin-top:32px">Elevation</div>
+    <div class="mat-grid">
+      <div class="mat-card" style="box-shadow:var(--e1);border-radius:var(--radius)"><div class="t">E1 — Cards</div><div class="s">soft + hairline</div></div>
+      <div class="mat-card" style="box-shadow:var(--e2);border-radius:var(--radius)"><div class="t">E2 — Hover / popover</div><div class="s">card lift</div></div>
+      <div class="mat-card" style="box-shadow:var(--e3);border-radius:var(--radius)"><div class="t">E3 — Tray / modal</div><div class="s">sheets</div></div>
+    </div>
+  </section>
+
+  <!-- STATUS & HONESTY -->
+  <section class="block" id="status">
+    <span class="eyebrow">§9.2 · §13 · Status &amp; honesty</span>
+    <h2>The trust language</h2>
+    <p class="desc">Real vs. placeholder, coming-soon, FTC disclosure and AI-source labels are first-class UI — never fine print. Status never communicated by color alone.</p>
+
+    <div class="grid-2">
+      <div class="preview-card">
+        <div class="label-min">Real vs. placeholder (Hard Constraint 6)</div>
+        <div class="row">
+          <span class="pill pill-live">Live</span>
+          <span class="pill pill-preview">Preview</span>
+          <span class="pill pill-soon">Activated at Launch</span>
+          <span class="pill pill-engine">TravelWell Engine Active</span>
+          <span class="pill pill-gold">LIVE · Demo</span>
+        </div>
+        <div class="grid-2" style="margin-top:18px;gap:14px">
+          <div class="si-card"><div class="media"><span class="acc"></span></div><div class="bd"><span class="pill pill-live" style="margin-bottom:8px">Live</span><h3>Paris</h3><p class="t-body-s" style="color:var(--muted-foreground)">Real content, full saturation.</p></div></div>
+          <div class="si-card is-preview"><div class="media"><span class="acc"></span></div><div class="bd"><span class="pill pill-preview" style="margin-bottom:8px">Preview</span><h3>Reykjavík</h3><p class="t-body-s" style="color:var(--muted-foreground)">Schema-only — desaturated media.</p></div></div>
+        </div>
+      </div>
+
+      <div class="stack">
+        <div class="preview-card">
+          <div class="label-min">Safety Card chips (§3.2)</div>
+          <div class="stack" style="gap:10px">
+            <span class="safety-chip safety-1"><span class="lvl">1</span> Exercise normal precautions</span>
+            <span class="safety-chip safety-2"><span class="lvl">2</span> Increased caution</span>
+            <span class="safety-chip safety-3"><span class="lvl">3</span> Reconsider travel</span>
+            <span class="safety-chip safety-4"><span class="lvl">4</span> Do not travel</span>
+          </div>
+        </div>
+        <div class="preview-card">
+          <div class="label-min">FTC affiliate disclosure (§9.4 — non-negotiable)</div>
+          <a class="btn btn-primary" href="#" onclick="return false">Book with Hôtel Lutetia</a>
+          <p class="ftc" style="margin-top:10px">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>
+            We may earn a commission if you book through this link. Disclosure shown adjacent — never hidden.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- BUTTONS -->
+  <section class="block" id="buttons">
+    <span class="eyebrow">§9.1 · Buttons</span>
+    <h2>One primary action per surface</h2>
+    <p class="desc">Pine-teal primary, hairline secondary, gold reserved for investor/luxury CTAs, ghost links. 44px min height, visible focus ring, disabled at 40%.</p>
+    <div class="preview-card">
+      <div class="row" style="gap:14px">
+        <button class="btn btn-primary">Design Your Next Adventure</button>
+        <button class="btn btn-secondary">Explore Experiences</button>
+        <button class="btn btn-gold">View Itinerary</button>
+        <a href="#" class="btn btn-ghost" onclick="return false">Learn more →</a>
+        <button class="btn btn-primary" disabled>Disabled</button>
+      </div>
+      <p class="ref" style="margin-top:16px">Tab to a button to see the always-visible pine focus ring.</p>
+    </div>
+  </section>
+
+  <!-- SIGNATURE / DARK BAND -->
+  <section class="block" id="signature">
+    <span class="eyebrow">§2 · §5 · Brand signature &amp; the dark band</span>
+    <h2>The maker's mark, and the one dark surface</h2>
+    <p class="desc">The signature signs SI / Well / Region / Provider cards. Warm-charcoal appears only as footer / investor bands — gold leads there.</p>
+
+    <div class="band-dark" style="border-radius:var(--radius-lg);padding:40px">
+      <span class="eyebrow" style="color:var(--accent)">Investor / footer band</span>
+      <h3 style="font-size:28px;margin-top:10px;max-width:24ch">A Travel Operating System, signed at the foot of every card.</h3>
+      <p class="signature" style="color:var(--dark-band-muted);margin-top:18px">If it's the trip of a lifetime… <span class="tw" style="color:var(--accent)">Travel Well.</span></p>
+      <div class="row" style="margin-top:22px;gap:14px;align-items:center">
+        <button class="btn btn-gold">Open the VC demo</button>
+        <span class="ref" style="color:var(--dark-band-muted);font-family:var(--font-mono)">v2.4.0 · TWW-OS</span>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script>
+  const CORE = [
+    ["Ivory", "Page ground", "var(--background)", "#F7F4EC", "oklch(.964 .012 85)", false],
+    ["Warm White", "Cards / sheets", "var(--card)", "#FFFFFF", "oklch(1 0 0)", true],
+    ["Linen", "Section banding", "var(--surface-alt)", "#FBF9F3", "oklch(.984 .008 85)", true],
+    ["Espresso Ink", "Primary text", "var(--foreground)", "#1C1B18", "oklch(.205 .006 75)", false],
+    ["Stone", "Muted text", "var(--muted-foreground)", "#6B6760", "oklch(.52 .008 80)", false],
+    ["Pine Teal", "Primary action", "var(--primary)", "#2C6E68", "oklch(.50 .055 178)", false],
+    ["Deep Pine", "Hover / pressed", "var(--primary-hover)", "#235A55", "oklch(.44 .052 178)", false],
+    ["Sage Mist", "Tints / selected", "var(--secondary)", "#E3EDE9", "oklch(.93 .018 175)", true],
+    ["Champagne Gold", "Accent (decorative)", "var(--accent)", "#C2A35B", "oklch(.74 .085 85)", false],
+    ["Antique Gold", "Gold text on light", "var(--gold-deep)", "#A8873F", "oklch(.63 .09 82)", false],
+    ["Warm Charcoal", "Dark band", "var(--dark-band)", "#211D17", "oklch(.21 .012 75)", false],
+    ["Sand Line", "Borders / hairlines", "var(--border)", "#E7E2D6", "oklch(.905 .012 85)", true],
+    ["Emergency Red", "Destructive / SOS", "var(--destructive)", "#B3261E", "oklch(.50 .20 27)", false],
+  ];
+  const SAFETY = [
+    ["Safety 1", "Normal precautions", "var(--safety-1)", "#3F7E55", "oklch(.55 .10 150)", false],
+    ["Safety 2", "Increased caution", "var(--safety-2)", "#C2A35B", "oklch(.74 .085 85)", false],
+    ["Safety 3", "Reconsider travel", "var(--safety-3)", "#C9772F", "oklch(.65 .15 55)", false],
+    ["Safety 4", "Do not travel", "var(--safety-4)", "#B3261E", "oklch(.50 .20 27)", false],
+  ];
+  function swatchHTML([name, role, cssvar, hex, oklch, lightBorder]) {
+    return `<div class="swatch">
+      <div class="chip" style="background:${cssvar}${lightBorder ? ';border-bottom:1px solid var(--border)' : ''}"></div>
+      <div class="meta">
+        <div class="name">${name}</div>
+        <div class="role">${role}</div>
+        <div class="vals"><code>${hex}</code><code>${oklch}</code></div>
+      </div>
+    </div>`;
+  }
+  document.getElementById('core-swatches').innerHTML = CORE.map(swatchHTML).join('');
+  document.getElementById('safety-swatches').innerHTML = SAFETY.map(swatchHTML).join('');
+
+  const TYPE = [
+    ["Display XL", "Playfair 600 · 72/1.02", '<span class="t-display-xl">TravelWell</span>'],
+    ["Display L", "Playfair 500 · 56/1.05", '<span class="t-display-l">Extraordinary Experiences</span>'],
+    ["H2", "Playfair 500 · 36/1.15", '<span class="t-h2">Travel, Elevated</span>'],
+    ["H3", "Playfair 500 · 24/1.25", '<span class="t-h3">Your Travel Ecosystem</span>'],
+    ["Lead", "Inter 400 · 20/1.5", '<span class="t-lead" style="color:var(--foreground)">A magazine that happens to be an engine.</span>'],
+    ["Body", "Inter 400 · 16/1.6", '<span class="t-body">The traveler should feel guided, calm, and in control — never the machinery underneath.</span>'],
+    ["Body S", "Inter 400 · 14/1.55", '<span class="t-body-s">Card descriptions, captions, metadata.</span>'],
+    ["Micro", "Inter 500 · 12/1.4", '<span class="t-micro">DISCLOSURE · METADATA · STATUS PILLS</span>'],
+    ["Hero italic", "Playfair italic 400", '<span style="font-family:var(--font-display);font-style:italic;font-size:30px">Your Journey Starts Here</span>'],
+  ];
+  document.getElementById('type-specimens').innerHTML = TYPE.map(
+    ([tk, meta, demo]) => `<div class="type-row"><div class="tk"><b>${tk}</b>${meta}</div><div class="specimen">${demo}</div></div>`
+  ).join('');
+
+  const SPACE = [4,8,12,16,24,32,48,64,96,128];
+  document.getElementById('space-scale').innerHTML = SPACE.map(
+    n => `<div class="space-row"><span class="lbl">${n}px</span><span class="bar" style="width:${n}px"></span></div>`
+  ).join('');
+</script>
+</body>
+</html>

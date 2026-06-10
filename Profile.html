@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TravelWell — Your Travel ID</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@400;500;600&family=Noto+Sans+Arabic:wght@400;500;600&family=Noto+Naskh+Arabic:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles/tokens.css">
+<link rel="stylesheet" href="styles/shell.css">
+<link rel="stylesheet" href="styles/onboarding.css">
+<link rel="stylesheet" href="styles/profile.css">
+<style>
+  .pf-switch { position: fixed; inset-block-end: 20px; inset-inline-start: 50%; transform: translateX(-50%); z-index: 120; background: var(--foreground); color: var(--background); border-radius: var(--radius-pill); padding: 7px; display: flex; gap: 4px; box-shadow: var(--e3); }
+  [dir="rtl"] .pf-switch { transform: translateX(50%); }
+  .pf-switch button { border: 0; background: none; color: var(--background); opacity: .65; cursor: pointer; font-family: var(--font-sans); font-weight: 600; font-size: 12.5px; padding: 8px 14px; border-radius: var(--radius-pill); white-space: nowrap; }
+  .pf-switch button[aria-pressed="true"] { background: var(--accent); color: var(--foreground); opacity: 1; }
+  .pf-switch__label { opacity: .5; font-size: 10px; letter-spacing: .1em; text-transform: uppercase; padding: 0 10px; display: grid; place-items: center; }
+</style>
+</head>
+<body>
+<a href="#main" class="skip-link">Skip to content</a>
+
+<main id="main">
+  <div class="pf" id="pf"><!-- renders here --></div>
+</main>
+
+<!-- reset confirm modal -->
+<div class="pf-modal" id="pf-modal" role="dialog" aria-modal="true" aria-labelledby="pf-modal-title">
+  <div class="pf-modal__scrim" data-act="modal-cancel"></div>
+  <div class="pf-modal__card">
+    <h3 id="pf-modal-title">Reset your Travel ID?</h3>
+    <p>This clears your party, interests, budgets and dream — everything in your Identity Card. Your saved trip itinerary is kept. This can't be undone.</p>
+    <div class="pf-modal__actions">
+      <button class="btn btn-secondary" data-act="modal-cancel">Keep my Travel ID</button>
+      <button class="btn btn-primary" data-act="modal-confirm" style="background:var(--destructive)">Reset everything</button>
+    </div>
+  </div>
+</div>
+
+<div class="pf-switch" role="group" aria-label="Preview state">
+  <span class="pf-switch__label">State</span>
+  <button data-state="saved" aria-pressed="true">Profiled</button>
+  <button data-state="new" aria-pressed="false">New (empty)</button>
+</div>
+
+<script src="js/data.js"></script>
+<script src="js/images.js"></script>
+<script src="js/shell.js"></script>
+<script>
+TWW.mountShell({ active: "profile" });
+const $ = (s,r=document)=>r.querySelector(s);
+const ICON = TWW.ICON;
+const byId = (arr,id)=>arr.find(x=>x.id===id);
+
+/* ---- model ---- */
+const PROFILE = {
+  id: "TW-2A9F-K3",
+  created: "Jun 2026",
+  party: [
+    { initial:"A", name:"Amara", role:"Trip lead · books &amp; pays", cohort:"35–44", tag:"You" },
+    { initial:"J", name:"Jhumur", role:"Partner", cohort:"35–44", tag:"Adult" },
+  ],
+  interests: ["safari","romance","culinary"],
+  budgets: { stay:["high","luxury"], fly:["business"], eat:["high"], move:["mid"], activities:["mid","high"] },
+  trip: { type:"Romantic getaway", length:"10 days", window:"July 2026" },
+  dream: "An unhurried anniversary safari — golden-hour game drives, candlelit dinners under the stars, and a few slow mornings with coffee and a view.",
+  diet: ["Pescatarian (Jhumur)", "No shellfish"],
+  access: ["Step-free rooms preferred"],
+  contact: { email:"amara@email.com", channel:"Email + SMS" },
+  consent: { updates:true, safety:true, marketing:false },
+};
+/* Multi-select budget bands. Most Wells share the general scale; Fly-Well
+   has its own cabin classes. pct drives the read-view bar width. */
+const BUDGET_TIERS = {
+  luxury: { label:"Luxury", pct:100 },
+  high:   { label:"High-End", pct:80 },
+  mid:    { label:"Mid-Range", pct:58 },
+  family: { label:"Family Friendly", pct:40 },
+  budget: { label:"Budget Conscious", pct:24 },
+};
+const FLY_TIERS = {
+  first:    { label:"First Class", pct:100 },
+  business: { label:"Business Class", pct:68 },
+  coach:    { label:"Coach", pct:34 },
+};
+const tiersFor = (wid) => wid==="fly" ? FLY_TIERS : BUDGET_TIERS;
+const BUDGET_WELLS = [
+  { id:"stay", name:"Stay-Well", icon:"bed" }, { id:"fly", name:"Fly-Well", icon:"plane" },
+  { id:"eat", name:"Eat-Well", icon:"utensils" }, { id:"move", name:"Move-Well", icon:"car" },
+  { id:"activities", name:"Activities-Well", icon:"compass" },
+];
+
+let editing = null; // section key currently editing
+
+/* ---- Identity Card ---- */
+function identityCard() {
+  const chips = PROFILE.interests.map(id=>{ const si=byId(TWW.SIS,id);
+    return `<span class="idp-chip"><span class="dot" style="background:${si.accent}"></span>${si.name}</span>`; }).join("");
+  return `
+  <div class="idp">
+    <div class="idp__top">
+      <div class="idp__top-row">
+        <div class="idp__seal">${ICON("globe")}</div>
+        <div>
+          <div class="idp__kicker">TravelWell · Identity Card</div>
+          <div class="idp__title">${PROFILE.trip.type}</div>
+        </div>
+      </div>
+      <div class="idp__no">
+        <span>ID · ${PROFILE.id}</span><span>PARTY · ${PROFILE.party.length}</span>
+        <span>WINDOW · ${PROFILE.trip.window.toUpperCase()}</span><span>SINCE · ${PROFILE.created.toUpperCase()}</span>
+      </div>
+    </div>
+    <div class="idp__body">
+      <div class="idp__col">
+        <h3>Traveling party</h3>
+        <div class="idp-party">
+          ${PROFILE.party.map(m=>`<div class="idp-member">
+            <div class="idp-member__av">${m.initial}</div>
+            <div><div class="idp-member__name">${m.name}</div><div class="idp-member__meta">${m.role} · ${m.cohort}</div></div>
+            <span class="idp-member__tag pill ${m.tag==='You'?'pill-live':'pill-preview'}">${m.tag}</span>
+          </div>`).join("")}
+        </div>
+        <h3 style="margin-top:22px">Travels for</h3>
+        <div class="idp-chips">${chips}</div>
+      </div>
+      <div class="idp__col">
+        <h3>The dream</h3>
+        <p class="idp-dream">“${PROFILE.dream}”</p>
+        <h3 style="margin-top:20px">Shape</h3>
+        <div class="idp-chips">
+          <span class="idp-chip" style="background:var(--surface-alt);border:1px solid var(--border)">${ICON("calendar","ic-sm")} ${PROFILE.trip.length}</span>
+          <span class="idp-chip" style="background:var(--surface-alt);border:1px solid var(--border)">${PROFILE.trip.window}</span>
+        </div>
+      </div>
+    </div>
+    <div class="idp__foot">
+      <span class="idp__sig">Signed, ready to travel. <span class="tw">Travel Well.</span></span>
+      <span class="pill pill-live">Saved on this device</span>
+    </div>
+  </div>`;
+}
+
+/* ---- editable sections ---- */
+function secParty() {
+  if (editing==="party") return editShell("party","heart","Traveling party",`
+    <p class="fld__hint" style="margin-bottom:4px">${ICON("info","ic-sm")} We ask for age <b>ranges</b>, never birthdays. Children are never contacted.</p>
+    ${PROFILE.party.map((m,i)=>`<div class="party-member" style="background:var(--card)">
+      <div class="party-member__av">${m.initial}</div>
+      <div style="flex:1"><div class="party-member__name">${m.name}</div><div class="party-member__meta">${m.role}</div></div>
+      <select class="fld" style="width:auto;padding:8px 10px;border:1.5px solid var(--border);border-radius:var(--radius-sm)" aria-label="Age range for ${m.name}">
+        ${["18–24","25–34","35–44","45–54","55–64","65+"].map(c=>`<option ${c===m.cohort?'selected':''}>${c}</option>`).join("")}
+      </select>
+    </div>`).join("")}
+    <button class="party-add" type="button">${ICON("arrow","ic-sm")} Add a traveler</button>`);
+  return readShell("party","heart","Traveling party", PROFILE.party.map(m=>
+    `<div class="pf-row"><span class="pf-row__k">${m.name}</span><span class="pf-row__v">${m.cohort} · ${m.tag}</span></div>`).join(""));
+}
+
+function secInterests() {
+  if (editing==="interests") {
+    const live = TWW.SIS.filter(s=>s.status==="live");
+    return editShell("interests","compass","Interests","" +
+      `<p class="fld__hint" style="margin-bottom:6px">Pick the ways you love to travel. <b>1–2 is the sweet spot</b>; up to 5.</p>
+       <div class="chip-pick">${live.map(s=>`<button type="button" class="chip-toggle" data-si="${s.id}" aria-pressed="${PROFILE.interests.includes(s.id)}">${s.name}</button>`).join("")}</div>`);
+  }
+  const chips = PROFILE.interests.map(id=>{ const si=byId(TWW.SIS,id);
+    return `<span class="idp-chip"><span class="dot" style="background:${si.accent}"></span>${si.name}</span>`; }).join("");
+  return readShell("interests","compass","Interests", `<div class="idp-chips">${chips}</div>`);
+}
+
+function secBudget() {
+  if (editing==="budget") {
+    return editShell("budget","gift","Budget, per Well",
+      `<p class="fld__hint" style="margin-bottom:6px">${ICON("info","ic-sm")} Pick <b>as many bands as you like</b> per Well — we'll match providers across them. Fly-Well uses cabin classes.</p>` +
+      BUDGET_WELLS.map(w=>`<div>
+        <div class="pf-budget__name" style="margin-bottom:8px">${ICON(w.icon,"ic-sm")} ${w.name}</div>
+        <div class="chip-pick">
+          ${Object.entries(tiersFor(w.id)).map(([k,t])=>`<button type="button" class="chip-toggle" data-budget="${w.id}" data-tier="${k}" aria-pressed="${(PROFILE.budgets[w.id]||[]).includes(k)}">${t.label}</button>`).join("")}
+        </div></div>`).join(""));
+  }
+  return readShell("budget","gift","Budget, per Well", `<div class="pf-budget">
+    ${BUDGET_WELLS.map(w=>{ const tiers=tiersFor(w.id); const sel=(PROFILE.budgets[w.id]||[]); const maxPct=Math.max(0,...sel.map(k=>tiers[k]?tiers[k].pct:0));
+      const labels = sel.map(k=>tiers[k]&&tiers[k].label).filter(Boolean).join(" · ") || "Any";
+      return `<div class="pf-budget__row">
+        <span class="pf-budget__name">${ICON(w.icon,"ic-sm")} ${w.name}</span>
+        <span class="pf-budget__track"><span class="pf-budget__fill" style="width:${maxPct}%"></span></span>
+        <span class="pf-budget__tier">${labels}</span></div>`; }).join("")}
+  </div>`);
+}
+
+function secDream() {
+  if (editing==="dream") return editShell("dream","sparkle","Trip intent &amp; dream",`
+    <div class="fld"><label>Trip type</label>
+      <div class="chip-pick">${["Romantic getaway","Family adventure","Solo journey","Friends trip","Celebration","Wellness reset"].map(t=>`<button type="button" class="chip-toggle" data-triptype="${t}" aria-pressed="${PROFILE.trip.type===t}">${t}</button>`).join("")}</div></div>
+    <div class="fld"><label>Trip length</label>
+      <div class="chip-pick">${["Weekend","5 days","7 days","10 days","2 weeks","A month+"].map(t=>`<button type="button" class="chip-toggle" data-triplen="${t}" aria-pressed="${PROFILE.trip.length===t}">${t}</button>`).join("")}</div></div>
+    <div class="fld"><label for="dreamtxt">Describe your dream <span class="opt">— in your own words</span></label>
+      <textarea id="dreamtxt">${PROFILE.dream}</textarea></div>`);
+  return readShell("dream","sparkle","Trip intent &amp; dream", `
+    <div class="pf-row"><span class="pf-row__k">Trip type</span><span class="pf-row__v">${PROFILE.trip.type}</span></div>
+    <div class="pf-row"><span class="pf-row__k">Length</span><span class="pf-row__v">${PROFILE.trip.length} · ${PROFILE.trip.window}</span></div>
+    <div style="margin-top:14px"><p class="idp-dream" style="font-size:16px">“${PROFILE.dream}”</p></div>`);
+}
+
+function secCare() {
+  if (editing==="care") return editShell("care","shield","Dietary &amp; accessibility",`
+    <div class="fld"><label for="diet">Dietary needs</label><textarea id="diet" style="min-height:64px">${PROFILE.diet.join(", ")}</textarea>
+      <p class="fld__hint">We pass these to Eat-Well partners so menus fit you.</p></div>
+    <div class="fld"><label for="access">Accessibility needs</label><textarea id="access" style="min-height:64px">${PROFILE.access.join(", ")}</textarea>
+      <p class="fld__hint">Used to filter step-free stays, transfers and activities.</p></div>`);
+  return readShell("care","shield","Dietary &amp; accessibility", `
+    <div class="pf-row"><span class="pf-row__k">Dietary</span><span class="pf-row__v">${PROFILE.diet.join(" · ")}</span></div>
+    <div class="pf-row"><span class="pf-row__k">Accessibility</span><span class="pf-row__v">${PROFILE.access.join(" · ") || "None noted"}</span></div>`);
+}
+
+function secContact() {
+  if (editing==="contact") return editShell("contact","message","Contact &amp; consent",`
+    <div class="fld"><label for="cemail">Email</label><input type="email" id="cemail" value="${PROFILE.contact.email}"></div>
+    <div>
+      ${consentRow("updates","Trip updates","Booking confirmations, price drops you asked about.")}
+      ${consentRow("safety","Safety notices","Important advisories for your destination.")}
+      ${consentRow("marketing","Occasional inspiration","Curated ideas. Off by default — never spam.")}
+    </div>`);
+  return readShell("contact","message","Contact &amp; consent", `
+    <div class="pf-row"><span class="pf-row__k">Email</span><span class="pf-row__v">${PROFILE.contact.email}</span></div>
+    <div class="pf-row"><span class="pf-row__k">Reach me via</span><span class="pf-row__v">${PROFILE.contact.channel}</span></div>
+    <div class="pf-row"><span class="pf-row__k">Consents</span><span class="pf-row__v">${[PROFILE.consent.updates&&"Updates",PROFILE.consent.safety&&"Safety",PROFILE.consent.marketing&&"Inspiration"].filter(Boolean).join(" · ")}</span></div>`);
+}
+
+function consentRow(key,t,s) {
+  return `<div class="pf-consent">
+    <button type="button" class="pf-toggle" data-consent="${key}" aria-pressed="${PROFILE.consent[key]}" aria-label="${t}"></button>
+    <div><div class="pf-consent__t">${t}</div><div class="pf-consent__s">${s}</div></div></div>`;
+}
+
+/* shells */
+function readShell(key,icon,title,body,wide) {
+  return `<div class="pf-sec ${wide?'pf-sec--wide':''}">
+    <div class="pf-sec__head"><div class="pf-sec__ic">${ICON(icon)}</div><div class="pf-sec__title">${title}</div>
+      <button class="pf-sec__edit" data-edit="${key}">${ICON("arrow","ic-sm")} Edit</button></div>
+    <div class="pf-sec__body">${body}</div></div>`;
+}
+function editShell(key,icon,title,fields,wide) {
+  return `<div class="pf-sec pf-edit ${wide?'pf-sec--wide':''}">
+    <div class="pf-sec__head"><div class="pf-sec__ic">${ICON(icon)}</div><div class="pf-sec__title">${title}</div></div>
+    <div class="pf-sec__body"><div class="pf-edit__fields">${fields}</div>
+      <div class="pf-edit__actions"><button class="btn btn-secondary" data-edit-cancel>Cancel</button><button class="btn btn-primary" data-edit-save="${key}">Save changes</button></div>
+    </div></div>`;
+}
+
+/* ---- render ---- */
+let justSaved = false;
+function renderSaved() {
+  $("#pf").innerHTML = `
+    ${justSaved ? `<div class="pf-saved-banner">${ICON("check","ic-sm")} Saved — your trip will re-tune around these changes.</div>` : ""}
+    <div class="pf__head">
+      <div><span class="eyebrow">Your Travel ID</span><h1>${PROFILE.party[0].name}'s travel identity</h1></div>
+      <div class="pf__head-actions">
+        <a class="btn btn-secondary" href="Sign Up.html">${ICON("arrow","ic-sm")} Rebuild from scratch</a>
+        <a class="btn btn-primary" href="itinerary.html">Open my trip →</a>
+      </div>
+    </div>
+    ${identityCard()}
+    <h2 class="t-h3" style="margin-top:36px;margin-bottom:4px">Edit any detail</h2>
+    <p class="t-body-s" style="color:var(--muted-foreground);margin-bottom:18px">Change anything here and your dream trip quietly re-tunes. No account required — this lives on your device.</p>
+    <div class="pf-sections">
+      ${secParty()}${secInterests()}${secBudget()}${secDream()}${secCare()}${secContact()}
+    </div>
+    <div class="pf-danger">
+      <div>${ICON("info")}</div>
+      <div><div class="pf-danger__t">Reset your Travel ID</div><div class="pf-danger__s">Clear everything in your Identity Card and start fresh. Your itinerary is kept.</div></div>
+      <button class="btn btn-danger" data-act="reset">Reset Travel ID</button>
+    </div>`;
+  justSaved = false;
+}
+function renderNew() {
+  $("#pf").innerHTML = `
+    <div class="pf-empty">
+      <div class="pf-empty__art">${ICON("globe")}</div>
+      <span class="eyebrow" style="display:block;margin-bottom:10px">No Travel ID yet</span>
+      <h2>Tell us who's traveling, and we'll tailor everything.</h2>
+      <p>A Travel ID is a lightweight profile — your party, what excites you, your budget and your dream. It personalizes every screen and lets the Concierge give advice that actually fits. <b>No account or password needed.</b></p>
+      <div class="pf-empty__actions">
+        <a class="btn btn-primary" href="Sign Up.html" style="height:54px;padding:0 28px;font-size:16px">Build my Travel ID — 6 quick steps</a>
+        <button class="btn btn-secondary" style="height:54px" data-tw-concierge>${ICON("sparkle","ic-sm")} Speak with Claude</button>
+      </div>
+      <p class="t-body-s" style="color:var(--muted-foreground);margin-top:20px">${ICON("shield","ic-sm")} We ask for age ranges, never birthdays. You can edit or delete everything anytime.</p>
+    </div>`;
+}
+
+let STATE = "saved";
+function render() {
+  editing = null;
+  STATE==="saved" ? renderSaved() : renderNew();
+  document.querySelectorAll(".pf-switch button").forEach(b=>b.setAttribute("aria-pressed", String(b.dataset.state===STATE)));
+  window.scrollTo({top:0});
+}
+
+/* ---- interactions ---- */
+document.addEventListener("click",(e)=>{
+  const sw = e.target.closest(".pf-switch button");
+  if (sw) { STATE=sw.dataset.state; render(); return; }
+
+  const edit = e.target.closest("[data-edit]");
+  if (edit) { editing = edit.dataset.edit; renderSaved(); document.querySelectorAll(".pf-switch button").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.state===STATE))); return; }
+  if (e.target.closest("[data-edit-cancel]")) { editing=null; renderSaved(); return; }
+  const save = e.target.closest("[data-edit-save]");
+  if (save) { commitEdit(save.dataset.editSave); editing=null; justSaved=true; renderSaved(); TWW.toast("Travel ID updated"); return; }
+
+  // toggles inside edit forms
+  const si = e.target.closest("[data-si]");
+  if (si) { const id=si.dataset.si; const on=si.getAttribute("aria-pressed")==="true";
+    if (on) PROFILE.interests=PROFILE.interests.filter(x=>x!==id); else if (PROFILE.interests.length<5) PROFILE.interests.push(id);
+    si.setAttribute("aria-pressed", String(!on && PROFILE.interests.includes(id))); return; }
+  const bud = e.target.closest("[data-budget]");
+  if (bud) { const wid=bud.dataset.budget, tier=bud.dataset.tier; const arr=PROFILE.budgets[wid]||(PROFILE.budgets[wid]=[]);
+    const i=arr.indexOf(tier); if(i>-1){ if(arr.length>1) arr.splice(i,1); } else arr.push(tier);
+    bud.setAttribute("aria-pressed", String(arr.includes(tier))); return; }
+  const tt = e.target.closest("[data-triptype]");
+  if (tt) { PROFILE.trip.type=tt.dataset.triptype; tt.parentElement.querySelectorAll("[data-triptype]").forEach(x=>x.setAttribute("aria-pressed","false")); tt.setAttribute("aria-pressed","true"); return; }
+  const tl = e.target.closest("[data-triplen]");
+  if (tl) { PROFILE.trip.length=tl.dataset.triplen; tl.parentElement.querySelectorAll("[data-triplen]").forEach(x=>x.setAttribute("aria-pressed","false")); tl.setAttribute("aria-pressed","true"); return; }
+  const cons = e.target.closest("[data-consent]");
+  if (cons) { const k=cons.dataset.consent; PROFILE.consent[k]=!PROFILE.consent[k]; cons.setAttribute("aria-pressed",String(PROFILE.consent[k])); return; }
+
+  // reset modal
+  if (e.target.closest("[data-act=reset]")) { $("#pf-modal").setAttribute("data-open","true"); return; }
+  if (e.target.closest("[data-act=modal-cancel]")) { $("#pf-modal").setAttribute("data-open","false"); return; }
+  if (e.target.closest("[data-act=modal-confirm]")) { $("#pf-modal").setAttribute("data-open","false"); STATE="new"; render(); TWW.toast("Travel ID reset"); return; }
+});
+
+function commitEdit(key) {
+  if (key==="dream") { const t=$("#dreamtxt"); if (t) PROFILE.dream=t.value; }
+  if (key==="care") { const d=$("#diet"), a=$("#access"); if (d) PROFILE.diet=d.value.split(",").map(s=>s.trim()).filter(Boolean); if (a) PROFILE.access=a.value.split(",").map(s=>s.trim()).filter(Boolean); }
+  if (key==="contact") { const em=$("#cemail"); if (em) PROFILE.contact.email=em.value; }
+  // party age selects
+  if (key==="party") { document.querySelectorAll(".pf-edit select").forEach((sel,i)=>{ if (PROFILE.party[i]) PROFILE.party[i].cohort=sel.value; }); }
+}
+
+render();
+</script>
+</body>
+</html>

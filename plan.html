@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TravelWell — Plan Your Trip</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@400;500;600&family=Noto+Sans+Arabic:wght@400;500;600&family=Noto+Naskh+Arabic:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles/tokens.css">
+<link rel="stylesheet" href="styles/shell.css">
+<link rel="stylesheet" href="styles/journey.css">
+<style>
+  .pl-section { max-width: var(--content-max); margin-inline: auto; padding: 0 var(--gutter); }
+  .pl-section + .pl-section { margin-top: 56px; }
+  .pl-shead { display:flex; align-items:flex-end; justify-content:space-between; gap:16px; margin-bottom:22px; flex-wrap:wrap; }
+  .pl-shead h2 { font-size: var(--t-h2); } .pl-shead p { color:var(--muted-foreground); font-size:15px; margin-top:4px; }
+
+  /* seasonal banner */
+  .pl-banner { position: relative; overflow: hidden; border-radius: 0 0 var(--radius-lg) var(--radius-lg); min-height: 360px; display:flex; align-items:flex-end; }
+  .pl-banner__img { position:absolute; inset:0; } .pl-banner__img img { width:100%; height:100%; object-fit:cover; }
+  .pl-banner__scrim { position:absolute; inset:0; background: linear-gradient(180deg, rgba(15,22,20,.2) 0%, rgba(15,22,20,.4) 40%, rgba(13,20,18,.85) 100%); }
+  .pl-banner__inner { position:relative; max-width: var(--content-max); margin-inline:auto; padding: 44px var(--gutter); width:100%; color:#fff; }
+  .pl-banner__season { display:inline-flex; align-items:center; gap:8px; background:rgba(255,255,255,.16); backdrop-filter:blur(6px); border:1px solid rgba(255,255,255,.25); border-radius:var(--radius-pill); padding:7px 15px; font-size:13px; font-weight:600; }
+  .pl-banner h1 { color:#fff; font-size:clamp(34px,5vw,56px); line-height:1.04; letter-spacing:-.015em; margin-top:16px; max-width:20ch; text-shadow:0 2px 24px rgba(0,0,0,.4); }
+  .pl-banner p { color:rgba(255,255,255,.9); font-size:18px; margin-top:12px; max-width:54ch; }
+  .pl-banner__actions { display:flex; gap:12px; margin-top:24px; flex-wrap:wrap; }
+
+  /* profiled strip */
+  .pl-prof { margin-top:24px; }
+  .pl-prof__card { display:flex; align-items:center; gap:16px; background:var(--secondary); border-radius:var(--radius); padding:16px 22px; flex-wrap:wrap; }
+  .pl-prof__av { width:44px; height:44px; border-radius:50%; background:var(--card); color:var(--primary); display:grid; place-items:center; font-family:var(--font-display); font-weight:600; font-size:18px; flex:none; }
+  .pl-prof__text { flex:1; min-width:200px; } .pl-prof__text b { font-weight:600; }
+
+  /* 10-Well checklist */
+  .pl-check { display:grid; grid-template-columns: repeat(5,1fr); gap:12px; }
+  .pl-check__item { border:1px solid var(--border); border-radius:var(--radius); background:var(--card); padding:16px; text-align:center; box-shadow:var(--e1); position:relative; text-decoration:none; color:var(--foreground); transition:transform .15s, box-shadow .15s; }
+  .pl-check__item:hover { transform:translateY(-2px); box-shadow:var(--e2); text-decoration:none; }
+  .pl-check__ic { width:44px; height:44px; border-radius:11px; background:var(--surface-alt); color:var(--muted-foreground); display:grid; place-items:center; margin:0 auto 10px; }
+  .pl-check__item.done .pl-check__ic { background:var(--secondary); color:var(--primary); }
+  .pl-check__name { font-size:13px; font-weight:600; }
+  .pl-check__status { font-size:11px; color:var(--muted-foreground); margin-top:2px; }
+  .pl-check__tick { position:absolute; top:10px; inset-inline-end:10px; width:20px; height:20px; border-radius:50%; background:var(--safety-1); color:#fff; display:grid; place-items:center; }
+  .pl-check__item.soon { opacity:.6; }
+
+  /* featured destinations / guides */
+  .pl-feat { display:grid; grid-template-columns: repeat(3,1fr); gap:18px; }
+  .pl-fcard { position:relative; border-radius:var(--radius-lg); overflow:hidden; aspect-ratio:3/2; display:block; border:1px solid var(--border); }
+  .pl-fcard img { width:100%; height:100%; object-fit:cover; transition:transform .5s cubic-bezier(.2,.7,.3,1); }
+  .pl-fcard:hover img { transform:scale(1.05); }
+  .pl-fcard__scrim { position:absolute; inset:0; background:linear-gradient(180deg,rgba(15,22,20,.05),rgba(15,22,20,.78)); }
+  .pl-fcard__body { position:absolute; inset-inline:0; bottom:0; padding:18px; color:#fff; }
+  .pl-fcard__k { font-size:11px; letter-spacing:.08em; text-transform:uppercase; opacity:.85; font-weight:600; }
+  .pl-fcard__t { font-family:var(--font-display); font-weight:600; font-size:21px; margin-top:3px; }
+
+  /* campaign band */
+  .pl-campaign { display:grid; grid-template-columns:1.2fr 1fr; gap:0; border-radius:var(--radius-lg); overflow:hidden; border:1px solid var(--border); box-shadow:var(--e1); }
+  .pl-campaign__text { padding:36px; background:var(--card); display:flex; flex-direction:column; justify-content:center; }
+  .pl-campaign__text .eyebrow { color:var(--gold-deep); display:block; margin-bottom:10px; }
+  .pl-campaign__text h3 { font-size:28px; line-height:1.1; } .pl-campaign__text p { color:var(--muted-foreground); margin-top:10px; }
+  .pl-campaign__media { position:relative; min-height:220px; } .pl-campaign__media img { width:100%; height:100%; object-fit:cover; position:absolute; inset:0; }
+
+  /* SI mini grid */
+  .pl-si { display:grid; grid-template-columns:repeat(5,1fr); gap:12px; }
+  .pl-si__tile { position:relative; border-radius:var(--radius); overflow:hidden; aspect-ratio:1; display:block; border:1px solid var(--border); }
+  .pl-si__tile img { width:100%; height:100%; object-fit:cover; }
+  .pl-si__tile .scrim { position:absolute; inset:0; background:linear-gradient(180deg,rgba(15,22,20,.05),rgba(15,22,20,.75)); }
+  .pl-si__tile .name { position:absolute; bottom:10px; inset-inline:12px; color:#fff; font-family:var(--font-display); font-weight:600; font-size:15px; line-height:1.1; text-shadow:0 1px 8px rgba(0,0,0,.4); }
+  .pl-si__tile--soon img { filter:saturate(.25); }
+
+  @media (max-width:900px){ .pl-check{grid-template-columns:repeat(3,1fr);} .pl-feat{grid-template-columns:1fr 1fr;} .pl-si{grid-template-columns:repeat(3,1fr);} .pl-campaign{grid-template-columns:1fr;} }
+  @media (max-width:560px){ .pl-check,.pl-si,.pl-feat{grid-template-columns:1fr 1fr;} }
+</style>
+</head>
+<body>
+<a href="#main" class="skip-link">Skip to content</a>
+<main id="main">
+  <section class="pl-banner">
+    <div class="pl-banner__img" id="pl-banner-img"></div>
+    <div class="pl-banner__scrim"></div>
+    <div class="pl-banner__inner">
+      <span class="pl-banner__season" id="pl-season"></span>
+      <h1 id="pl-banner-title">Plan your next adventure.</h1>
+      <p id="pl-banner-sub">Start from a feeling, a place, or a season — we'll shape the rest around you.</p>
+      <div class="pl-banner__actions">
+        <a class="btn btn-primary" href="special-interests.html" style="height:52px;padding:0 26px;font-size:16px">Design your journey →</a>
+        <button class="btn" data-tw-concierge style="height:52px;background:rgba(255,255,255,.16);color:#fff;border:1px solid rgba(255,255,255,.3)">Speak with Claude</button>
+      </div>
+    </div>
+  </section>
+
+  <div class="pl-section pl-prof" id="pl-prof-slot"></div>
+
+  <section class="pl-section">
+    <div class="pl-shead">
+      <div><h2>Your 10-Well checklist</h2><p>A complete trip covers every need. Here's where yours stands.</p></div>
+      <a class="btn btn-secondary" href="itinerary.html">Open your itinerary →</a>
+    </div>
+    <div class="pl-check" id="pl-check"></div>
+  </section>
+
+  <section class="pl-section">
+    <div class="pl-shead"><div><h2>In season now</h2><p>Destinations at their best this month.</p></div><a class="btn btn-ghost" href="destinations.html">All destinations →</a></div>
+    <div class="pl-feat" id="pl-feat-dest"></div>
+  </section>
+
+  <section class="pl-section">
+    <div class="pl-campaign">
+      <div class="pl-campaign__text">
+        <span class="eyebrow">Featured · Registry</span>
+        <h3>Honeymoon &amp; celebration registries</h3>
+        <p>Let friends and family gift moments from your trip — a spa morning, a sunset dinner, a night under canvas. Coming with launch.</p>
+        <div style="margin-top:20px"><span class="pill pill-soon">Activated at Launch</span></div>
+      </div>
+      <div class="pl-campaign__media" id="pl-campaign-media"></div>
+    </div>
+  </section>
+
+  <section class="pl-section">
+    <div class="pl-shead"><div><h2>Read before you go</h2><p>Field guides and seasonal intel from the TravelWell desk.</p></div><a class="btn btn-ghost" href="guides.html">All guides →</a></div>
+    <div class="pl-feat" id="pl-feat-guides"></div>
+  </section>
+
+  <section class="pl-section">
+    <div class="pl-shead"><div><h2>Start with a feeling</h2><p>Twenty-five ways to travel.</p></div><a class="btn btn-ghost" href="special-interests.html">All 25 interests →</a></div>
+    <div class="pl-si" id="pl-si"></div>
+  </section>
+</main>
+<div style="height:80px"></div>
+
+<script src="js/data.js"></script>
+<script src="js/places.js"></script>
+<script src="js/images.js"></script>
+<script src="js/shell.js"></script>
+<script>
+TWW.mountShell({ active: "plan" });
+const $ = (s,r=document)=>r.querySelector(s);
+const ICON = TWW.ICON;
+
+/* date-aware seasonal banner (current date) */
+const now = new Date();
+const MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+const month = now.getMonth(); // 0-based
+// season copy by month → choose a destination + message
+const SEASONS = {
+  5:{img:"safariGiraffe",season:"June · Dry season opens in East Africa",title:"The Great Migration is gathering.",sub:"June starts the dry season — herds mass on the Mara's plains. Prime safari window through October."},
+  6:{img:"safariGiraffe",season:"July · Migration season",title:"Front-row seats to the Great Migration.",sub:"July is peak — river crossings, golden plains. The single best month for a first safari."},
+  2:{img:"kyoto",season:"March · Cherry blossom in Japan",title:"Sakura is about to break.",sub:"Late March brings the first blossom to Kyoto and Tokyo. Plan now — the window is short and magic."},
+  11:{img:"northernLights",season:"December · Aurora season in the North",title:"The lights are dancing.",sub:"Long Nordic nights mean prime aurora viewing. Pair it with snow, design and deep quiet."},
+};
+const season = SEASONS[month] || { img:"santorini", season:MONTHS[month]+" · A fine time to wander", title:"Plan your next adventure.", sub:"Tell us a feeling, a place, or a season — we'll shape the rest around you." };
+$("#pl-banner-img").innerHTML = `<img src="${TWW.img(season.img,1800)}" alt="" referrerpolicy="no-referrer">`;
+$("#pl-season").innerHTML = ICON("sun","ic-sm") + " " + season.season;
+$("#pl-banner-title").textContent = season.title;
+$("#pl-banner-sub").textContent = season.sub;
+$("#pl-campaign-media").innerHTML = `<img src="${TWW.img('venice',900)}" alt="" referrerpolicy="no-referrer">`;
+
+/* profiled strip (demo: has Travel ID) */
+const profiled = true;
+$("#pl-prof-slot").innerHTML = profiled ? `<div class="pl-prof__card">
+  <span class="pl-prof__av">A</span>
+  <div class="pl-prof__text"><b>Welcome back, Amara.</b> Based on your Travel ID — Safari &amp; Romance in East Africa — we've ranked everything below for you.</div>
+  <a class="btn btn-secondary" href="Profile.html">Edit Travel ID</a>
+</div>` : "";
+
+/* 10-Well checklist (mock coverage from current trip) */
+const COVERED = new Set(["fly","stay","eat","activities","beauty"]);
+$("#pl-check").innerHTML = TWW.WELLS.map(w=>{
+  const soon = w.status==="soon"; const done = COVERED.has(w.id);
+  return `<a class="pl-check__item ${done?'done':''} ${soon?'soon':''}" href="${soon?'#':'well-detail.html?w='+w.id}" ${soon?'onclick="return false"':''}>
+    ${done?`<span class="pl-check__tick">${ICON("check","ic-sm")}</span>`:''}
+    <span class="pl-check__ic">${ICON(w.icon)}</span>
+    <div class="pl-check__name">${w.name}</div>
+    <div class="pl-check__status">${soon?'At launch':done?'In your trip':'Not yet'}</div>
+  </a>`;
+}).join("");
+
+/* featured destinations (a few live ones) */
+const featDest = [];
+["05A","02F","08A"].forEach(code=>{ const d=(TWW.DESTINATIONS[code]||[]).find(x=>x.status==='live'); if(d) featDest.push({...d,region:code}); });
+$("#pl-feat-dest").innerHTML = featDest.map(d=>`<a class="pl-fcard" href="destination-detail.html?d=${d.id}&r=${d.region}">
+  <img src="${TWW.img(d.img,800)}" alt="" loading="lazy" referrerpolicy="no-referrer"><span class="pl-fcard__scrim"></span>
+  <span class="pl-fcard__body"><span class="pl-fcard__k">${d.country}</span><span class="pl-fcard__t">${d.name}</span></span>
+</a>`).join("");
+
+/* featured guides */
+$("#pl-feat-guides").innerHTML = TWW.GUIDES.slice(0,3).map(gd=>`<a class="pl-fcard" href="guide-detail.html?g=${gd.id}">
+  <img src="${TWW.img(gd.img,800)}" alt="" loading="lazy" referrerpolicy="no-referrer"><span class="pl-fcard__scrim"></span>
+  <span class="pl-fcard__body"><span class="pl-fcard__k">${gd.type} · ${gd.read}</span><span class="pl-fcard__t">${gd.title}</span></span>
+</a>`).join("");
+
+/* SI grid (first 10) */
+$("#pl-si").innerHTML = TWW.SIS.slice(0,10).map(si=>`<a class="pl-si__tile ${si.status!=='live'?'pl-si__tile--soon':''}" href="si-detail.html?si=${si.id}">
+  <img src="${TWW.siImg(si.id,400)}" alt="" loading="lazy" referrerpolicy="no-referrer"><span class="scrim"></span><span class="name">${si.name}</span>
+</a>`).join("");
+</script>
+</body>
+</html>

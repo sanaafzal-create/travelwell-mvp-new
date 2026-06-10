@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TravelWell — Luxury Worlds</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@400;500;600&family=Noto+Sans+Arabic:wght@400;500;600&family=Noto+Naskh+Arabic:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles/tokens.css">
+<link rel="stylesheet" href="styles/shell.css">
+<link rel="stylesheet" href="styles/journey.css">
+<link rel="stylesheet" href="styles/luxury.css">
+</head>
+<body>
+<a href="#main" class="skip-link">Skip to content</a>
+<main id="main"><div id="lx-root"></div></main>
+
+<script src="js/data.js"></script>
+<script src="js/places.js"></script>
+<script src="js/images.js"></script>
+<script src="js/shell.js"></script>
+<script>
+TWW.mountShell({ active: "luxury" });
+const $ = (s,r=document)=>r.querySelector(s);
+const ICON = TWW.ICON;
+const qs = new URLSearchParams(location.search);
+const tier = qs.get("tier") === "luxury" ? "luxury" : "ultra";
+
+const T = {
+  ultra: {
+    eyebrow: "Ultra-Luxury", title: "When only extraordinary will do.",
+    sub: "The rarest experiences on earth, arranged so completely that all you do is arrive. A dedicated curator, every door open, nothing left to chance.",
+    img: "luxuryPool",
+    tiers: [
+      { name:"Signature", price:"from $2,500 / day", featured:false, items:["Dedicated trip curator","Private villa or suite class","Priority everything","24/7 concierge line"] },
+      { name:"Atelier", price:"from $5,000 / day", featured:true, items:["Everything in Signature","Private jet & yacht coordination","In-villa Michelin chef","Nanny-Well & Security-Well included","Access to closed doors & private collections"] },
+      { name:"Sui Generis", price:"by invitation", featured:false, items:["A trip designed from nothing","Heads of state-level logistics","Global fixer network","Absolute discretion"] },
+    ],
+    budgets: [["Stay","Ultra"],["Fly","Private"],["Eat","Michelin / private chef"],["Activities","Exclusive access"],["Beauty","In-suite"],["Security","Close protection"]],
+  },
+  luxury: {
+    eyebrow: "Luxury", title: "Effortless, elevated travel.",
+    sub: "Beautiful places, handled beautifully. A concierge who knows your taste, the best rooms in the house, and a trip that simply works — without the ultra-luxury price.",
+    img: "maldivesResort",
+    tiers: [
+      { name:"Refined", price:"from $900 / day", featured:false, items:["Concierge planning","Boutique & 5-star stays","Curated experiences","Priority reservations"] },
+      { name:"Elevated", price:"from $1,600 / day", featured:true, items:["Everything in Refined","Upgrades & private transfers","Nanny-Well available","Hand-picked guides","Flexible changes"] },
+      { name:"Bespoke", price:"from $2,400 / day", featured:false, items:["Fully tailored itinerary","Dedicated trip designer","Special-occasion touches","Door-to-door management"] },
+    ],
+    budgets: [["Stay","Premium"],["Fly","Business"],["Eat","Fine dining"],["Activities","Private guides"],["Beauty","Spa days"],["Nanny","On request"]],
+  },
+};
+const LX = T[tier];
+
+// chooser data
+const EVENTS = [
+  { m:"Feb", d:"14", name:"Carnival, Rio", where:"Latin America · 10S", img:"marrakech" },
+  { m:"May", d:"24", name:"Monaco Grand Prix", where:"Mediterranean · 02F", img:"venice" },
+  { m:"Jul", d:"06", name:"Migration Crossings", where:"East Africa · 05A", img:"safariGiraffe" },
+  { m:"Sep", d:"02", name:"Venice Film Festival", where:"Western Europe · 01F", img:"venice" },
+  { m:"Dec", d:"31", name:"New Year in the Maldives", where:"South Asia · 07A", img:"maldivesResort" },
+];
+const JOURNEYS = [
+  { t:"Private Island Buyout", s:"An entire island, just for you", img:"tropicalBeach" },
+  { t:"Around the World by Jet", s:"Five continents, one cabin", img:"dubai" },
+  { t:"The Grand Safari", s:"Big Five in ultimate comfort", img:"safariGiraffe" },
+  { t:"Alpine Winter Escape", s:"Chalet, powder, fireside", img:"mountainValley" },
+  { t:"Mediterranean by Yacht", s:"Coastline at your pace", img:"santorini" },
+  { t:"Cultural Grand Tour", s:"Curators, collections, access", img:"kyoto" },
+];
+const NARROW = [
+  { q:"Villa or penthouse?", opts:["Private villa","City penthouse","Either — surprise me"] },
+  { q:"How present should we be?", opts:["Invisible","On call","By my side"] },
+  { q:"What makes it unforgettable?", opts:["Total privacy","Rare access","Pure indulgence"] },
+];
+
+function chooserPanel(kind) {
+  if (kind === "event") return EVENTS.map(e=>`<a class="lx-opt" href="region-detail.html?r=${e.where.split('· ')[1]}"><div class="lx-opt__media"><img src="${TWW.img(e.img,500)}" alt="" loading="lazy" referrerpolicy="no-referrer"><span class="scrim"></span></div><div class="lx-opt__b"><div class="lx-opt__t">${e.name}</div><div class="lx-opt__s">${e.m} · ${e.where}</div></div></a>`).join("");
+  if (kind === "region") return TWW.REGIONS.slice(0,6).map(r=>`<a class="lx-opt" href="region-detail.html?r=${r.code}"><div class="lx-opt__media"><img src="${TWW.regionImg(r.code,500)}" alt="" loading="lazy" referrerpolicy="no-referrer"><span class="scrim"></span></div><div class="lx-opt__b"><div class="lx-opt__t">${r.name}</div><div class="lx-opt__s">${r.line}</div></div></a>`).join("");
+  return JOURNEYS.map(j=>`<a class="lx-opt" href="special-interests.html"><div class="lx-opt__media"><img src="${TWW.img(j.img,500)}" alt="" loading="lazy" referrerpolicy="no-referrer"><span class="scrim"></span></div><div class="lx-opt__b"><div class="lx-opt__t">${j.t}</div><div class="lx-opt__s">${j.s}</div></div></a>`).join("");
+}
+
+function render() {
+  document.title = "TravelWell — " + LX.eyebrow;
+  $("#lx-root").innerHTML = `
+  <section class="lx-hero">
+    <div class="lx-hero__img"><img src="${TWW.img(LX.img,1800)}" alt="" referrerpolicy="no-referrer"></div>
+    <div class="lx-hero__scrim"></div>
+    <div class="lx-hero__inner">
+      <span class="lx-hero__eyebrow">${ICON("sparkles","ic-sm")} ${LX.eyebrow} World</span>
+      <h1>${LX.title}</h1>
+      <p>${LX.sub}</p>
+      <div class="lx-hero__tierswitch">
+        <a href="luxury.html?tier=luxury" aria-current="${tier==='luxury'}">Luxury</a>
+        <a href="luxury.html?tier=ultra" aria-current="${tier==='ultra'}">Ultra-Luxury</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- chooser leads -->
+  <div class="lx-chooser">
+    <div class="lx-chooser__card">
+      <div class="lx-chooser__label">Start with what moves you</div>
+      <div class="lx-chooser__tabs" id="lx-tabs" role="group" aria-label="Choose by">
+        <button class="lx-chooser__tab" data-kind="event" aria-pressed="true">${ICON("calendar","ic-sm")} By event</button>
+        <button class="lx-chooser__tab" data-kind="region" aria-pressed="false">${ICON("globe","ic-sm")} By region</button>
+        <button class="lx-chooser__tab" data-kind="journey" aria-pressed="false">${ICON("compass","ic-sm")} By journey</button>
+      </div>
+      <div class="lx-chooser__panel" id="lx-panel">${chooserPanel("event")}</div>
+    </div>
+  </div>
+
+  <!-- marquee calendar -->
+  <section class="lx-section">
+    <div class="lx-shead"><div><span class="eyebrow">Live calendar</span><h2>Marquee moments worth planning around</h2><p>The world's rarest events — we hold the access.</p></div></div>
+    <div class="lx-cal">
+      ${EVENTS.map(e=>`<div class="lx-event">
+        <div class="lx-event__date"><div class="m">${e.m}</div><div class="d">${e.d}</div></div>
+        <div class="lx-event__sep"></div>
+        <div><div class="lx-event__name">${e.name}</div><div class="lx-event__where">${ICON("pin","ic-sm")} ${e.where}</div></div>
+        <a class="btn btn-secondary lx-event__cta" href="region-detail.html?r=${e.where.split('· ')[1]}">Plan around it →</a>
+      </div>`).join("")}
+    </div>
+  </section>
+
+  <!-- service tiers -->
+  <section class="lx-section">
+    <div class="lx-shead"><div><span class="eyebrow">Service tiers</span><h2>Choose how far we go</h2></div></div>
+    <div class="lx-tiers">
+      ${LX.tiers.map(t=>`<div class="lx-tier ${t.featured?'lx-tier--featured':''}">
+        <div class="lx-tier__name">${t.name}</div>
+        <div class="lx-tier__price">${/from|by/.test(t.price)?'':'from '}<b>${t.price.replace('from ','')}</b></div>
+        <ul class="lx-tier__list">${t.items.map(i=>`<li>${ICON("check","ic-sm")} ${i}</li>`).join("")}</ul>
+        <a class="btn ${t.featured?'btn-gold':'btn-secondary'} lx-tier__cta" data-tw-concierge>Speak to a curator</a>
+      </div>`).join("")}
+    </div>
+  </section>
+
+  <!-- extra wells -->
+  <section class="lx-section">
+    <div class="lx-shead"><div><span class="eyebrow">Only at this level</span><h2>Two Wells that join your trip</h2><p>Nanny-Well and Security-Well appear only in Luxury and Ultra-Luxury contexts.</p></div></div>
+    <div class="lx-extrawells">
+      <div class="lx-ew"><div class="lx-ew__ic">${ICON("heart")}</div><div><div class="lx-ew__t">Nanny-Well</div><div class="lx-ew__s">Vetted, multilingual childcare in-destination — so the grown-ups get a moment too. ${tier==='ultra'?'Included at Atelier tier.':'Available on request.'}</div></div></div>
+      <div class="lx-ew"><div class="lx-ew__ic">${ICON("lock")}</div><div><div class="lx-ew__t">Security-Well</div><div class="lx-ew__s">Discreet close protection and risk advisory, unseen and unobtrusive. ${tier==='ultra'?'Included at Atelier tier.':'Available for sensitive trips.'}</div></div></div>
+    </div>
+  </section>
+
+  <!-- per-well budgets -->
+  <section class="lx-section">
+    <div class="lx-shead"><div><span class="eyebrow">Per-Well standard</span><h2>What "${LX.eyebrow.toLowerCase()}" means, Well by Well</h2></div></div>
+    <div class="lx-tiers" style="grid-template-columns:repeat(3,1fr)">
+      ${LX.budgets.map(([w,v])=>`<div class="lx-tier" style="padding:20px;flex-direction:row;align-items:center;gap:14px"><div class="lx-ew__ic" style="width:42px;height:42px;border-radius:11px">${ICON((TWW.WELLS.concat(TWW.LUX_WELLS).find(x=>x.name.toLowerCase().startsWith(w.toLowerCase()))||{icon:'compass'}).icon)}</div><div><div style="font-weight:600">${w}-Well</div><div style="font-size:13px;color:var(--muted-foreground)">${v}</div></div></div>`).join("")}
+    </div>
+  </section>
+
+  <!-- narrow the dream -->
+  <section class="lx-section">
+    <div class="lx-narrow">
+      <span class="eyebrow">Narrow the dream</span>
+      <h2>A few questions, and we'll shape it.</h2>
+      <p>Our curators start every ${LX.eyebrow.toLowerCase()} trip with a short conversation. Here's how it begins — answer, and we'll have ideas ready.</p>
+      <div class="lx-narrow__qs">
+        ${NARROW.map((n,qi)=>`<div class="lx-nq"><div class="lx-nq__q">${n.q}</div><div class="lx-nq__opts">${n.opts.map(o=>`<button class="lx-nq__opt" data-nq="${qi}" data-opt="${o}">${o}</button>`).join("")}</div></div>`).join("")}
+      </div>
+      <button class="btn btn-gold lx-narrow__cta" data-tw-concierge>Continue with a curator →</button>
+    </div>
+  </section>
+
+  <!-- operational moat (tucked) -->
+  <section class="lx-section">
+    <details class="lx-moat">
+      <summary>${ICON("info","ic-sm")} How we deliver this — the operational moat <span class="chev">${ICON("chev","ic-sm")}</span></summary>
+      <div class="lx-moat__body">
+        <p>The ${LX.eyebrow.toLowerCase()} world isn't a price tier bolted onto the platform — it runs on a separate operating layer. A vetted global network of fixers, villa owners, private-aviation desks and security partners, coordinated by curators who carry a small, fiercely-protected book of clients.</p>
+        <p>That network is the moat: relationships that took years to build, access that can't be bought on a marketplace, and a single point of accountability for the whole trip. The platform handles the machinery; the curator carries the relationship.</p>
+        <p>For the full doctrine — how access is sourced, how discretion is maintained, and how the economics work — request the curator brief.</p>
+      </div>
+    </details>
+  </section>`;
+
+  bindChooser();
+}
+
+function bindChooser() {
+  // events delegated below; this just ensures default panel
+}
+document.addEventListener("click",(e)=>{
+  const tab = e.target.closest("#lx-tabs button");
+  if (tab) { document.querySelectorAll("#lx-tabs button").forEach(b=>b.setAttribute("aria-pressed",String(b===tab))); $("#lx-panel").innerHTML = chooserPanel(tab.dataset.kind); return; }
+  const opt = e.target.closest("[data-nq]");
+  if (opt) { opt.parentElement.querySelectorAll("[data-nq]").forEach(o=>o.setAttribute("aria-pressed",String(o===opt))); return; }
+});
+render();
+</script>
+</body>
+</html>

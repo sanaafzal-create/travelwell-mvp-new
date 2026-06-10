@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TravelWell — Travel Guides</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@400;500;600&family=Noto+Sans+Arabic:wght@400;500;600&family=Noto+Naskh+Arabic:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles/tokens.css">
+<link rel="stylesheet" href="styles/shell.css">
+<link rel="stylesheet" href="styles/journey.css">
+<style>
+  .gx-intro { padding: 48px 0 28px; }
+  .gx-intro .eyebrow { display:block; margin-bottom:12px; }
+  .gx-intro h1 { font-size: clamp(34px,5vw,56px); line-height:1.04; letter-spacing:-.015em; }
+  .gx-intro .lead { color:var(--muted-foreground); margin-top:14px; font-size:18px; max-width:56ch; }
+
+  .gx-filter { display:flex; gap:6px; flex-wrap:wrap; margin-top:24px; }
+  .gx-filter button { border:1px solid var(--border); background:var(--card); border-radius:var(--radius-pill); padding:8px 16px; font-size:13.5px; font-weight:600; color:var(--foreground); cursor:pointer; font-family:var(--font-sans); }
+  .gx-filter button[aria-pressed="true"] { background:var(--foreground); color:var(--background); border-color:var(--foreground); }
+
+  /* featured */
+  .gx-feature { position:relative; border-radius:var(--radius-lg); overflow:hidden; min-height:340px; display:flex; align-items:flex-end; margin-top:8px; }
+  .gx-feature img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+  .gx-feature__scrim { position:absolute; inset:0; background:linear-gradient(180deg,rgba(15,22,20,.1),rgba(13,20,18,.85)); }
+  .gx-feature__body { position:relative; padding:36px; color:#fff; max-width:60ch; }
+  .gx-feature__type { display:inline-flex; align-items:center; gap:7px; background:rgba(255,255,255,.16); backdrop-filter:blur(6px); border:1px solid rgba(255,255,255,.25); border-radius:var(--radius-pill); padding:5px 13px; font-size:12px; font-weight:600; }
+  .gx-feature h2 { color:#fff; font-size:clamp(28px,3.6vw,40px); line-height:1.08; margin-top:14px; }
+  .gx-feature p { color:rgba(255,255,255,.9); margin-top:10px; font-size:16px; }
+  .gx-feature__meta { display:flex; gap:14px; margin-top:14px; font-size:13px; color:rgba(255,255,255,.8); }
+
+  .gx-group { margin-top:48px; }
+  .gx-group__label { display:flex; align-items:center; gap:12px; font-size:12px; letter-spacing:.1em; text-transform:uppercase; color:var(--muted-foreground); font-weight:700; margin-bottom:18px; }
+  .gx-group__label::after { content:""; flex:1; height:1px; background:var(--border); }
+  .gx-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:20px; }
+  .gx-card { border:1px solid var(--border); border-radius:var(--radius-lg); overflow:hidden; background:var(--card); box-shadow:var(--e1); text-decoration:none; color:var(--foreground); display:flex; flex-direction:column; transition:transform .2s, box-shadow .2s; }
+  .gx-card:hover { transform:translateY(-3px); box-shadow:var(--e2); text-decoration:none; }
+  .gx-card__media { position:relative; height:170px; } .gx-card__media img { width:100%; height:100%; object-fit:cover; }
+  .gx-card__type { position:absolute; top:12px; inset-inline-start:12px; background:rgba(255,255,255,.92); color:var(--foreground); font-size:11px; font-weight:700; letter-spacing:.04em; text-transform:uppercase; padding:4px 10px; border-radius:var(--radius-pill); }
+  .gx-card__body { padding:18px 20px; flex:1; display:flex; flex-direction:column; }
+  .gx-card__title { font-family:var(--font-display); font-weight:600; font-size:20px; line-height:1.15; }
+  .gx-card__lede { font-size:13.5px; color:var(--muted-foreground); line-height:1.5; margin-top:8px; flex:1; }
+  .gx-card__meta { display:flex; gap:12px; margin-top:14px; font-size:12px; color:var(--muted-foreground); }
+  .gx-card__meta span { display:inline-flex; align-items:center; gap:5px; }
+
+  @media (max-width:900px){ .gx-grid{grid-template-columns:1fr 1fr;} }
+  @media (max-width:560px){ .gx-grid{grid-template-columns:1fr;} }
+
+  /* Before-You-Go Well Whisper band */
+  .bg-whisper { margin-top: 28px; border-radius: var(--radius-lg); overflow: hidden; border: 1px solid color-mix(in oklch, var(--primary) 22%, var(--border)); background: linear-gradient(135deg, var(--secondary), color-mix(in oklch, var(--secondary) 60%, var(--card))); }
+  .bg-whisper__head { display:flex; align-items:flex-start; gap:14px; padding: 22px 26px 6px; }
+  .bg-whisper__ic { width:42px; height:42px; border-radius:50%; background:var(--card); color:var(--primary); display:grid; place-items:center; flex:none; box-shadow:var(--e1); }
+  .bg-whisper__kind { font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:var(--primary); font-weight:700; }
+  .bg-whisper__title { font-family:var(--font-display); font-weight:600; font-size:21px; line-height:1.15; margin-top:2px; color:var(--foreground); }
+  .bg-whisper__sub { font-size:14px; color:var(--secondary-foreground); opacity:.85; margin-top:3px; max-width:62ch; }
+  .bg-whisper__grid { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; padding: 18px 26px 24px; }
+  .bg-card { display:flex; flex-direction:column; gap:8px; background:var(--card); border:1px solid var(--border); border-radius:var(--radius); padding:16px; text-decoration:none; color:var(--foreground); transition:transform .15s, box-shadow .15s, border-color .15s; }
+  .bg-card:hover { transform:translateY(-3px); box-shadow:var(--e2); text-decoration:none; border-color:color-mix(in oklch,var(--primary) 40%,var(--border)); }
+  .bg-card__ic { width:38px; height:38px; border-radius:10px; background:var(--secondary); color:var(--primary); display:grid; place-items:center; }
+  .bg-card__t { font-weight:600; font-size:14.5px; display:flex; align-items:center; gap:7px; flex-wrap:wrap; }
+  .bg-card__s { font-size:12.5px; color:var(--muted-foreground); line-height:1.45; flex:1; }
+  .bg-card__cta { font-size:12.5px; font-weight:600; color:var(--primary); display:inline-flex; align-items:center; gap:4px; }
+  .bg-card__pri { font-size:10px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; border-radius:var(--radius-pill); padding:2px 8px; }
+  .bg-card__pri--crit { background:color-mix(in oklch,var(--destructive) 12%,white); color:var(--destructive); }
+  .bg-card__pri--soon { background:var(--surface-alt); color:var(--muted-foreground); border:1px solid var(--border); }
+  .bg-whisper__foot { display:flex; align-items:center; gap:8px; padding: 0 26px 22px; font-size:12.5px; color:var(--secondary-foreground); opacity:.85; }
+  @media (max-width:900px){ .bg-whisper__grid{grid-template-columns:1fr 1fr;} }
+  @media (max-width:560px){ .bg-whisper__grid{grid-template-columns:1fr;} }
+</style>
+</head>
+<body>
+<a href="#main" class="skip-link">Skip to content</a>
+<main id="main">
+  <div class="container">
+    <div class="gx-intro">
+      <span class="eyebrow">The TravelWell Desk</span>
+      <h1>Guides worth reading before you go.</h1>
+      <p class="lead">Field guides, seasonal intel and ranked lists — written by people who've actually been, and updated when things change.</p>
+      <div class="gx-filter" id="gx-filter" role="group" aria-label="Filter by type"></div>
+    </div>
+
+    <a class="gx-feature" id="gx-feature" href="#"></a>
+
+    <section class="bg-whisper" aria-label="Before you go essentials">
+      <div class="bg-whisper__head">
+        <span class="bg-whisper__ic">
+          <svg class="ic" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4 12H2m20 0h-2M5 5l1.5 1.5M17.5 17.5 19 19M5 19l1.5-1.5M17.5 6.5 19 5"/></svg>
+        </span>
+        <div>
+          <div class="bg-whisper__kind">A gentle whisper</div>
+          <div class="bg-whisper__title">Read these before you go</div>
+          <div class="bg-whisper__sub">The easy-to-forget essentials that make a trip smoother — and safer. A few minutes now saves real trouble later.</div>
+        </div>
+      </div>
+      <div class="bg-whisper__grid" id="bg-grid"></div>
+      <div class="bg-whisper__foot" id="bg-foot"></div>
+    </section>
+
+    <div id="gx-groups"></div>
+  </div>
+</main>
+<div style="height:80px"></div>
+
+<script src="js/data.js"></script>
+<script src="js/places.js"></script>
+<script src="js/images.js"></script>
+<script src="js/shell.js"></script>
+<script>
+TWW.mountShell({ active: "guides" });
+const $ = (s,r=document)=>r.querySelector(s);
+const ICON = TWW.ICON;
+let filter = "all";
+
+/* Before-You-Go essentials whisper */
+const BEFORE = [
+  { ic:"bag", t:"Gear-Well", pri:"", s:"Trip-matched packing — layers, optics, dry-bags. Don't guess; let the list do it.", cta:"Build my packing list", href:"well-detail.html?w=gear" },
+  { ic:"phone", t:"Stay connected", pri:"", s:"Sort an eSIM, data and call plan before you fly — land already online, no roaming shocks.", cta:"Connectivity guide", href:"guide-detail.html?g=safari-packing" },
+  { ic:"shield", t:"Insure-Well", pri:"crit", priLabel:"Don't skip", s:"Travel protection — and critically, a Med-Evac plan. The one thing you must not leave home without.", cta:"See Insure-Well", href:"well-detail.html?w=insure" },
+  { ic:"heart", t:"Travel safety pack", pri:"soon", priLabel:"Coming soon", s:"Our own clinician-reviewed first-aid kit with a QR Safety Card. Pre-order to carry one.", cta:"Pre-order the kit", href:"first-aid-kit.html" },
+];
+$("#bg-grid").innerHTML = BEFORE.map(b=>`<a class="bg-card" href="${b.href}">
+  <span class="bg-card__ic">${ICON(b.ic)}</span>
+  <span class="bg-card__t">${b.t}${b.pri?`<span class="bg-card__pri bg-card__pri--${b.pri}">${b.priLabel}</span>`:''}</span>
+  <span class="bg-card__s">${b.s}</span>
+  <span class="bg-card__cta">${b.cta} ${ICON("arrow","ic-sm")}</span>
+</a>`).join("");
+$("#bg-foot").innerHTML = `${ICON("info","ic-sm")} <span>Tuned to your trip once you've started one — these update as your itinerary fills.</span>`;
+
+const feat = TWW.GUIDES.find(g=>g.id==="morocco-top8") || TWW.GUIDES[0];
+$("#gx-feature").href = "guide-detail.html?g="+feat.id;
+$("#gx-feature").innerHTML = `<img src="${TWW.img(feat.img,1600)}" alt="" referrerpolicy="no-referrer"><span class="gx-feature__scrim"></span>
+  <div class="gx-feature__body">
+    <span class="gx-feature__type">${ICON("compass","ic-sm")} ${feat.type} · Editor's pick</span>
+    <h2>${feat.title}</h2><p>${feat.lede}</p>
+    <div class="gx-feature__meta"><span>${ICON("info","ic-sm")} ${feat.read}</span><span>Updated ${feat.updated}</span></div>
+  </div>`;
+
+function renderFilter() {
+  $("#gx-filter").innerHTML = [`<button data-f="all" aria-pressed="${filter==='all'}">All guides</button>`]
+    .concat(TWW.GUIDE_TYPES.map(t=>`<button data-f="${t}" aria-pressed="${filter===t}">${t}</button>`)).join("");
+}
+function card(g) {
+  return `<a class="gx-card" href="guide-detail.html?g=${g.id}">
+    <div class="gx-card__media"><img src="${TWW.img(g.img,700)}" alt="" loading="lazy" referrerpolicy="no-referrer"><span class="gx-card__type">${g.type}</span></div>
+    <div class="gx-card__body">
+      <div class="gx-card__title">${g.title}</div>
+      <div class="gx-card__lede">${g.lede}</div>
+      <div class="gx-card__meta"><span>${ICON("info","ic-sm")} ${g.read}</span><span>Updated ${g.updated}</span></div>
+    </div>
+  </a>`;
+}
+function renderGroups() {
+  const types = filter==="all" ? TWW.GUIDE_TYPES : [filter];
+  $("#gx-groups").innerHTML = types.map(t=>{
+    const items = TWW.GUIDES.filter(g=>g.type===t);
+    if (!items.length) return "";
+    return `<section class="gx-group"><div class="gx-group__label">${t}</div><div class="gx-grid">${items.map(card).join("")}</div></section>`;
+  }).join("");
+}
+document.addEventListener("click",(e)=>{
+  const f = e.target.closest("#gx-filter button");
+  if (f) { filter = f.dataset.f; renderFilter(); renderGroups(); }
+});
+renderFilter(); renderGroups();
+</script>
+</body>
+</html>

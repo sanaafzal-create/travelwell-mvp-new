@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TravelWell — Special Interest</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@400;500;600&family=Noto+Sans+Arabic:wght@400;500;600&family=Noto+Naskh+Arabic:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles/tokens.css">
+<link rel="stylesheet" href="styles/shell.css">
+<link rel="stylesheet" href="styles/journey.css">
+<style>
+  .sd-hero { position: relative; min-height: 520px; display: flex; align-items: flex-end; overflow: hidden; }
+  .sd-hero__img { position: absolute; inset: 0; }
+  .sd-hero__img img { width: 100%; height: 100%; object-fit: cover; }
+  .sd-hero--schema .sd-hero__img img { filter: saturate(.2) brightness(1.02); }
+  .sd-hero__scrim { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(15,22,20,.15) 0%, rgba(15,22,20,.3) 40%, rgba(13,20,18,.88) 100%); }
+  .sd-hero__accent { position: absolute; inset-inline: 0; bottom: 0; height: 6px; z-index: 3; }
+  .sd-hero__inner { position: relative; max-width: var(--content-max); margin-inline: auto; padding: 0 var(--gutter) 52px; width: 100%; color: #fff; }
+  .sd-hero__badges { display: flex; gap: 10px; margin-bottom: 18px; }
+  .sd-hero__sig { font-family: var(--font-display); font-style: italic; font-size: clamp(18px,2.4vw,24px); color: rgba(255,255,255,.9); }
+  .sd-hero__title { font-family: var(--font-display); font-weight: 600; font-size: clamp(44px,7vw,84px); line-height: 1; letter-spacing: -.02em; margin: 6px 0 14px; text-shadow: 0 2px 30px rgba(0,0,0,.4); }
+  .sd-hero__promise { font-size: clamp(18px,2vw,22px); line-height: 1.4; max-width: 40ch; color: rgba(255,255,255,.95); }
+
+  .sd-intro { max-width: var(--reading-max); margin-inline: auto; padding: 56px var(--gutter) 0; }
+  .sd-intro p { font-size: 19px; line-height: 1.7; color: var(--foreground); }
+  .sd-intro p + p { margin-top: 20px; }
+  .sd-intro .dropcap::first-letter { font-family: var(--font-display); font-size: 64px; font-weight: 600; float: inline-start; line-height: .8; padding-inline-end: 10px; padding-top: 6px; color: var(--primary); }
+
+  .sd-section { max-width: var(--content-max); margin-inline: auto; padding: 64px var(--gutter) 0; }
+  .sd-section__eyebrow { display: block; margin-bottom: 8px; }
+  .sd-section__title { font-size: var(--t-h2); }
+  .sd-section__sub { color: var(--muted-foreground); font-size: 16px; margin-top: 6px; max-width: 60ch; }
+
+  /* wells activated */
+  .sd-wells { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 26px; }
+  .sd-well { border: 1px solid var(--border); border-radius: var(--radius); background: var(--card); padding: 20px; box-shadow: var(--e1); display: flex; gap: 14px; align-items: flex-start; }
+  .sd-well__ic { width: 44px; height: 44px; border-radius: 11px; background: var(--secondary); color: var(--primary); display: grid; place-items: center; flex: none; }
+  .sd-well__name { font-family: var(--font-display); font-weight: 600; font-size: 18px; }
+  .sd-well__how { font-size: 13.5px; color: var(--muted-foreground); margin-top: 3px; line-height: 1.45; }
+
+  /* provider rail */
+  .sd-rail { display: flex; gap: 16px; overflow-x: auto; padding: 26px 0 8px; scroll-snap-type: x mandatory; scrollbar-width: thin; }
+  .sd-pv { flex: 0 0 300px; scroll-snap-align: start; border: 1px solid var(--border); border-radius: var(--radius); background: var(--card); box-shadow: var(--e1); overflow: hidden; display: flex; flex-direction: column; }
+  .sd-pv__body { padding: 18px; flex: 1; }
+  .sd-pv__tier { font-size: 10.5px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; padding: 4px 9px; border-radius: var(--radius-pill); display: inline-flex; align-items: center; gap: 4px; }
+  .sd-pv__tier--prime { background: var(--accent); color: var(--accent-foreground); }
+  .sd-pv__tier--vetted { background: var(--secondary); color: var(--secondary-foreground); }
+  .sd-pv__name { font-family: var(--font-display); font-weight: 600; font-size: 18px; margin-top: 10px; }
+  .sd-pv__desc { font-size: 13.5px; color: var(--muted-foreground); margin-top: 5px; line-height: 1.45; }
+  .sd-pv__foot { padding: 12px 18px; border-top: 1px solid var(--border); background: var(--surface-alt); font-size: 12px; color: var(--muted-foreground); }
+
+  /* regions */
+  .sd-regions { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-top: 26px; }
+  .sd-rg { position: relative; border-radius: var(--radius); overflow: hidden; aspect-ratio: 4/3; display: block; border: 1px solid var(--border); }
+  .sd-rg img { width: 100%; height: 100%; object-fit: cover; transition: transform .5s cubic-bezier(.2,.7,.3,1); }
+  .sd-rg:hover img { transform: scale(1.05); }
+  .sd-rg__scrim { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(15,22,20,.1), rgba(15,22,20,.72)); }
+  .sd-rg__name { position: absolute; bottom: 12px; inset-inline: 14px; color: #fff; font-family: var(--font-display); font-weight: 600; font-size: 17px; text-shadow: 0 1px 10px rgba(0,0,0,.4); }
+  .sd-rg__code { position: absolute; top: 10px; inset-inline-start: 12px; font-family: var(--font-mono); font-size: 10px; letter-spacing: .12em; color:#fff; background: rgba(20,28,26,.4); padding: 3px 8px; border-radius: var(--radius-pill); }
+
+  /* CTA band */
+  .sd-cta { max-width: var(--content-max); margin: 72px auto 0; padding: 0 var(--gutter); }
+  .sd-cta__card { border-radius: var(--radius-lg); padding: 48px; color: #fff; position: relative; overflow: hidden; }
+  .sd-cta__card .eyebrow { color: rgba(255,255,255,.8); }
+  .sd-cta__card h2 { color: #fff; font-size: 34px; margin-top: 10px; max-width: 20ch; }
+  .sd-cta__card p { color: rgba(255,255,255,.85); margin-top: 12px; max-width: 50ch; }
+  .sd-cta__actions { display: flex; gap: 12px; margin-top: 26px; flex-wrap: wrap; }
+
+  /* schema notice */
+  .sd-schema-notice { max-width: var(--reading-max); margin: 40px auto 0; padding: 0 var(--gutter); }
+  .sd-schema-card { background: var(--surface-alt); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 32px; text-align: center; }
+  .sd-schema-card__ic { width: 64px; height: 64px; border-radius: 50%; background: var(--card); border: 1px solid var(--border); color: var(--muted-foreground); display: grid; place-items: center; margin: 0 auto 18px; }
+  .sd-schema-card h3 { font-size: 24px; }
+  .sd-schema-card p { color: var(--muted-foreground); margin-top: 10px; font-size: 15px; line-height: 1.55; }
+
+  .sd-switch { position: fixed; inset-block-end: 20px; inset-inline-start: 50%; transform: translateX(-50%); z-index: 70; background: var(--foreground); color: var(--background); border-radius: var(--radius-pill); padding: 7px; display: flex; gap: 4px; box-shadow: var(--e3); }
+  .sd-switch button { border: 0; background: none; color: var(--background); opacity: .65; cursor: pointer; font-family: var(--font-sans); font-weight: 600; font-size: 12.5px; padding: 8px 14px; border-radius: var(--radius-pill); white-space: nowrap; }
+  .sd-switch button[aria-pressed="true"] { background: var(--accent); color: var(--foreground); opacity: 1; }
+  .sd-switch__label { opacity: .5; font-size: 10px; letter-spacing: .1em; text-transform: uppercase; padding: 0 8px; display: grid; place-items: center; }
+
+  @media (max-width: 900px) { .sd-wells { grid-template-columns: 1fr; } .sd-regions { grid-template-columns: repeat(2,1fr); } }
+</style>
+</head>
+<body>
+<a href="#main" class="skip-link">Skip to content</a>
+
+<div class="jn-subhead">
+  <div class="jn-subhead__inner">
+    <nav class="jn-crumbs" aria-label="Breadcrumb">
+      <a href="Home.html">Home</a><span class="sep">/</span>
+      <a href="special-interests.html">Special Interests</a><span class="sep">/</span>
+      <span class="here" id="crumb-si">Interest</span>
+    </nav>
+    <a class="btn btn-ghost" href="special-interests.html">← All 25 interests</a>
+  </div>
+</div>
+
+<main id="main"><div id="sd-root"></div></main>
+
+<div class="sd-switch" id="sd-switch" role="group" aria-label="Preview state">
+  <span class="sd-switch__label">Variant</span>
+  <button data-variant="live" aria-pressed="true">Live SI</button>
+  <button data-variant="schema" aria-pressed="false">Schema / coming soon</button>
+</div>
+
+<script src="js/data.js"></script>
+<script src="js/places.js"></script>
+<script src="js/images.js"></script>
+<script src="js/shell.js"></script>
+<script>
+TWW.mountShell({ active: "special-interests" });
+const $ = (s,r=document)=>r.querySelector(s);
+const ICON = TWW.ICON;
+const qs = new URLSearchParams(location.search);
+
+const EDITORIAL = {
+  safari: { promise:"The wild, on its own terms — and you, right there in it.",
+    intro:["There is a moment, just after dawn, when the plains exhale. The light goes gold, a lion calls somewhere you can't see, and the whole continent feels awake at once. A safari isn't a holiday so much as a remembering — of how small and how lucky we are.",
+      "We pair you with camps that sit lightly on the land and guides who read it like a book. Whether it's your first game drive or your fortieth, we build the days around the animals' rhythm, not a schedule."] },
+  romance: { promise:"Time that belongs to no one but the two of you.",
+    intro:["The best romantic trips aren't about grand gestures — they're about uninterrupted time. A long dinner with nowhere to be. A morning you don't set an alarm for. A view you both go quiet in front of.",
+      "We design around the two of you: where you'll stay, what you'll taste, the moments worth dressing up for and the ones worth staying in. You bring the company; we'll handle the rest."] },
+  culinary: { promise:"A table worth the flight — and the stories around it.",
+    intro:["Some trips you remember by what you saw. These you remember by what you ate, and who you ate it with. The market at opening. The grandmother's recipe. The tasting menu that took four hours and felt like one.",
+      "We route you to the tables that matter — the famous and the hidden — and to the people behind them. Eat-Well does the booking; you do the savoring."] },
+  ocean: { promise:"The open water, and everything alive beneath it.",
+    intro:["The ocean resets something in us. We chase the next set, the clearest reef, the quietest cove — and the meals that taste better with salt still on your skin.",
+      "From liveaboards to barefoot beach resorts, we match the water to your mood and the season to the swell."] },
+  wellness: { promise:"Come home to yourself.",
+    intro:["Wellness travel is permission — to slow down, to be looked after, to do less on purpose. The right retreat doesn't add to your to-do list; it quietly subtracts from it.",
+      "We pair you with places built around rest, movement and nourishment, and we keep the logistics invisible so you can keep your shoulders down."] },
+  ultra: { promise:"The extraordinary, made effortless.",
+    intro:["At the very top, luxury stops being about things and starts being about ease — the sense that everything has been handled before you thought to ask.",
+      "Private villas with their own staff. Doors that don't open for others. A curator who knows your name and your preferences. With Ultra-Luxury, the Nanny-Well and Security-Well quietly join your trip when they're needed."] },
+};
+const GENERIC_INTRO = (si)=>([`${si.name} is one of the 25 ways travelers love to move through the world — ${si.sig}. This world is being curated now.`]);
+
+const FALLBACK_WELLS = ["stay","activities","eat","move"];
+const WELL_HOW = {
+  stay:"Where you'll rest, matched to the trip", fly:"Getting there, the easy way", eat:"Tables worth the trip",
+  move:"Getting around once you arrive", gear:"What to pack and carry", beauty:"Looking and feeling your best",
+  activities:"What you'll actually do", shop:"Taking a piece of it home", nanny:"Care for the little ones", security:"Discreet protection",
+};
+
+let variant = "live";
+let si = TWW.SIS.find(s=>s.id===qs.get("si")) || TWW.SIS.find(s=>s.id==="safari");
+// if URL points to a schema SI, default the switch to schema
+if (si.status!=="live") variant = "schema";
+
+function wellsActivated(siId) {
+  const acts = TWW.ACTIVITIES[siId];
+  if (acts && acts.length) { const set=[]; acts.forEach(a=>{ if(!set.includes(a.well)) set.push(a.well); }); return set; }
+  return FALLBACK_WELLS;
+}
+function featuredRegions(siId) {
+  return TWW.REGIONS.filter(r=>(TWW.REGION_SI[r.code]||[]).includes(siId)).slice(0,4);
+}
+function providerRail(siId) {
+  const wells = wellsActivated(siId);
+  const out = [];
+  wells.forEach(w=>{ (TWW.PROVIDERS[w]||[]).filter(p=>p.tier!=="prospective").slice(0,2).forEach(p=>out.push(p)); });
+  return out.slice(0,6);
+}
+const allWells = {}; [...TWW.WELLS,...TWW.LUX_WELLS].forEach(w=>allWells[w.id]=w);
+
+function render() {
+  $("#crumb-si").textContent = si.name;
+  document.title = "TravelWell — " + si.name;
+  const ed = EDITORIAL[si.id];
+  const isSchema = variant==="schema";
+
+  const hero = `<section class="sd-hero ${isSchema?'sd-hero--schema':''}">
+    <div class="sd-hero__img"><img src="${TWW.siImg(si.id,1800)}" alt="" referrerpolicy="no-referrer"></div>
+    <div class="sd-hero__scrim"></div>
+    <div class="sd-hero__accent" style="background:${si.accent}"></div>
+    <div class="sd-hero__inner">
+      <div class="sd-hero__badges">
+        ${isSchema ? `<span class="pill pill-preview" style="background:rgba(255,255,255,.86)">Preview · coming soon</span>` : `<span class="pill pill-live" style="background:rgba(255,255,255,.92)">Live now</span>`}
+        ${si.lux ? `<span class="pill" style="background:var(--accent);color:var(--accent-foreground)">Luxury world</span>` : ``}
+      </div>
+      <div class="sd-hero__sig">${si.sig.charAt(0).toUpperCase()+si.sig.slice(1)}</div>
+      <h1 class="sd-hero__title">${si.name}</h1>
+      <p class="sd-hero__promise">${ed?ed.promise:si.sig}</p>
+    </div>
+  </section>`;
+
+  if (isSchema) {
+    $("#sd-root").innerHTML = hero + `
+      <div class="sd-schema-notice"><div class="sd-schema-card">
+        <div class="sd-schema-card__ic">${ICON("compass")}</div>
+        <h3>This world is on the way</h3>
+        <p>${si.name} is part of our taxonomy of 25 ways to travel, but it isn't bookable yet — we're curating partners and guides for it now. It can't be added to a trip until it goes live.</p>
+        <div style="display:flex;gap:12px;justify-content:center;margin-top:22px;flex-wrap:wrap">
+          <button class="btn btn-primary" data-act="notify">Notify me when it's live</button>
+          <a class="btn btn-secondary" href="special-interests.html">Explore live interests</a>
+        </div>
+      </div></div>
+      ${featuredRegions(si.id).length?regionsSection():""}
+      <div style="height:80px"></div>`;
+    syncSwitch(); return;
+  }
+
+  const wells = wellsActivated(si.id);
+  const rail = providerRail(si.id);
+
+  $("#sd-root").innerHTML = hero + `
+    <div class="sd-intro">${(ed?ed.intro:GENERIC_INTRO(si)).map((p,i)=>`<p class="${i===0?'dropcap':''}">${p}</p>`).join("")}</div>
+
+    <section class="sd-section">
+      <span class="eyebrow sd-section__eyebrow">What it switches on</span>
+      <h2 class="sd-section__title">The Wells a ${si.name.toLowerCase()} trip activates</h2>
+      <p class="sd-section__sub">Choose this interest and we light up the right Wells, pre-filled with matched providers.</p>
+      <div class="sd-wells">
+        ${wells.map(w=>`<div class="sd-well"><div class="sd-well__ic">${ICON(allWells[w].icon)}</div><div><div class="sd-well__name">${allWells[w].name}</div><div class="sd-well__how">${WELL_HOW[w]||allWells[w].tag}</div></div></div>`).join("")}
+      </div>
+    </section>
+
+    ${rail.length?`<section class="sd-section">
+      <span class="eyebrow sd-section__eyebrow">A taste of our partners</span>
+      <h2 class="sd-section__title">Vetted providers you'll meet</h2>
+      <p class="sd-section__sub">Curated and scoped to your region during the journey. Prime Providers shown first.</p>
+      <div class="sd-rail">
+        ${rail.map(p=>`<div class="sd-pv"><div class="sd-pv__body">
+          <span class="sd-pv__tier sd-pv__tier--${p.tier}">${p.tier==='prime'?'★ Prime':'Vetted'}</span>
+          <div class="sd-pv__name">${p.name}</div>
+          <div class="sd-pv__desc">${p.desc}</div>
+        </div><div class="sd-pv__foot">${allWells[p.well].name}</div></div>`).join("")}
+      </div>
+    </section>`:""}
+
+    ${regionsSection()}
+
+    <div class="sd-cta"><div class="sd-cta__card" style="background:linear-gradient(135deg, ${si.accent}, color-mix(in oklch, ${si.accent} 60%, black))">
+      <span class="eyebrow">Start the journey</span>
+      <h2>Design a ${si.name.toLowerCase()} trip that's truly yours.</h2>
+      <p>Pick a region next and watch your Wells fill with providers matched to ${si.name}.</p>
+      <div class="sd-cta__actions">
+        <a class="btn" href="regions.html" style="background:#fff;color:var(--foreground)" data-act="start">Choose a region →</a>
+        <button class="btn" data-tw-concierge style="background:rgba(255,255,255,.18);color:#fff;border:1px solid rgba(255,255,255,.3)">${ICON("sparkle","ic-sm")} Speak with Claude</button>
+      </div>
+    </div></div>
+    <div style="height:80px"></div>`;
+  syncSwitch();
+}
+
+function regionsSection() {
+  const regions = featuredRegions(si.id);
+  if (!regions.length) return "";
+  return `<section class="sd-section">
+    <span class="eyebrow sd-section__eyebrow">Where it shines</span>
+    <h2 class="sd-section__title">Best regions for ${si.name}</h2>
+    <div class="sd-regions">
+      ${regions.map(r=>`<a class="sd-rg" href="region-detail.html?r=${r.code}">
+        <img src="${TWW.regionImg(r.code,500)}" alt="" loading="lazy" referrerpolicy="no-referrer">
+        <span class="sd-rg__scrim"></span>
+        <span class="sd-rg__code">${r.code}</span>
+        <span class="sd-rg__name">${r.name}</span>
+      </a>`).join("")}
+    </div>
+  </section>`;
+}
+
+function syncSwitch() {
+  document.querySelectorAll("#sd-switch button").forEach(b=>b.setAttribute("aria-pressed", String(b.dataset.variant===variant)));
+}
+
+document.addEventListener("click",(e)=>{
+  const sw = e.target.closest("#sd-switch button");
+  if (sw) { variant = sw.dataset.variant; render(); return; }
+  if (e.target.closest("[data-act=notify]")) { TWW.toast("We'll email you when "+si.name+" goes live"); return; }
+  if (e.target.closest("[data-act=start]")) { try{ localStorage.setItem("tww:journeySIs", JSON.stringify([si.id])); }catch(e){} }
+});
+
+render();
+</script>
+</body>
+</html>

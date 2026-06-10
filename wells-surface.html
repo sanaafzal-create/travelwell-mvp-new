@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TravelWell — Build your trip, Well by Well</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@400;500;600&family=Noto+Sans+Arabic:wght@400;500;600&family=Noto+Naskh+Arabic:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles/tokens.css">
+<link rel="stylesheet" href="styles/shell.css">
+<link rel="stylesheet" href="styles/journey.css">
+<link rel="stylesheet" href="styles/wells.css">
+</head>
+<body>
+<a href="#main" class="skip-link">Skip to content</a>
+
+<div class="jn-subhead">
+  <div class="jn-subhead__inner">
+    <nav class="jn-crumbs" aria-label="Breadcrumb">
+      <a href="Home.html">Home</a><span class="sep">/</span>
+      <a href="special-interests.html">Interests</a><span class="sep">/</span>
+      <a href="regions.html">Regions</a><span class="sep">/</span>
+      <a href="activities.html">Activities</a><span class="sep">/</span>
+      <span class="here">The Wells</span>
+    </nav>
+    <div class="tw-steps" aria-label="Journey progress">
+      <div class="tw-step" data-state="done"><span class="tw-step__dot">1</span><span class="tw-step__label">Interest</span></div>
+      <span class="tw-step__line"></span>
+      <div class="tw-step" data-state="done"><span class="tw-step__dot">2</span><span class="tw-step__label">Region</span></div>
+      <span class="tw-step__line"></span>
+      <div class="tw-step" data-state="done"><span class="tw-step__dot">3</span><span class="tw-step__label">Activities</span></div>
+      <span class="tw-step__line"></span>
+      <div class="tw-step" data-state="current"><span class="tw-step__dot">4</span><span class="tw-step__label">Wells</span></div>
+      <span class="tw-step__line"></span>
+      <div class="tw-step"><span class="tw-step__dot">5</span><span class="tw-step__label">Book It</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- always-visible Wells bar -->
+<div class="wb">
+  <div class="wb__inner">
+    <span class="wb__label">Your Wells</span>
+    <div class="wb__rail" id="wb-rail" role="tablist" aria-label="Wells"></div>
+  </div>
+</div>
+
+<main id="main">
+  <div class="container" style="padding-top:24px">
+    <span class="eyebrow">The Dream Journey · Step 4 of 5</span>
+    <h1 style="font-size:clamp(28px,4vw,42px);line-height:1.05;margin-top:8px" id="surface-title">Build your trip, Well by Well.</h1>
+    <p class="t-lead" id="surface-sub" style="margin-top:10px;max-width:60ch">Each Well covers one need. We've scoped the options to your region and pre-filled them from your activities. Add what you love — you'll book in the next step.</p>
+  </div>
+
+  <div id="wp-root"><!-- well panel renders here --></div>
+
+  <div class="container">
+    <div class="wp-writein">
+      <div class="wp-writein__ic">
+        <svg class="ic" viewBox="0 0 24 24" style="width:24px;height:24px"><path d="M12 21s7-6 7-11a7 7 0 0 0-14 0c0 5 7 11 7 11z" fill="none" stroke="currentColor" stroke-width="1.75"/><circle cx="12" cy="10" r="2.5" fill="none" stroke="currentColor" stroke-width="1.75"/></svg>
+      </div>
+      <div style="flex:1;min-width:200px">
+        <div class="wp-writein__t">Somewhere else in mind?</div>
+        <div class="wp-writein__s">Name a place we haven't listed and we'll route the right providers to it.</div>
+      </div>
+      <form class="wp-writein__form" id="writein-form">
+        <input type="text" id="writein-input" placeholder="e.g. a private island off Lamu…" aria-label="Write in a destination">
+        <button class="btn btn-secondary" type="submit">Add</button>
+      </form>
+    </div>
+  </div>
+</main>
+
+<!-- continue bar -->
+<div class="wp-continue">
+  <div class="wp-continue__inner">
+    <div class="wp-continue__summary">
+      <span class="wp-continue__cov" id="cov-bar"></span>
+      <span class="wp-continue__text" id="cov-text"><b>0 Wells</b> started · nothing added yet</span>
+    </div>
+    <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+      <button class="btn btn-secondary" data-tw-trip>View Your Trip</button>
+      <a class="btn btn-primary" href="itinerary.html" style="padding:0 26px">Continue to Book It →</a>
+    </div>
+  </div>
+</div>
+
+<script src="js/data.js"></script>
+<script src="js/places.js"></script>
+<script src="js/images.js"></script>
+<script src="js/shell.js"></script>
+<script>
+TWW.mountShell({ active: "" });
+const $ = (s,r=document)=>r.querySelector(s);
+const ICON = TWW.ICON;
+const qs = new URLSearchParams(location.search);
+const code = qs.get("r") || "05A";
+const R = TWW.REGIONS.find(r=>r.code===code) || TWW.REGIONS.find(r=>r.code==="05A");
+
+// context
+let chosenSIs = [];
+try { const raw = JSON.parse(localStorage.getItem("tww:journeySIs")); chosenSIs = Array.isArray(raw)&&raw.length?raw:["safari","romance"]; } catch(e){ chosenSIs=["safari","romance"]; }
+const luxContext = chosenSIs.includes("ultra"); // Nanny/Security only in Luxury/Ultra
+
+// per-Well budget from a (mock) Travel ID
+const BUDGET = { stay:"comfort", fly:"comfort", eat:"premium", move:"value", activities:"comfort", gear:"comfort", beauty:"comfort", shop:"value", nanny:"premium", security:"ultra" };
+const PRICE_LABEL = { value:"Value", comfort:"Comfort", premium:"Premium", ultra:"Ultra" };
+const PRICE_DOT = { value:"#3F7E55", comfort:"#2C6E68", premium:"#C2A35B", ultra:"#A8873F" };
+const TIER_LABEL = { prime:"Prime Provider", vetted:"Vetted", prospective:"Prospective" };
+const MODE = {
+  api:{ label:"Book in TravelWell", ic:"check" },
+  widget:{ label:"Book in TravelWell", ic:"check" },
+  affiliate:{ label:"Opens partner site", ic:"arrow" },
+};
+
+// activities → which wells are pre-filled (from B5)
+let preWells = new Set();
+try { (JSON.parse(localStorage.getItem("tww:journeyActs"))||[]).forEach(k=>{ const [si,act]=k.split(":"); const a=(TWW.ACTIVITIES[si]||[]).find(x=>x.id===act); if(a) preWells.add(a.well); }); } catch(e){}
+
+// the wells list for this context
+const WELLS = [...TWW.WELLS, ...(luxContext?TWW.LUX_WELLS:[])];
+
+// trip state: { wellId: Set(providerName) }
+const trip = {};
+WELLS.forEach(w=>trip[w.id]=new Set());
+
+let activeWell = preWells.size ? [...preWells][0] : "stay";
+let visibleCount = 6;
+let priceFilter = "all";
+let loading = true;
+
+function totalAdded(){ return Object.values(trip).reduce((n,s)=>n+s.size,0); }
+function wellsStarted(){ return Object.values(trip).filter(s=>s.size>0).length; }
+
+/* ---- Wells bar ---- */
+function renderBar() {
+  $("#wb-rail").innerHTML = WELLS.map(w=>{
+    const soon = w.status==="soon";
+    const lux = w.lux;
+    const count = trip[w.id]?.size || 0;
+    const pre = preWells.has(w.id) && count===0;
+    return `<button class="wb-chip ${soon?'wb-chip--soon':''} ${lux?'wb-chip--lux':''}" role="tab" aria-selected="${activeWell===w.id}" data-well="${w.id}">
+      <span class="wb-chip__ic">${ICON(w.icon)}</span>
+      ${w.name.replace('-Well','')}
+      ${soon ? `<span class="wb-chip__soon">Soon</span>` : count>0 ? `<span class="wb-chip__count">${count}</span>` : pre ? `<span class="wb-chip__soon" style="color:var(--primary);background:var(--secondary);border-color:transparent">Ready</span>` : ``}
+    </button>`;
+  }).join("");
+}
+
+/* ---- provider card ---- */
+function providerCard(pv) {
+  const added = trip[activeWell]?.has(pv.name);
+  const budget = BUDGET[activeWell];
+  const match = pv.price===budget;
+  const mode = MODE[pv.mode];
+  return `<article class="pv ${added?'pv--added':''}" data-pv="${pv.name}">
+    <div class="pv__body">
+      <div class="pv__top">
+        <h3 class="pv__name">${pv.name}</h3>
+        <span class="pv__tier pv__tier--${pv.tier}">${pv.tier==='prime'?'★ Prime':TIER_LABEL[pv.tier]}</span>
+      </div>
+      <p class="pv__desc">${pv.desc}</p>
+      <div class="pv__attrs">
+        <span class="pv__attr ${match?'pv__attr--match':''}"><span class="dot" style="background:${PRICE_DOT[pv.price]}"></span>${PRICE_LABEL[pv.price]}${match?' · fits budget':''}</span>
+        <span class="pv__attr">${ICON(WELLS.find(w=>w.id===activeWell).icon,'ic-sm')} ${R.name}</span>
+      </div>
+    </div>
+    <div class="pv__foot">
+      <div class="pv__cta-row">
+        ${added
+          ? `<span class="pv__added-tag">${ICON("check","ic-sm")} Added to your trip</span><button class="btn btn-ghost" data-remove="${pv.name}" style="min-height:auto">Remove</button>`
+          : `<button class="btn btn-primary" data-book="${pv.name}">Book It</button><span class="pv__mode">${ICON(mode.ic,'ic-sm')} ${mode.label}</span>`}
+      </div>
+      ${pv.mode==='affiliate' ? `<p class="pv__ftc">${ICON("info","ic-sm")} <span>${pv.commission}. We may earn a commission if you book through this link — at no extra cost to you.</span></p>` : ``}
+    </div>
+  </article>`;
+}
+
+/* ---- well panel ---- */
+function renderPanel() {
+  const w = WELLS.find(x=>x.id===activeWell);
+  const root = $("#wp-root");
+  const head = `<div class="wp"><div class="wp__head">
+    <div class="wp__ic">${ICON(w.icon)}</div>
+    <div style="flex:1;min-width:0">
+      <h2 class="wp__title">${w.name}</h2>
+      <div class="wp__tag">${w.tag} · the <b>${w.body}</b> of your trip</div>
+    </div>
+    <div class="wp__meta">
+      ${w.status!=='soon' ? `<span class="wp__budget">${ICON("gift","ic-sm")} Your budget: ${PRICE_LABEL[BUDGET[w.id]]||'Comfort'}</span>` : ``}
+      <span class="wp__scope">Scoped to ${R.name}</span>
+    </div>
+  </div></div>`;
+
+  // pre-launch wells
+  if (w.status==="soon") {
+    root.innerHTML = head + `<div class="container"><div class="wp-empty">
+      <div class="wp-empty__ic">${ICON(w.icon)}</div>
+      <h3>${w.name} is on the way</h3>
+      <p>${w.name} (${w.tag.toLowerCase()}) is part of the full TravelWell ecosystem and will switch on at launch. We're lining up vetted partners now.</p>
+      <span class="pill pill-soon">Activated at Launch</span>
+    </div></div>`;
+    return;
+  }
+
+  // loading skeleton
+  if (loading) {
+    root.innerHTML = head + `<div class="wp"><div class="pv-grid">${Array.from({length:4},()=>`<div class="pv-skel"><div class="pv-skel__line" style="width:60%;height:18px"></div><div class="pv-skel__line" style="width:90%"></div><div class="pv-skel__line" style="width:40%"></div></div>`).join("")}</div></div>`;
+    return;
+  }
+
+  let pool = (TWW.PROVIDERS[w.id]||[]).slice();
+  if (priceFilter!=="all") pool = pool.filter(p=>p.price===priceFilter);
+  // empty (filtered)
+  if (!pool.length) {
+    root.innerHTML = head + filterRow(0) + `<div class="container"><div class="wp-empty">
+      <div class="wp-empty__ic">${ICON("info")}</div>
+      <h3>No ${w.name} options at this budget yet</h3>
+      <p>Try a different budget tier, or write in a specific place below and we'll source options for you.</p>
+    </div></div>`;
+    return;
+  }
+  // sort: prime first, then by budget match, then tier
+  const tierRank = { prime:0, vetted:1, prospective:2 };
+  pool.sort((a,b)=> tierRank[a.tier]-tierRank[b.tier] || (b.price===BUDGET[w.id])-(a.price===BUDGET[w.id]));
+  const shown = pool.slice(0, visibleCount);
+  const prime = shown.filter(p=>p.tier==="prime");
+  const rest = shown.filter(p=>p.tier!=="prime");
+
+  root.innerHTML = head + filterRow(pool.length) + `<div class="wp">
+    ${prime.length?`<div class="pv-section-label">${ICON("sparkle","ic-sm")} Prime Providers — vetted &amp; recommended first</div><div class="pv-grid">${prime.map(providerCard).join("")}</div>`:``}
+    ${rest.length?`${prime.length?`<div class="pv-section-label">More vetted options</div>`:``}<div class="pv-grid">${rest.map(providerCard).join("")}</div>`:``}
+    ${pool.length>visibleCount ? `<div class="wp__more"><button class="btn btn-secondary" id="show-more">Show more (${pool.length-visibleCount} more)</button></div>` : ``}
+  </div>`;
+}
+
+function filterRow(count) {
+  return `<div class="wp"><div class="wp__filters">
+    <span class="sortlabel">Budget</span>
+    ${["all","value","comfort","premium","ultra"].map(t=>`<button class="wp-fchip" data-price="${t}" aria-pressed="${priceFilter===t}">${t==='all'?'All':PRICE_LABEL[t]}</button>`).join("")}
+    <span class="wp__count-note">${count} option${count===1?'':'s'} · scoped to ${R.name}</span>
+  </div></div>`;
+}
+
+/* ---- continue / coverage ---- */
+function renderCoverage() {
+  const total = WELLS.filter(w=>w.status!=="soon").length;
+  const started = wellsStarted();
+  $("#cov-bar").innerHTML = Array.from({length:total},(_,i)=>`<i class="${i<started?'on':''}"></i>`).join("");
+  const added = totalAdded();
+  $("#cov-text").innerHTML = added===0
+    ? `<b>0 Wells</b> started · nothing added yet`
+    : `<b>${started} of ${total} Wells</b> started · <b>${added}</b> ${added===1?'item':'items'} in your trip`;
+}
+
+/* ---- render all ---- */
+function render() { renderBar(); renderPanel(); renderCoverage(); }
+
+function selectWell(id) {
+  const w = WELLS.find(x=>x.id===id);
+  if (!w) return;
+  activeWell = id; visibleCount = 6; priceFilter = "all";
+  if (w.status==="soon") { loading = false; render(); return; }
+  loading = true;
+  render();
+  // simulate per-Well fetch
+  clearTimeout(window.__wpTimer);
+  window.__wpTimer = setTimeout(()=>{ loading=false; renderPanel(); }, 480);
+}
+
+/* ---- events ---- */
+document.addEventListener("click",(e)=>{
+  const chip = e.target.closest(".wb-chip");
+  if (chip) { selectWell(chip.dataset.well); return; }
+  const book = e.target.closest("[data-book]");
+  if (book) {
+    const w = WELLS.find(x=>x.id===activeWell);
+    trip[activeWell].add(book.dataset.book);
+    if (TWW.addToTrip) TWW.addToTrip({ well:activeWell, icon:w.icon, name:book.dataset.book, meta:`${w.name} · ${R.name}`, status:"idea" });
+    else TWW.toast(`Added ${book.dataset.book} to your trip`);
+    renderBar(); renderPanel(); renderCoverage();
+    return;
+  }
+  const rm = e.target.closest("[data-remove]");
+  if (rm) { trip[activeWell].delete(rm.dataset.remove); renderBar(); renderPanel(); renderCoverage(); return; }
+  const pf = e.target.closest("[data-price]");
+  if (pf) { priceFilter = pf.dataset.price; visibleCount = 6; renderPanel(); return; }
+  if (e.target.closest("#show-more")) { visibleCount += 6; renderPanel(); return; }
+});
+
+$("#writein-form").addEventListener("submit",(e)=>{
+  e.preventDefault();
+  const v = $("#writein-input").value.trim();
+  if (!v) { TWW.toast("Type a place to add it"); return; }
+  TWW.toast(`Noted “${v}” — we'll route providers there`);
+  $("#writein-input").value = "";
+});
+
+render();
+// initial load for the first well
+window.__wpTimer = setTimeout(()=>{ loading=false; renderPanel(); }, 520);
+</script>
+</body>
+</html>

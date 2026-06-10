@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TravelWell — Region</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@400;500;600&family=Noto+Sans+Arabic:wght@400;500;600&family=Noto+Naskh+Arabic:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles/tokens.css">
+<link rel="stylesheet" href="styles/shell.css">
+<link rel="stylesheet" href="styles/journey.css">
+<style>
+  /* hero */
+  .rd-hero { position: relative; min-height: 440px; display: flex; align-items: flex-end; overflow: hidden; }
+  .rd-hero__img { position: absolute; inset: 0; }
+  .rd-hero__img img { width: 100%; height: 100%; object-fit: cover; }
+  .rd-hero__scrim { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(13,20,18,.30) 0%, rgba(13,20,18,.50) 45%, rgba(11,17,15,.92) 100%); }
+  .rd-hero__inner { position: relative; max-width: var(--content-max); margin-inline: auto; padding: 0 var(--gutter) 44px; width: 100%; color: #fff; }
+  .rd-hero__code { font-family: var(--font-mono); font-size: 13px; letter-spacing: .2em; color: rgba(255,255,255,.85); }
+  .rd-hero__title { font-family: var(--font-display); font-weight: 500; font-size: clamp(40px, 6vw, 72px); line-height: 1.02; letter-spacing: -.01em; margin-top: 8px; color: #fff; text-shadow: 0 2px 8px rgba(11,17,15,.55), 0 6px 36px rgba(11,17,15,.5); },0,.35); }
+  .rd-hero__line { font-family: var(--font-display); font-style: italic; font-size: clamp(18px, 2.4vw, 24px); color: rgba(255,255,255,.92); margin-top: 8px; }
+  .rd-hero__badges { display: flex; gap: 10px; margin-top: 18px; flex-wrap: wrap; }
+
+  .rd-body { max-width: var(--content-max); margin-inline: auto; padding: 40px var(--gutter) 0; }
+  .rd-blurb { font-size: 20px; line-height: 1.55; max-width: 60ch; color: var(--foreground); }
+
+  /* fact strip */
+  .rd-facts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-top: 36px; align-items: start; }
+  .rd-fact { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px 20px; box-shadow: var(--e1); }
+  .rd-fact__k { font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted-foreground); font-weight: 700; display: flex; align-items: center; gap: 8px; }
+  .rd-fact__k .ic { color: var(--primary); }
+  .rd-fact__v { margin-top: 10px; font-size: 15px; line-height: 1.5; }
+  .rd-countries { display: flex; flex-wrap: wrap; gap: 6px; }
+  .rd-country { background: var(--secondary); color: var(--secondary-foreground); border-radius: var(--radius-pill); padding: 4px 11px; font-size: 12.5px; font-weight: 500; }
+  .rd-gw { font-family: var(--font-mono); font-size: 14px; }
+  .rd-gw-chips { display: flex; flex-direction: column; gap: 7px; }
+  .rd-gw-chip { display: flex; align-items: center; gap: 10px; }
+  .rd-gw-chip .code { font-family: var(--font-mono); font-size: 13px; font-weight: 700; color: var(--primary); background: var(--secondary); border-radius: var(--radius-sm); padding: 4px 9px; flex: none; letter-spacing: .04em; }
+  .rd-gw-chip .city { font-size: 14px; color: var(--foreground); }
+  .rd-fact__cap { font-size: 12.5px; color: var(--muted-foreground); margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border); }
+
+  /* season */
+  .rd-seasons { display: flex; flex-direction: column; gap: 10px; }
+  .rd-season { display: flex; gap: 12px; align-items: baseline; }
+  .rd-season__l { font-weight: 600; font-size: 13.5px; width: 96px; flex: none; }
+  .rd-season__m { font-family: var(--font-mono); font-size: 12px; color: var(--primary); width: 72px; flex: none; }
+  .rd-season__n { font-size: 13px; color: var(--muted-foreground); }
+
+  .rd-section { max-width: var(--content-max); margin-inline: auto; padding: 56px var(--gutter) 0; }
+  .rd-section__head { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; margin-bottom: 22px; flex-wrap: wrap; }
+  .rd-section__head h2 { font-size: var(--t-h2); }
+  .rd-section__head p { color: var(--muted-foreground); font-size: 15px; margin-top: 4px; }
+
+  /* destinations grid */
+  .rd-dest-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; }
+  .rd-dest { position: relative; border-radius: var(--radius); overflow: hidden; aspect-ratio: 3/4; display: block; border: 1px solid var(--border); cursor: pointer; }
+  .rd-dest img { width: 100%; height: 100%; object-fit: cover; transition: transform .5s cubic-bezier(.2,.7,.3,1); }
+  .rd-dest:hover img { transform: scale(1.05); }
+  .rd-dest__scrim { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(15,22,20,.1), rgba(15,22,20,.78)); }
+  .rd-dest__badge { position: absolute; top: 12px; inset-inline-end: 12px; }
+  .rd-dest__body { position: absolute; inset-inline: 0; bottom: 0; padding: 16px; color: #fff; }
+  .rd-dest__country { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; opacity: .85; font-weight: 600; }
+  .rd-dest__name { font-family: var(--font-display); font-weight: 600; font-size: 20px; line-height: 1.1; margin-top: 3px; }
+  .rd-dest__line { font-size: 12.5px; color: rgba(255,255,255,.85); margin-top: 4px; }
+  .rd-dest--stub img { filter: saturate(.35); }
+
+  /* sub-regions */
+  .rd-subs { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .rd-sub { border: 1px solid var(--border); border-radius: var(--radius); background: var(--card); box-shadow: var(--e1); overflow: hidden; }
+  .rd-sub__head { display: flex; align-items: center; gap: 12px; padding: 16px 18px; cursor: pointer; background: none; border: 0; width: 100%; text-align: start; font-family: var(--font-sans); }
+  .rd-sub__head:hover { background: var(--surface-alt); }
+  .rd-sub__num { width: 30px; height: 30px; border-radius: 8px; background: var(--secondary); color: var(--primary); display: grid; place-items: center; font-weight: 700; font-size: 13px; flex: none; font-family: var(--font-mono); }
+  .rd-sub__name { font-family: var(--font-display); font-weight: 600; font-size: 18px; flex: 1; }
+  .rd-sub__chev { color: var(--muted-foreground); transition: transform .2s; }
+  .rd-sub[data-open="true"] .rd-sub__chev { transform: rotate(180deg); }
+  .rd-sub__panel { display: none; padding: 0 18px 18px; }
+  .rd-sub[data-open="true"] .rd-sub__panel { display: block; }
+  .rd-sub__toplabel { font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted-foreground); font-weight: 700; margin: 6px 0 10px; }
+  .rd-top { display: flex; flex-direction: column; gap: 2px; }
+  .rd-top__item { display: flex; align-items: center; gap: 12px; padding: 9px 10px; border-radius: var(--radius-sm); text-decoration: none; color: var(--foreground); }
+  .rd-top__item:hover { background: var(--secondary); text-decoration: none; }
+  .rd-top__rank { width: 22px; height: 22px; border-radius: 50%; background: var(--surface-alt); border: 1px solid var(--border); display: grid; place-items: center; font-size: 12px; font-weight: 700; color: var(--muted-foreground); flex: none; }
+  .rd-top__name { font-weight: 500; font-size: 14.5px; flex: 1; }
+
+  /* continue bar */
+  .rd-continue { max-width: var(--content-max); margin: 56px auto 0; padding: 0 var(--gutter); }
+  .rd-continue__card { background: var(--secondary); border-radius: var(--radius-lg); padding: 32px 36px; display: flex; align-items: center; gap: 24px; flex-wrap: wrap; }
+  .rd-continue__card h3 { font-size: 24px; }
+  .rd-continue__card p { color: var(--secondary-foreground); opacity: .85; margin-top: 4px; }
+
+  @media (max-width: 900px) { .rd-facts { grid-template-columns: 1fr; } .rd-dest-grid { grid-template-columns: repeat(2,1fr); } .rd-subs { grid-template-columns: 1fr; } }
+  @media (max-width: 560px) { .rd-dest-grid { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<a href="#main" class="skip-link">Skip to content</a>
+
+<div class="jn-subhead">
+  <div class="jn-subhead__inner">
+    <nav class="jn-crumbs" aria-label="Breadcrumb">
+      <a href="Home.html">Home</a><span class="sep">/</span>
+      <a href="regions.html">Regions</a><span class="sep">/</span>
+      <span class="here" id="crumb-region">Region</span>
+    </nav>
+    <div class="tw-steps" aria-label="Journey progress">
+      <div class="tw-step" data-state="done"><span class="tw-step__dot">1</span><span class="tw-step__label">Interest</span></div>
+      <span class="tw-step__line"></span>
+      <div class="tw-step" data-state="current"><span class="tw-step__dot">2</span><span class="tw-step__label">Region</span></div>
+      <span class="tw-step__line"></span>
+      <div class="tw-step"><span class="tw-step__dot">3</span><span class="tw-step__label">Activities</span></div>
+      <span class="tw-step__line"></span>
+      <div class="tw-step"><span class="tw-step__dot">4</span><span class="tw-step__label">Wells</span></div>
+      <span class="tw-step__line"></span>
+      <div class="tw-step"><span class="tw-step__dot">5</span><span class="tw-step__label">Book It</span></div>
+    </div>
+  </div>
+</div>
+
+<main id="main">
+  <div id="rd-root"><!-- rendered --></div>
+</main>
+
+<script src="js/data.js"></script>
+<script src="js/places.js"></script>
+<script src="js/images.js"></script>
+<script src="js/shell.js"></script>
+<script>
+TWW.mountShell({ active: "regions" });
+const $ = (s,r=document)=>r.querySelector(s);
+const ICON = TWW.ICON;
+const qs = new URLSearchParams(location.search);
+const code = qs.get("r") || "05A";
+const R = TWW.REGIONS.find(r=>r.code===code) || TWW.REGIONS.find(r=>r.code==="05A");
+const DET = TWW.REGION_DETAIL[R.code] || {};
+const DESTS = TWW.DESTINATIONS[R.code] || [];
+const isSub = !!DET.sub;
+const subList = TWW.SUBREGIONS[R.code] || [];
+
+const AIRPORTS = {
+  CDG:"Paris", LHR:"London", AMS:"Amsterdam", BCN:"Barcelona", FCO:"Rome", ATH:"Athens",
+  CPH:"Copenhagen", OSL:"Oslo", HEL:"Helsinki", DXB:"Dubai", DOH:"Doha", AUH:"Abu Dhabi",
+  NBO:"Nairobi", JRO:"Kilimanjaro", KGL:"Kigali", CPT:"Cape Town", JNB:"Johannesburg", WDH:"Windhoek",
+  BKK:"Bangkok", SIN:"Singapore", DPS:"Bali (Denpasar)", NRT:"Tokyo", ICN:"Seoul", HKG:"Hong Kong",
+  SYD:"Sydney", AKL:"Auckland", NAN:"Nadi, Fiji", MEX:"Mexico City", LIM:"Lima", GIG:"Rio de Janeiro",
+  NAS:"Nassau", PUJ:"Punta Cana", SJU:"San Juan", JFK:"New York", LAX:"Los Angeles", ORD:"Chicago",
+  YYZ:"Toronto", YVR:"Vancouver", YUL:"Montréal",
+};
+
+$("#crumb-region").textContent = R.name;
+document.title = "TravelWell — " + R.name;
+
+function hero() {
+  return `<section class="rd-hero">
+    <div class="rd-hero__img"><img src="${TWW.regionImg(R.code,1800)}" alt="" referrerpolicy="no-referrer"></div>
+    <div class="rd-hero__scrim"></div>
+    <div class="rd-hero__inner">
+      <div class="rd-hero__code">REGION ${R.code}</div>
+      <h1 class="rd-hero__title">${R.name}</h1>
+      <p class="rd-hero__line">${R.line}</p>
+      <div class="rd-hero__badges">
+        ${R.status==='live' ? `<span class="pill pill-live" style="background:rgba(255,255,255,.92)">Live region</span>` : `<span class="pill pill-preview" style="background:rgba(255,255,255,.86)">Preview region</span>`}
+        <span class="pill pill-engine">${DET.countries? DET.countries.length : R.countries} ${isSub?'country':'countries'}</span>
+        ${isSub?`<span class="pill" style="background:var(--accent);color:var(--accent-foreground)">${subList.length} travel sub-regions</span>`:''}
+      </div>
+    </div>
+  </section>`;
+}
+
+function facts() {
+  return `<div class="rd-body">
+    <p class="rd-blurb">${DET.blurb || R.line}</p>
+    <div class="rd-facts">
+      <div class="rd-fact">
+        <div class="rd-fact__k">${ICON("globe","ic-sm")} ${isSub?'Country':'Member countries'}</div>
+        <div class="rd-fact__v"><div class="rd-countries">${(DET.countries||[]).map(c=>`<span class="rd-country">${c}</span>`).join("")}</div></div>
+        <div class="rd-fact__cap">${(DET.countries||[]).length} ${isSub?'nation':'countries'} in this ${isSub?'region':'world region'}${isSub?'':' · visa-friendly routings'}</div>
+      </div>
+      <div class="rd-fact">
+        <div class="rd-fact__k">${ICON("plane","ic-sm")} Gateway airports</div>
+        <div class="rd-fact__v"><div class="rd-gw-chips">${R.gateways.split("·").map(c=>c.trim()).map(code=>`<div class="rd-gw-chip"><span class="code">${code}</span><span class="city">${AIRPORTS[code]||'International gateway'}</span></div>`).join("")}</div></div>
+        <div class="rd-fact__cap">Primary international arrivals · connections region-wide</div>
+      </div>
+      <div class="rd-fact">
+        <div class="rd-fact__k">${ICON("sun","ic-sm")} When to go</div>
+        <div class="rd-fact__v"><div class="rd-seasons">${(DET.season||[]).map(s=>`<div class="rd-season"><span class="rd-season__l">${s.l}</span><span class="rd-season__m">${s.m}</span><span class="rd-season__n">${s.note}</span></div>`).join("")}</div></div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function destinations() {
+  if (!DESTS.length) return "";
+  return `<section class="rd-section">
+    <div class="rd-section__head">
+      <div><h2>Destinations within</h2><p>Hand-picked places — stay inside the region as you build.</p></div>
+      <a class="btn btn-secondary" href="destinations.html?r=${R.code}">See all ${ICON("arrow","ic-sm")}</a>
+    </div>
+    <div class="rd-dest-grid">
+      ${DESTS.map(d=>`<a class="rd-dest ${d.status==='stub'?'rd-dest--stub':''}" href="destination-detail.html?d=${d.id}&r=${R.code}">
+        <img src="${TWW.img(d.img,600)}" alt="" loading="lazy" referrerpolicy="no-referrer">
+        <span class="rd-dest__scrim"></span>
+        <span class="rd-dest__badge">${d.status==='live'?`<span class="pill pill-live" style="background:rgba(255,255,255,.92)">Live</span>`:`<span class="pill pill-preview" style="background:rgba(255,255,255,.86)">Preview</span>`}</span>
+        <span class="rd-dest__body">
+          <span class="rd-dest__country">${d.country}</span>
+          <span class="rd-dest__name">${d.name}</span>
+          <span class="rd-dest__line">${d.line}</span>
+        </span>
+      </a>`).join("")}
+    </div>
+  </section>`;
+}
+
+function subregions() {
+  if (!isSub) return "";
+  return `<section class="rd-section">
+    <div class="rd-section__head">
+      <div><h2>Travel sub-regions</h2><p>${R.name} is big — we split it into ${subList.length} labeled sub-regions, each with its own ranked Top list.</p></div>
+    </div>
+    <div class="rd-subs">
+      ${subList.map((name,i)=>{
+        const top = TWW.SUBREGION_TOP[name] || [];
+        return `<div class="rd-sub" data-sub="${i}">
+          <button class="rd-sub__head" aria-expanded="${i===0}">
+            <span class="rd-sub__num">${String(i+1).padStart(2,'0')}</span>
+            <span class="rd-sub__name">${name}</span>
+            <span class="rd-sub__chev">${ICON("chev","ic-sm")}</span>
+          </button>
+          <div class="rd-sub__panel">
+            <div class="rd-sub__toplabel">Top in ${name}</div>
+            <div class="rd-top">
+              ${top.map((t,ti)=>`<a class="rd-top__item" href="destination-detail.html?d=${t.toLowerCase().replace(/[^a-z]+/g,'-')}&r=${R.code}"><span class="rd-top__rank">${ti+1}</span><span class="rd-top__name">${t}</span>${ICON("arrow","ic-sm")}</a>`).join("")}
+            </div>
+          </div>
+        </div>`;
+      }).join("")}
+    </div>
+  </section>`;
+}
+
+function continueBar() {
+  return `<div class="rd-continue">
+    <div class="rd-continue__card">
+      <div style="flex:1;min-width:240px">
+        <span class="eyebrow">Step 2 of 5 complete</span>
+        <h3 style="margin-top:6px">${R.name} it is. What excites you here?</h3>
+        <p>Next, pick the activities you're dreaming of — we'll pre-fill your Wells with matched providers.</p>
+      </div>
+      <div style="display:flex;gap:12px;flex-wrap:wrap">
+        <a class="btn btn-secondary" href="regions.html">← Change region</a>
+        <a class="btn btn-primary" href="activities.html?r=${R.code}" style="height:52px;padding:0 26px">Choose activities →</a>
+      </div>
+    </div>
+  </div>`;
+}
+
+$("#rd-root").innerHTML = hero() + facts() + (isSub ? subregions() : destinations()) + (isSub ? destinations() : "") + continueBar();
+
+// open first sub-region by default; toggle on click
+document.querySelectorAll(".rd-sub").forEach((s,i)=>{ if(i===0) s.setAttribute("data-open","true"); });
+document.addEventListener("click",(e)=>{
+  const h = e.target.closest(".rd-sub__head");
+  if (!h) return;
+  const sub = h.closest(".rd-sub");
+  const open = sub.getAttribute("data-open")==="true";
+  sub.setAttribute("data-open", String(!open));
+  h.setAttribute("aria-expanded", String(!open));
+});
+</script>
+</body>
+</html>

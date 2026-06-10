@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TravelWell — Verify your email</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@400;500;600&family=Noto+Sans+Arabic:wght@400;500;600&family=Noto+Naskh+Arabic:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles/tokens.css">
+<link rel="stylesheet" href="styles/shell.css">
+<link rel="stylesheet" href="styles/onboarding.css">
+<style>
+  .ve-wrap { min-height: calc(100vh - 68px); display: grid; place-items: center; padding: 48px 24px 110px; position: relative; overflow: hidden; }
+  .ve-bg { position: absolute; inset: 0; z-index: 0; }
+  .ve-bg img { width: 100%; height: 100%; object-fit: cover; }
+  .ve-bg::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, color-mix(in oklch, var(--background) 86%, transparent), var(--background) 70%); }
+  .ve-card { position: relative; z-index: 1; width: 100%; max-width: 480px; background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: var(--e3); overflow: hidden; animation: obIn .45s cubic-bezier(.2,.7,.3,1); }
+  .ve-card__accent { height: 5px; }
+  .ve-card__inner { padding: 44px 44px 36px; text-align: center; }
+  .ve-logo { font-family: var(--font-display); font-weight: 600; font-size: 21px; color: var(--foreground); letter-spacing: -.01em; }
+  .ve-logo .lwell { color: var(--primary); }
+  .ve-logo .lworld { font-style: italic; font-weight: 500; font-size: .60em; color: var(--gold-deep); margin-inline-start: 1px; }
+  .ve-logo .dot { color: var(--primary); }
+  .ve-ic { width: 84px; height: 84px; border-radius: 22px; display: grid; place-items: center; margin: 28px auto 22px; }
+  .ve-ic svg { width: 40px; height: 40px; }
+  .ve-eyebrow { display: block; margin-bottom: 10px; }
+  .ve-title { font-size: clamp(26px, 3.4vw, 34px); line-height: 1.08; letter-spacing: -.01em; }
+  .ve-sub { color: var(--muted-foreground); margin-top: 12px; font-size: 15.5px; line-height: 1.55; max-width: 38ch; margin-inline: auto; }
+  .ve-mail-to { display: inline-flex; align-items: center; gap: 8px; background: var(--surface-alt); border: 1px solid var(--border); border-radius: var(--radius-pill); padding: 8px 16px; font-weight: 600; font-size: 14px; margin-top: 18px; }
+  .ve-actions { margin-top: 28px; display: flex; flex-direction: column; gap: 12px; }
+  .ve-actions .btn { width: 100%; height: 52px; font-size: 16px; }
+  .ve-resend { margin-top: 20px; font-size: 14px; color: var(--muted-foreground); }
+  .ve-resend button { background: none; border: 0; color: var(--primary); font-weight: 600; cursor: pointer; font-family: var(--font-sans); font-size: 14px; }
+  .ve-resend button:disabled { color: var(--muted-foreground); cursor: not-allowed; }
+  .ve-spinner { width: 76px; height: 76px; border-radius: 50%; border: 5px solid var(--secondary); border-top-color: var(--primary); animation: siSpin 1s linear infinite; margin: 28px auto 22px; }
+  @keyframes siSpin { to { transform: rotate(360deg); } }
+  @media (prefers-reduced-motion: reduce) { .ve-spinner { animation-duration: 3s; } }
+  .ve-foot { border-top: 1px solid var(--border); padding: 16px; text-align: center; font-size: 13px; color: var(--muted-foreground); }
+  .ve-foot a { font-weight: 600; }
+
+  /* tone variants */
+  .ve--ok .ve-card__accent { background: var(--safety-1); }
+  .ve--ok .ve-ic { background: color-mix(in oklch, var(--safety-1) 14%, white); color: oklch(.4 .1 150); }
+  .ve--ok .ve-eyebrow { color: oklch(.4 .1 150); }
+  .ve--pending .ve-card__accent { background: var(--primary); }
+  .ve--pending .ve-ic { background: var(--secondary); color: var(--primary); }
+  .ve--expired .ve-card__accent { background: var(--safety-3); }
+  .ve--expired .ve-ic { background: color-mix(in oklch, var(--safety-3) 14%, white); color: oklch(.5 .14 55); }
+  .ve--expired .ve-eyebrow { color: oklch(.5 .14 55); }
+  .ve--verifying .ve-card__accent { background: var(--primary); }
+
+  /* checkmark draw-in */
+  .ve-check-ring { width: 84px; height: 84px; margin: 28px auto 22px; }
+  .ve-check-ring circle { fill: none; stroke: var(--safety-1); stroke-width: 5; stroke-dasharray: 264; stroke-dashoffset: 264; animation: veRing .6s ease forwards; }
+  .ve-check-ring path { fill: none; stroke: var(--safety-1); stroke-width: 6; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 60; stroke-dashoffset: 60; animation: veTick .35s ease .5s forwards; }
+  @keyframes veRing { to { stroke-dashoffset: 0; } }
+  @keyframes veTick { to { stroke-dashoffset: 0; } }
+  @media (prefers-reduced-motion: reduce) { .ve-check-ring circle, .ve-check-ring path { animation-duration: .001s; } }
+
+  .ve-switch { position: fixed; inset-block-end: 20px; inset-inline-start: 50%; transform: translateX(-50%); z-index: 120; background: var(--foreground); color: var(--background); border-radius: var(--radius-pill); padding: 7px; display: flex; gap: 4px; box-shadow: var(--e3); }
+  [dir="rtl"] .ve-switch { transform: translateX(50%); }
+  .ve-switch button { border: 0; background: none; color: var(--background); opacity: .65; cursor: pointer; font-family: var(--font-sans); font-weight: 600; font-size: 12.5px; padding: 8px 14px; border-radius: var(--radius-pill); white-space: nowrap; }
+  .ve-switch button[aria-pressed="true"] { background: var(--accent); color: var(--foreground); opacity: 1; }
+  .ve-switch__label { opacity: .5; font-size: 10px; letter-spacing: .1em; text-transform: uppercase; padding: 0 10px; display: grid; place-items: center; }
+</style>
+</head>
+<body>
+<a href="#main" class="skip-link">Skip to content</a>
+
+<main id="main">
+  <div class="ve-wrap">
+    <div class="ve-bg" id="ve-bg"></div>
+    <div class="ve-card" id="ve-card"><!-- state --></div>
+  </div>
+</main>
+
+<div class="ve-switch" role="group" aria-label="Preview state">
+  <span class="ve-switch__label">State</span>
+  <button data-state="pending" aria-pressed="true">Pending</button>
+  <button data-state="verifying" aria-pressed="false">Verifying</button>
+  <button data-state="verified" aria-pressed="false">Verified</button>
+  <button data-state="expired" aria-pressed="false">Expired</button>
+</div>
+
+<script src="js/data.js"></script>
+<script src="js/images.js"></script>
+<script src="js/shell.js"></script>
+<script>
+TWW.mountShell({ active: "", footer: false });
+const $ = (s,r=document)=>r.querySelector(s);
+const ICON = TWW.ICON;
+const EMAIL = "amara@email.com";
+
+$("#ve-bg").innerHTML = `<img src="${TWW.img('santorini',1600)}" alt="" referrerpolicy="no-referrer">`;
+
+function shell(tone, body, foot) {
+  return `<div class="ve-card__accent"></div>
+    <div class="ve-card__inner">
+      <div class="ve-logo">Travel<span class="lwell">Well</span><span class="lworld">.world</span></div>
+      ${body}
+    </div>
+    <div class="ve-foot">${foot}</div>`;
+}
+
+function pending() {
+  return shell("pending", `
+    <div class="ve-ic">${ICON("message")}</div>
+    <span class="eyebrow ve-eyebrow">Confirm it's you</span>
+    <h1 class="ve-title">Verify your email</h1>
+    <p class="ve-sub">We sent a confirmation link to your inbox. Tap it to secure your account and unlock booking — no password needed.</p>
+    <div class="ve-mail-to">${ICON("message","ic-sm")} ${EMAIL}</div>
+    <div class="ve-actions">
+      <button class="btn btn-primary" data-goto="verifying">I've tapped the link →</button>
+    </div>
+    <p class="ve-resend">Didn't get it? <button data-act="resend" id="ve-resend">Resend email</button></p>`,
+    `Wrong address? <a href="Sign In.html">Use a different email</a>`);
+}
+
+function verifying() {
+  return shell("verifying", `
+    <div class="ve-spinner"></div>
+    <span class="eyebrow ve-eyebrow">Verifying</span>
+    <h1 class="ve-title">Confirming your email…</h1>
+    <p class="ve-sub">This only takes a moment. Hang tight while we secure your account.</p>`,
+    `Having trouble? <a href="#" data-goto="expired">The link may have expired</a>`);
+}
+
+function verified() {
+  return shell("ok", `
+    <svg class="ve-check-ring" viewBox="0 0 84 84"><circle cx="42" cy="42" r="42"/><path d="M24 44l12 12 24-26"/></svg>
+    <span class="eyebrow ve-eyebrow">You're verified</span>
+    <h1 class="ve-title">Email confirmed.</h1>
+    <p class="ve-sub">Your account is secured and your dream trip is ready. Let's pick up where you left off.</p>
+    <div class="ve-actions">
+      <a class="btn btn-primary" href="itinerary.html">Continue to your trip →</a>
+      <a class="btn btn-secondary" href="special-interests.html">Explore experiences</a>
+    </div>`,
+    `Signed in as <b style="color:var(--foreground)">${EMAIL}</b>`);
+}
+
+function expired() {
+  return shell("expired", `
+    <div class="ve-ic">${ICON("info")}</div>
+    <span class="eyebrow ve-eyebrow">Link expired</span>
+    <h1 class="ve-title">This link has expired.</h1>
+    <p class="ve-sub">For your security, verification links last 24 hours and work once. No problem — we'll send a fresh one right away.</p>
+    <div class="ve-actions">
+      <button class="btn btn-primary" data-act="resend-expired">Send a new link</button>
+      <a class="btn btn-secondary" href="Sign In.html">Back to sign in</a>
+    </div>`,
+    `Still stuck? <a href="#" data-tw-concierge>Speak with Claude</a>`);
+}
+
+const RENDER = { pending, verifying, verified, expired };
+const TONE = { pending:"ve--pending", verifying:"ve--verifying", verified:"ve--ok", expired:"ve--expired" };
+
+function setState(state) {
+  const card = $("#ve-card");
+  card.className = "ve-card " + TONE[state];
+  card.innerHTML = RENDER[state]();
+  card.style.animation = "none"; void card.offsetWidth; card.style.animation = "";
+  document.querySelectorAll(".ve-switch button").forEach(b=>b.setAttribute("aria-pressed", String(b.dataset.state===state)));
+  if (state==="verifying") {
+    setTimeout(()=>{ if ($(".ve-switch button[data-state=verifying]").getAttribute("aria-pressed")==="true") setState("verified"); }, 1900);
+  }
+}
+
+document.addEventListener("click",(e)=>{
+  const sw = e.target.closest(".ve-switch button");
+  if (sw) { setState(sw.dataset.state); return; }
+  const goto = e.target.closest("[data-goto]");
+  if (goto && !goto.hasAttribute("data-tw-concierge")) { e.preventDefault(); setState(goto.dataset.goto); return; }
+  const act = e.target.closest("[data-act]");
+  if (!act) return;
+  if (act.dataset.act==="resend") {
+    TWW.toast("Verification email re-sent to "+EMAIL);
+    act.disabled = true; let n=30; const t0=act.textContent;
+    const iv=setInterval(()=>{ act.textContent="Resend in "+n+"s"; if(--n<0){clearInterval(iv);act.disabled=false;act.textContent=t0;} },1000);
+  }
+  if (act.dataset.act==="resend-expired") { TWW.toast("Fresh link sent to "+EMAIL); setState("pending"); }
+});
+
+setState("pending");
+</script>
+</body>
+</html>

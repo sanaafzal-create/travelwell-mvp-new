@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TravelWell — Welcome back</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@400;500;600&family=Noto+Sans+Arabic:wght@400;500;600&family=Noto+Naskh+Arabic:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles/tokens.css">
+<link rel="stylesheet" href="styles/shell.css">
+<link rel="stylesheet" href="styles/onboarding.css">
+<style>
+  .si-wrap { min-height: calc(100vh - 68px); display: grid; grid-template-columns: 1.05fr .95fr; }
+
+  /* LEFT — ambient brand panel */
+  .si-art { position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between; padding: 48px; color: #fff; background: var(--dark-band); }
+  .si-art__img { position: absolute; inset: 0; z-index: 0; }
+  .si-art__img img { width: 100%; height: 100%; object-fit: cover; }
+  .si-art__scrim { position: absolute; inset: 0; z-index: 1; background: linear-gradient(180deg, rgba(20,40,38,.55) 0%, rgba(20,40,38,.35) 35%, rgba(15,30,28,.85) 100%); }
+  .si-art > * { position: relative; z-index: 2; }
+  .si-art__logo { font-family: var(--font-display); font-weight: 600; font-size: 23px; color: #F7F4EC; letter-spacing: -.01em; }
+  .si-art__logo .lwell { color: var(--accent); }
+  .si-art__logo .lworld { font-style: italic; font-weight: 500; font-size: .60em; color: var(--accent); margin-inline-start: 1px; }
+  .si-art__logo .dot { color: var(--accent); }
+  .si-art__quote { max-width: 22ch; }
+  .si-art__quote .eyebrow { color: var(--accent); }
+  .si-art__quote h2 { color: #fff; font-size: 32px; line-height: 1.12; margin-top: 14px; }
+  .si-art__sig { font-family: var(--font-display); font-style: italic; font-size: 17px; color: rgba(255,255,255,.85); margin-top: 18px; }
+  .si-art__sig .tw { color: var(--accent); font-style: normal; }
+
+  /* RIGHT — interaction column */
+  .si-panel { display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 48px; background: var(--background); }
+  .si-card { width: 100%; max-width: 440px; animation: obIn .45s cubic-bezier(.2,.7,.3,1); }
+  .si-avatar { width: 72px; height: 72px; border-radius: 50%; background: linear-gradient(150deg, var(--primary), var(--primary-hover)); color: #fff; display: grid; place-items: center; font-family: var(--font-display); font-weight: 600; font-size: 30px; box-shadow: var(--e2); margin-bottom: 22px; }
+  .si-eyebrow { display: block; margin-bottom: 10px; }
+  .si-title { font-size: clamp(28px, 3.4vw, 38px); line-height: 1.06; letter-spacing: -.01em; }
+  .si-sub { color: var(--muted-foreground); margin-top: 12px; font-size: 16px; line-height: 1.55; }
+
+  .si-actions { margin-top: 30px; display: flex; flex-direction: column; gap: 12px; }
+  .si-actions .btn { width: 100%; height: 54px; font-size: 16px; }
+
+  /* continue-vs-new: the saved trip card */
+  .si-trip { border: 1px solid var(--border); border-radius: var(--radius); background: var(--card); box-shadow: var(--e1); overflow: hidden; text-align: start; }
+  .si-trip__media { height: 116px; position: relative; }
+  .si-trip__media img { width: 100%; height: 100%; object-fit: cover; }
+  .si-trip__media .pill { position: absolute; top: 12px; inset-inline-start: 12px; }
+  .si-trip__body { padding: 16px 18px; }
+  .si-trip__name { font-family: var(--font-display); font-weight: 600; font-size: 19px; }
+  .si-trip__meta { font-size: 13px; color: var(--muted-foreground); margin-top: 4px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .si-trip__coverage { display: flex; gap: 4px; margin-top: 12px; }
+  .si-trip__coverage i { flex: 1; height: 5px; border-radius: 3px; background: var(--border); }
+  .si-trip__coverage i.on { background: var(--primary); }
+  .si-trip__foot { display: flex; align-items: center; gap: 10px; margin-top: 14px; }
+  .si-trip__foot .btn { flex: 1; height: 46px; }
+
+  .si-or { display: flex; align-items: center; gap: 14px; margin: 22px 0; color: var(--muted-foreground); font-size: 13px; }
+  .si-or::before, .si-or::after { content: ""; flex: 1; height: 1px; background: var(--border); }
+
+  /* talk-to-me strip */
+  .si-talk { display: flex; align-items: center; gap: 14px; border: 1px solid var(--primary-hover); border-radius: var(--radius); padding: 18px 20px; background: linear-gradient(135deg, var(--primary), var(--primary-hover)); cursor: pointer; transition: transform .15s, box-shadow .2s; width: 100%; text-align: start; font-family: var(--font-sans); box-shadow: var(--e1); }
+  .si-talk:hover { transform: translateY(-2px); box-shadow: var(--e2); }
+  .si-talk__av { width: 46px; height: 46px; border-radius: 50%; background: rgba(255,255,255,.18); color: #fff; display: grid; place-items: center; flex: none; }
+  .si-talk__av svg { width: 22px; height: 22px; }
+  .si-talk__t { font-weight: 700; font-size: 17px; color: #fff; display: block; }
+  .si-talk__s { font-size: 13px; color: rgba(255,255,255,.85); margin-top: 4px; display: block; }
+  .si-talk__arrow { margin-inline-start: auto; color: rgba(255,255,255,.9); }
+
+  /* "anything changed" nudge */
+  .si-nudge { display: flex; gap: 10px; align-items: flex-start; background: var(--secondary); border-radius: var(--radius); padding: 13px 15px; margin-top: 22px; font-size: 13.5px; color: var(--secondary-foreground); line-height: 1.5; }
+  .si-nudge svg { flex: none; color: var(--primary); margin-top: 1px; }
+  .si-nudge a { font-weight: 600; }
+
+  .si-foot-link { margin-top: 26px; font-size: 14px; color: var(--muted-foreground); text-align: center; }
+
+  /* magic-link sent / verifying */
+  .si-icon-lg { width: 76px; height: 76px; border-radius: 18px; background: var(--secondary); color: var(--primary); display: grid; place-items: center; margin-bottom: 22px; }
+  .si-icon-lg svg { width: 36px; height: 36px; }
+  .si-mail-to { display: inline-flex; align-items: center; gap: 8px; background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-pill); padding: 8px 16px; font-weight: 600; font-size: 14px; margin-top: 18px; }
+  .si-resend { margin-top: 22px; font-size: 14px; color: var(--muted-foreground); }
+  .si-resend button { background: none; border: 0; color: var(--primary); font-weight: 600; cursor: pointer; font-family: var(--font-sans); font-size: 14px; }
+
+  .si-spinner { width: 64px; height: 64px; border-radius: 50%; border: 4px solid var(--secondary); border-top-color: var(--primary); animation: siSpin 1s linear infinite; margin-bottom: 24px; }
+  @keyframes siSpin { to { transform: rotate(360deg); } }
+  @media (prefers-reduced-motion: reduce) { .si-spinner { animation-duration: 3s; } }
+
+  /* profile-update mini-flow */
+  .si-update-list { display: flex; flex-direction: column; gap: 10px; margin-top: 8px; }
+  .si-update { display: flex; align-items: center; gap: 14px; border: 1.5px solid var(--border); border-radius: var(--radius); padding: 14px 16px; cursor: pointer; background: var(--card); text-align: start; transition: border-color .15s, background-color .15s; width: 100%; font-family: var(--font-sans); }
+  .si-update:hover { border-color: color-mix(in oklch, var(--primary) 40%, var(--border)); }
+  .si-update__ic { width: 40px; height: 40px; border-radius: 10px; background: var(--secondary); color: var(--primary); display: grid; place-items: center; flex: none; }
+  .si-update__t { font-weight: 600; font-size: 15px; display: block; }
+  .si-update__s { font-size: 13px; color: var(--muted-foreground); margin-top: 2px; display: block; }
+  .si-update__arrow { margin-inline-start: auto; color: var(--muted-foreground); }
+
+  /* form (not recognized) */
+  .si-form { margin-top: 26px; display: flex; flex-direction: column; gap: 16px; }
+
+  /* state switcher (demo only) */
+  .si-switch { position: fixed; inset-block-end: 20px; inset-inline-start: 50%; transform: translateX(-50%); z-index: 120; background: var(--foreground); color: var(--background); border-radius: var(--radius-pill); padding: 7px; display: flex; gap: 4px; box-shadow: var(--e3); max-width: calc(100vw - 32px); overflow-x: auto; }
+  [dir="rtl"] .si-switch { transform: translateX(50%); }
+  .si-switch button { border: 0; background: none; color: var(--background); opacity: .65; cursor: pointer; font-family: var(--font-sans); font-weight: 600; font-size: 12.5px; padding: 8px 14px; border-radius: var(--radius-pill); white-space: nowrap; }
+  .si-switch button[aria-pressed="true"] { background: var(--accent); color: var(--foreground); opacity: 1; }
+  .si-switch__label { opacity: .5; font-size: 10px; letter-spacing: .1em; text-transform: uppercase; padding: 0 10px; display: grid; place-items: center; }
+
+  @media (max-width: 880px) {
+    .si-wrap { grid-template-columns: 1fr; }
+    .si-art { min-height: 220px; padding: 28px; }
+    .si-art__quote h2 { font-size: 24px; }
+    .si-panel { padding: 36px 24px 96px; }
+  }
+</style>
+</head>
+<body>
+<a href="#main" class="skip-link">Skip to content</a>
+
+<main id="main">
+  <div class="si-wrap">
+    <!-- LEFT: ambient brand -->
+    <aside class="si-art">
+      <div class="si-art__img" id="si-art-img"></div>
+      <div class="si-art__scrim"></div>
+      <a class="si-art__logo" href="Home.html">Travel<span class="lwell">Well</span><span class="lworld">.world</span></a>
+      <div class="si-art__quote">
+        <span class="eyebrow">Welcome back</span>
+        <h2 id="si-art-quote">Your Kenya is right where you left it.</h2>
+        <p class="si-art__sig">Pick up the thread. <span class="tw">Travel Well.</span></p>
+      </div>
+    </aside>
+
+    <!-- RIGHT: interaction -->
+    <section class="si-panel">
+      <div class="si-card" id="si-card"><!-- state renders here --></div>
+    </section>
+  </div>
+</main>
+
+<!-- demo state switcher -->
+<div class="si-switch" role="group" aria-label="Preview state">
+  <span class="si-switch__label">State</span>
+  <button data-state="recognized" aria-pressed="true">Recognized</button>
+  <button data-state="sent" aria-pressed="false">Link sent</button>
+  <button data-state="landing" aria-pressed="false">Link landing</button>
+  <button data-state="update" aria-pressed="false">Profile update</button>
+  <button data-state="unknown" aria-pressed="false">Not recognized</button>
+</div>
+
+<script src="js/data.js"></script>
+<script src="js/images.js"></script>
+<script src="js/shell.js"></script>
+<script>
+TWW.mountShell({ active: "", footer: false });
+const $ = (s,r=document)=>r.querySelector(s);
+const ICON = TWW.ICON;
+
+const USER = { name:"Amara", initial:"A", email:"amara@email.com" };
+const TRIP = { name:"Kenya: Anniversary Safari", region:"East Africa", dates:"Jul 12–22, 2026", party:"2 travelers", coverage:3, total:6, img:"safariGiraffe" };
+
+/* ambient image */
+$("#si-art-img").innerHTML = `<img src="${TWW.img('safariGiraffe',1400)}" alt="" referrerpolicy="no-referrer">`;
+
+function recognized() {
+  return `
+    <div class="si-avatar">${USER.initial}</div>
+    <span class="eyebrow si-eyebrow">Signed in on this device</span>
+    <h1 class="si-title">Welcome back, ${USER.name}.</h1>
+    <p class="si-sub">Ready when you are. Continue the trip you were designing, or start something new.</p>
+
+    <div class="si-actions">
+      <div class="si-trip">
+        <div class="si-trip__media">
+          <img src="${TWW.img(TRIP.img,800)}" alt="" referrerpolicy="no-referrer">
+          <span class="pill pill-live" style="background:rgba(255,255,255,.92)">In progress</span>
+        </div>
+        <div class="si-trip__body">
+          <div class="si-trip__name">${TRIP.name}</div>
+          <div class="si-trip__meta">${ICON("pin","ic-sm")} ${TRIP.region} <span>·</span> ${TRIP.dates} <span>·</span> ${TRIP.party}</div>
+          <div class="si-trip__coverage" title="${TRIP.coverage} of ${TRIP.total} Wells planned">
+            ${Array.from({length:TRIP.total},(_,i)=>`<i class="${i<TRIP.coverage?'on':''}"></i>`).join("")}
+          </div>
+          <div class="si-trip__meta" style="margin-top:8px">${TRIP.coverage} of ${TRIP.total} Wells planned · saved automatically</div>
+          <div class="si-trip__foot">
+            <a class="btn btn-primary" href="itinerary.html">Continue this trip →</a>
+          </div>
+        </div>
+      </div>
+
+      <button class="btn btn-secondary" onclick="location.href='special-interests.html'">Start a new trip</button>
+    </div>
+
+    <div class="si-or">or, not sure where to begin?</div>
+    <button class="si-talk" data-tw-concierge>
+      <span class="si-talk__av">${ICON("sparkle")}</span>
+      <span><span class="si-talk__t">Speak with Claude</span><span class="si-talk__s">Tell me what changed and I'll adjust your trip.</span></span>
+      <span class="si-talk__arrow">${ICON("arrow","ic-sm")}</span>
+    </button>
+
+    <div class="si-nudge">
+      ${ICON("info","ic-sm")}
+      <span>Anything changed since last time — new dates, a +1, a different budget? <a href="#" data-goto="update">Update your trip details</a>.</span>
+    </div>`;
+}
+
+function sent() {
+  return `
+    <div class="si-icon-lg">${ICON("message")}</div>
+    <span class="eyebrow si-eyebrow">New device · passwordless</span>
+    <h1 class="si-title">Check your inbox.</h1>
+    <p class="si-sub">We sent a one-tap magic link to sign you in securely. No password, ever — just open the email and you're back.</p>
+    <div class="si-mail-to">${ICON("message","ic-sm")} ${USER.email}</div>
+    <div class="si-actions" style="margin-top:26px">
+      <button class="btn btn-primary" data-goto="landing">I opened the link →</button>
+    </div>
+    <p class="si-resend">Didn't get it? <button data-act="resend">Resend link</button> · <button data-act="changeemail">Use a different email</button></p>
+    <div class="si-nudge">
+      ${ICON("shield","ic-sm")}
+      <span>The link expires in 15 minutes and works once. If it expires, just request a fresh one.</span>
+    </div>`;
+}
+
+function landing() {
+  // verifying → resolves to recognized after a beat
+  return `
+    <div style="display:flex;flex-direction:column;align-items:center;text-align:center">
+      <div class="si-spinner" id="si-spin"></div>
+      <span class="eyebrow si-eyebrow">Verifying your link</span>
+      <h1 class="si-title">One moment, ${USER.name}…</h1>
+      <p class="si-sub">Confirming it's really you and bringing your saved trip back.</p>
+    </div>`;
+}
+
+function expiredLanding() {
+  return `
+    <div class="si-icon-lg" style="background:color-mix(in oklch,var(--safety-3) 14%,white);color:oklch(.5 .14 55)">${ICON("info")}</div>
+    <span class="eyebrow si-eyebrow" style="color:oklch(.5 .14 55)">Link expired</span>
+    <h1 class="si-title">That link has expired.</h1>
+    <p class="si-sub">For your security, magic links last 15 minutes and work once. No problem — we'll send a fresh one.</p>
+    <div class="si-actions" style="margin-top:26px">
+      <button class="btn btn-primary" data-goto="sent">Send a new link</button>
+      <button class="btn btn-secondary" data-goto="unknown">Use a different email</button>
+    </div>`;
+}
+
+function update() {
+  const rows = [
+    { ic:"calendar", t:"Travel dates", s:"Jul 12–22, 2026", to:"dates" },
+    { ic:"heart", t:"Who's coming", s:"2 travelers", to:"party" },
+    { ic:"gift", t:"Budget blend", s:"Comfort · per Well", to:"budget" },
+    { ic:"compass", t:"Interests", s:"Safari · Romance", to:"interests" },
+  ];
+  return `
+    <span class="eyebrow si-eyebrow">Quick update</span>
+    <h1 class="si-title">Anything changed, ${USER.name}?</h1>
+    <p class="si-sub">Tweak any detail and your whole trip re-tunes around it. Skip anything that's still right.</p>
+    <div class="si-update-list" style="margin-top:24px">
+      ${rows.map(r=>`<button class="si-update" data-act="editfield" data-field="${r.t}">
+        <span class="si-update__ic">${ICON(r.ic)}</span>
+        <span><span class="si-update__t">${r.t}</span><span class="si-update__s">${r.s}</span></span>
+        <span class="si-update__arrow">${ICON("arrow","ic-sm")}</span>
+      </button>`).join("")}
+    </div>
+    <div class="si-actions" style="margin-top:24px">
+      <button class="btn btn-primary" data-goto="recognized">All good — back to my trip</button>
+    </div>`;
+}
+
+function unknown() {
+  return `
+    <div class="si-icon-lg">${ICON("globe")}</div>
+    <span class="eyebrow si-eyebrow">Sign in</span>
+    <h1 class="si-title">Let's find your trips.</h1>
+    <p class="si-sub">We don't recognize this device yet. Enter your email and we'll send a magic link — or start fresh, no account needed.</p>
+    <form class="si-form" id="si-form" novalidate>
+      <div class="fld">
+        <label for="si-email">Email address</label>
+        <input type="email" id="si-email" placeholder="you@email.com" autocomplete="email" value="">
+        <div class="fld__err" id="si-email-err">${ICON("info","ic-sm")} Please enter a valid email address.</div>
+      </div>
+      <button type="submit" class="btn btn-primary" style="height:54px;font-size:16px;width:100%">Send me a magic link</button>
+    </form>
+    <div class="si-or">new to TravelWell?</div>
+    <a class="btn btn-secondary" href="Sign Up.html" style="width:100%;height:50px">Create a Travel ID</a>
+    <button class="si-talk" data-tw-concierge style="margin-top:16px">
+      <span class="si-talk__av">${ICON("sparkle")}</span>
+      <span><span class="si-talk__t">Speak with Claude</span><span class="si-talk__s">Explore without an account — I'll guide you.</span></span>
+      <span class="si-talk__arrow">${ICON("arrow","ic-sm")}</span>
+    </button>`;
+}
+
+const QUOTES = {
+  recognized: "Your Kenya is right where you left it.",
+  sent: "One tap, and you're home again.",
+  landing: "Bringing your journey back…",
+  update: "A trip that bends to your life.",
+  unknown: "Every great trip starts with hello.",
+};
+const RENDER = { recognized, sent, landing, update, unknown };
+
+function setState(state, opts={}) {
+  const fn = state==="landing" && opts.expired ? expiredLanding : RENDER[state];
+  $("#si-card").innerHTML = fn();
+  $("#si-card").style.animation = "none"; void $("#si-card").offsetWidth; $("#si-card").style.animation = "";
+  $("#si-art-quote").textContent = QUOTES[state] || QUOTES.recognized;
+  document.querySelectorAll(".si-switch button").forEach(b=>b.setAttribute("aria-pressed", String(b.dataset.state===state)));
+
+  // landing auto-resolves to recognized
+  if (state==="landing" && !opts.expired) {
+    setTimeout(()=>{ if ($(".si-switch button[data-state=landing]").getAttribute("aria-pressed")==="true") { setState("recognized"); TWW.toast("Welcome back, "+USER.name+" — you're signed in"); } }, 2200);
+  }
+}
+
+/* delegated interactions */
+document.addEventListener("click", (e)=>{
+  const sw = e.target.closest(".si-switch button");
+  if (sw) { setState(sw.dataset.state); return; }
+  const goto = e.target.closest("[data-goto]");
+  if (goto) { e.preventDefault(); setState(goto.dataset.goto); return; }
+  const act = e.target.closest("[data-act]");
+  if (!act) return;
+  if (act.dataset.act==="resend") TWW.toast("Magic link re-sent to "+USER.email);
+  if (act.dataset.act==="changeemail") setState("unknown");
+  if (act.dataset.act==="editfield") TWW.toast("Editing: "+act.dataset.field);
+});
+
+/* form validation (not-recognized) */
+document.addEventListener("submit",(e)=>{
+  if (e.target.id!=="si-form") return;
+  e.preventDefault();
+  const input = $("#si-email"), err = $("#si-email-err");
+  const ok = /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(input.value.trim());
+  if (!ok) { input.setAttribute("aria-invalid","true"); err.setAttribute("data-show","true"); input.focus(); return; }
+  input.removeAttribute("aria-invalid"); err.removeAttribute("data-show");
+  USER.email = input.value.trim();
+  setState("sent");
+});
+
+setState("recognized");
+</script>
+</body>
+</html>
