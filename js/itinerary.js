@@ -84,7 +84,7 @@ TWW.mountShell({ active: "itinerary" });
           <div class="it-head__party" aria-label="Travelers">
             ${TRAVELERS.map(t => `<span class="av" title="${t.name}">${t.initial}</span>`).join("")}
           </div>
-          <button class="btn btn-secondary" data-tw-concierge>${ICON("sparkle", "ic-sm")} Speak with Claude</button>
+          <button class="btn btn-secondary" data-tw-concierge>${ICON("sparkle", "ic-sm")} Speak with Atlas</button>
         </div>
       </div>
       <div class="it-summary">
@@ -263,7 +263,7 @@ TWW.mountShell({ active: "itinerary" });
       <p>You haven't added anything yet. Pick a way you love to travel and we'll start building — every choice lands here automatically, always saved.</p>
       <div class="it-empty__actions">
         <a class="btn btn-primary" href="special-interests.html" style="height:54px;padding:0 28px;font-size:16px">Design your journey →</a>
-        <button class="btn btn-secondary" style="height:54px" data-tw-concierge>${ICON("sparkle", "ic-sm")} Speak with Claude</button>
+        <button class="btn btn-secondary" style="height:54px" data-tw-concierge>${ICON("sparkle", "ic-sm")} Speak with Atlas</button>
       </div>
     </div>`;
   }

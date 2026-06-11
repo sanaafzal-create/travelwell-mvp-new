@@ -153,7 +153,7 @@
       <div class="tw-concierge__head">
         <div class="tw-concierge__avatar">${ICON("sparkles")}</div>
         <div style="flex:1">
-          <div class="tw-concierge__title">Speak with Claude</div>
+          <div class="tw-concierge__title">Speak with Atlas</div>
           <div class="tw-concierge__sub"><span class="dot"></span> Your Concierge · powered by Claude</div>
         </div>
         <button class="tw-iconbtn" data-tw-close="concierge" aria-label="Close Concierge" style="width:36px;height:36px;border:0;background:var(--surface-alt)">${ICON("close","ic-sm")}</button>
@@ -282,7 +282,7 @@
           </div>
           <button class="tw-iconbtn tw-iconbtn--emergency" data-tw-emergency aria-label="Emergency help">${ICON("cross")}</button>
           <button class="tw-iconbtn" data-tw-tray aria-label="Your Trip">${ICON("bag2")}<span class="badge" id="tw-trip-badge" hidden>0</span></button>
-          <button class="tw-talk-btn" data-tw-concierge>${ICON("sparkles","ic-sm")} <span class="lbl">Speak with Claude</span></button>
+          <button class="tw-talk-btn" data-tw-concierge>${ICON("sparkles","ic-sm")} <span class="lbl">Speak with Atlas</span></button>
         </div>
       </div>
     </header>`;

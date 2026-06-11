@@ -41,7 +41,7 @@
 .it-main { min-width: 0; }
 
 /* day nav */
-.it-daynav { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; margin-bottom: 24px; }ckdrop-filter: blur(8px); padding: 10px 0; z-index: 30; }
+.it-daynav { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; margin-bottom: 24px; padding: 10px 0; }
 .it-daynav::-webkit-scrollbar { display: none; }
 .it-daynav__btn { border: 1px solid var(--border); background: var(--card); border-radius: var(--radius); padding: 9px 16px; cursor: pointer; font-family: var(--font-sans); white-space: nowrap; text-align: center; transition: border-color .15s, background-color .15s; flex: none; }
 .it-daynav__btn:hover { border-color: color-mix(in oklch, var(--primary) 40%, var(--border)); }
